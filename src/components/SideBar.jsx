@@ -9,12 +9,21 @@ function SideBar() {
                 <div className="p-4">
                     <h2 className="text-lg font-semibold">OCC</h2>
                     <ul className="mt-4">
-                            <li>
-                                <Link to="/department">Department</Link>
-                            </li>
-                            <li>
-                                <Link to="/rooms">Rooms</Link>
-                            </li>
+                        <li>
+                            <Link to="/school-year">School year</Link>
+                        </li>
+                        <li>
+                            <Link to="/department">Department</Link>
+                        </li>
+                        <li>
+                            <Link to="/rooms">Rooms</Link>
+                        </li>
+                        <li>
+                            <Link to="/faculty-list">Faculty</Link>
+                        </li>
+                        <li>
+                            <Link to="/student-list">Student</Link>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -28,7 +37,7 @@ function SideBar() {
 
                 {/* Content */}
                 <div className="flex-grow p-6 bg-[#F0F4F8] overflow-auto">
-                    <Outlet/>
+                    <Outlet />
                 </div>
             </div>
         </div>

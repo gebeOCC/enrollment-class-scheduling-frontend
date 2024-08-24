@@ -31,19 +31,19 @@ function Department() {
     const saveDepartment = async (event) => {
         event.preventDefault();
         setSubmitting(true);
-        try {
-            const response = await axiosInstance.post(`add-department/`, deptForm);
-            if (response.data.message === "success") {
-                closeModal();
-                setDeptForm({
-                    department_name: '',
-                    department_name_abbreviation: '',
-                });
-                setDepartmentsCourses(response.data.department);
-            }
-        } finally {
-            setSubmitting(false);
-        }
+        await axiosInstance.post(`add-department/`, deptForm)
+            .then(response => {
+                if (response.data.message === "success") {
+                    closeModal();
+                    setDeptForm({
+                        department_name: '',
+                        department_name_abbreviation: '',
+                    });
+                    setDepartmentsCourses(response.data.department);
+                }
+            }).finally(() => {
+                setSubmitting(false);
+            })
     };
 
     useEffect(() => {
@@ -72,19 +72,19 @@ function Department() {
     const submitCourse = async (event) => {
         event.preventDefault();
         setSubmitting(true);
-        try {
-            const response = await axiosInstance.post(`add-course/`, courseForm);
-            if (response.data.message === "success") {
-                setCourseForm({
-                    id: '',
-                    course_name: '',
-                    course_name_abbreviation: '',
-                });
-                setDepartmentsCourses(response.data.department);
-            }
-        } finally {
-            setSubmitting(false);
-        }
+        await axiosInstance.post(`add-course/`, courseForm)
+            .then(response => {
+                if (response.data.message === "success") {
+                    setCourseForm({
+                        id: '',
+                        course_name: '',
+                        course_name_abbreviation: '',
+                    });
+                    setDepartmentsCourses(response.data.department);
+                }
+            }).finally(() => {
+                setSubmitting(false);
+            })
     };
 
     return (

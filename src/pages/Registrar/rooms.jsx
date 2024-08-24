@@ -26,7 +26,7 @@ function Rooms() {
             console.log(response.data)
             if (response.data.message === "success") {
                 setRooms(response.data.rooms);
-                setIsRoomModalOpen(false);
+                setRoomName("");
             }
         } finally {
             setSubmitting(false);
@@ -159,7 +159,7 @@ function Rooms() {
                                     className="bg-thirdColor text-white py-1 px-3 rounded-md mr-2"
                                     onClick={() => { setIsRoomModalOpen(false) }}
                                 >
-                                    Cancel
+                                    Close
                                 </button>
                                 <button
                                     disabled={submitting}
