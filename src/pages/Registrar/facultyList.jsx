@@ -356,7 +356,7 @@ function FacultyList() {
                                 Submit
                             </button>
                             <button
-                                type="submit"
+                                type="button"
                                 onClick={() => setIsFacultyModalOpen(false)}
                                 className="w-full border border-thirdColor text-thirdColor py-2 rounded-md hover:bg-thirdColor hover:text-white">
                                 Cancel

@@ -1,22 +1,21 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import Department from "../pages/registrar/department";
-import SideBar from "../components/SideBar";
 import Rooms from "../pages/Registrar/rooms";
 import FacultyList from "../pages/Registrar/facultyList";
 import Studentlist from "../pages/Registrar/studentList";
-function Registrar() {
+import SchoolYear from "../pages/Registrar/schoolYear";
+
+function RegistrarRoutes() {
     return (
-        <BrowserRouter>
-            <Routes>
-                <Route path="/" element={<SideBar />}>
-                    <Route path="/department" element={<Department />} />
-                    <Route path="/rooms" element={<Rooms />} />
-                    <Route path="/faculty-list" element={<FacultyList />} />
-                    <Route path="/student-list" element={<Studentlist />} />
-                </Route>
-            </Routes>
-        </BrowserRouter>
-    )
+        <Routes>
+            {/* Define all routes related to registrar here */}
+            <Route path="/department" element={<Department />} />
+            <Route path="/rooms" element={<Rooms />} />
+            <Route path="/faculty-list" element={<FacultyList />} />
+            <Route path="/student-list" element={<Studentlist />} />
+            <Route path="/school-year" element={<SchoolYear />} />
+        </Routes>
+    );
 }
 
-export default Registrar
+export default RegistrarRoutes;
