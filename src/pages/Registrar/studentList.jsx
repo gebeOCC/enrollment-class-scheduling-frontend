@@ -117,7 +117,7 @@ function Studentlist() {
                             value={searchBar}
                             onChange={(e) => { setSearchBar(e.target.value) }}
                             type="text"
-                            placeholder="Search faculty..."
+                            placeholder="Search student..."
                             className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" />
                         <button
                             onClick={() => { setIsStudentModalOpen(true) }}
@@ -131,10 +131,10 @@ function Studentlist() {
                     <thead>
                         <tr className="w-full bg-[#00b6cf] text-white text-left">
                             <th className="py-2 px-4">#</th>
-                            <th className="py-2 px-4">Faculty ID no.</th>
+                            <th className="py-2 px-4">Student ID no.</th>
                             <th className="py-2 px-4">Name</th>
                             <th className="py-2 px-4">Email</th>
-                            <th className="py-2 px-4">Department</th>
+                            <th className="py-2 px-4">Contact no.</th>
                             <th className="py-2 px-4">Action</th>
                         </tr>
                     </thead>
@@ -171,7 +171,7 @@ function Studentlist() {
             {isStudentModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
                     <div className="bg-white p-6 rounded-md w-2/4">
-                        <h2 className="text-3xl font-bold text-center mb-6">Add Faculty</h2>
+                        <h2 className="text-3xl font-bold text-center mb-6">Add Student</h2>
 
                         <form>
                             <div className="grid grid-cols-3 gap-4 mb-4">

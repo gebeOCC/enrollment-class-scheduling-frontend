@@ -1,12 +1,28 @@
 import { useState } from "react";
+import axiosInstance from "../../../axios/axiosInstance";
 
 function LoginPage() {
-    const [idNumber, setIdNumber] = useState("");
-    const [password, setPassword] = useState("");
+    const [form, setForm] = useState({
+        user_id_no: '',
+        password: ''
+    })
 
-    const handleLogin = () => {
-        // Handle login logic here
-        console.log("Logging in with ID No:", idNumber, "and Password:", password);
+    const handleFormChange = (e) => {
+        setForm(prev => ({
+            ...prev,
+            [e.target.name]: e.target.value
+        }));
+    };
+
+    const handleLogin = async () => {
+        console.log("Logging in with ID No:", form.user_id_no, "and Password:", form.password);
+        await axiosInstance.post('/login', form)
+            .then(response => {
+                console.log(response.data)
+                if(response.data.user_role === 'registrar'){
+                    window.location.reload('/department');
+                }
+            })
     };
 
     const handleForgotPassword = () => {
@@ -27,8 +43,9 @@ function LoginPage() {
                     <input
                         type="text"
                         id="idNumber"
-                        value={idNumber}
-                        onChange={(e) => setIdNumber(e.target.value)}
+                        value={form.user_id_no}
+                        name="user_id_no"
+                        onChange={handleFormChange}
                         className="mt-1 block w-full px-4 py-2 border rounded-md text-gray-900"
                         placeholder="Enter your ID Number"
                     />
@@ -42,8 +59,9 @@ function LoginPage() {
                     <input
                         type="password"
                         id="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        value={form.password}
+                        name="password"
+                        onChange={handleFormChange}
                         className="mt-1 block w-full px-4 py-2 border rounded-md text-gray-900"
                         placeholder="Enter your password"
                     />
