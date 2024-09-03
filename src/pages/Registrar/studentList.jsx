@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import axiosInstance from "../../../axios/axiosInstance"
 function Studentlist() {
+    const [submitting, setSubmitting] = useState(false);
     const [searchBar, setSearchBar] = useState('')
     const [students, setStudents] = useState([])
 
@@ -14,81 +15,24 @@ function Studentlist() {
     const [isStudentModalOpen, setIsStudentModalOpen] = useState(false)
     const [isDefaultChecked, setIsDefaultChecked] = useState(true);
     const [form, setForm] = useState({
-        user_id_no: 'J',
-        password: 'J',
+        user_id_no: '',
+        password: '',
         user_role: 'student',
-        first_name: 'j',
-        last_name: 'j',
-        middle_name: 'j',
-        gender: 'male',
-        birthday: '2024-08-06',
-        contact_number: '09999999999',
-        email_address: 'john@gmail.com',
-        present_address: 'john',
-        zip_code: '9090',
+        first_name: '',
+        last_name: '',
+        middle_name: '',
+        gender: '',
+        birthday: '',
+        contact_number: '',
+        email_address: '',
+        present_address: '',
+        zip_code: '',
     })
 
     const handleFormChange = (e) => {
         setForm(prev => ({
             ...prev,
             [e.target.name]: e.target.value
-        }));
-    };
-
-    const handleGenderChange = (e) => {
-        setForm(prev => ({
-            ...prev,
-            gender: e.target.value
-        }));
-    };
-
-    const lastName = form.last_name.toLowerCase();
-    const birthYear = form.birthday.split('-')[0];
-    const defaultPassword = lastName + birthYear;
-
-    const defaultPasswordChange = () => {
-        if (isDefaultChecked) {
-            setForm(prev => ({
-                ...prev,
-                password: defaultPassword
-            }));
-        }
-    }
-
-    const submitUserInfo = async (event) => {
-        event.preventDefault();
-        console.log(form)
-        // setSubmitting(true);
-        await axiosInstance.post(`add-student/`, form)
-            .then(response => {
-                if (response.data.message === "success") {
-                    setForm({
-                        user_id_no: '',
-                        password: '',
-                        user_role: 'student',
-                        first_name: '',
-                        last_name: '',
-                        middle_name: '',
-                        gender: '',
-                        birthday: '',
-                        contact_number: '',
-                        email_address: '',
-                        present_address: '',
-                        zip_code: '',
-                    });
-                    setIsFacultyModalOpen(false)
-                    // setDepartmentsCourses(response.data.department);
-                }
-                console.log(response.data)
-            }).finally(() => {
-                // setSubmitting(false);
-            })
-    }
-
-    const handleToUpperCase = (field) => {
-        setForm((prev) => ({
-            ...prev,
-            [field]: prev[field].toUpperCase(),
         }));
     };
 
@@ -107,7 +51,68 @@ function Studentlist() {
         }
     }, [form.first_name, form.last_name, form.middle_name, form.present_address]);
 
-    return(
+    const handleGenderChange = (e) => {
+        setForm(prev => ({
+            ...prev,
+            gender: e.target.value
+        }));
+    };
+
+
+    const lastName = form.last_name.toLowerCase();
+    const birthYear = form.birthday.split('-')[0];
+    const defaultPassword = lastName + birthYear;
+
+    const defaultPasswordChange = () => {
+        if (isDefaultChecked) {
+            setForm(prev => ({
+                ...prev,
+                password: defaultPassword
+            }));
+        }
+    }
+
+    const submitUserInfo = async (event) => {
+        event.preventDefault();
+        setSubmitting(true);
+        console.log(form)
+        await axiosInstance.post(`add-student/`, form)
+            .then(response => {
+                if (response.data.message === "success") {
+                    setForm({
+                        user_id_no: '',
+                        password: '',
+                        user_role: 'student',
+                        first_name: '',
+                        last_name: '',
+                        middle_name: '',
+                        gender: '',
+                        birthday: '',
+                        contact_number: '',
+                        email_address: '',
+                        present_address: '',
+                        zip_code: '',
+                    });
+                    setIsStudentModalOpen(false)
+                }
+                console.log(response.data)
+            }).finally(() => {
+                setSubmitting(false);
+            })
+    }
+
+    const handleToUpperCase = (field) => {
+        setForm((prev) => ({
+            ...prev,
+            [field]: prev[field].toUpperCase(),
+        }));
+    };
+
+    useEffect(() => {
+        defaultPasswordChange()
+    }, [form.last_name, form.birthday, isDefaultChecked])
+
+    return (
         <>
             <div className="p-6 bg-white shadow-md rounded-lg">
                 <div className="flex justify-between items-center mb-4">
@@ -281,7 +286,7 @@ function Studentlist() {
                             </div>
 
                             <div className="mb-4">
-                                <label className="block text-sm font-medium mb-1">Faculty ID no.</label>
+                                <label className="block text-sm font-medium mb-1">Student ID no.</label>
                                 <input
                                     value={form.user_id_no}
                                     name="user_id_no"
@@ -313,6 +318,7 @@ function Studentlist() {
                             </div>
 
                             <button
+                                disabled={submitting}
                                 type="submit"
                                 onClick={submitUserInfo}
                                 className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 mb-2">
