@@ -90,44 +90,48 @@ function Department() {
 
     const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
     const [facultyAssign, setFacultyAssign] = useState({
-        faculty_id: '',
         department_id: '',
     });
 
-    const submitAssign = async (e) => {
-        e.preventDefault();
-        await axiosInstance.post(`assign-program-head`, facultyAssign)
+    const [deptFaculties, setDeptFaculties] = useState([]);
+
+    useEffect(() => {
+        const getDeptFaculty = async () => {
+            await axiosInstance.get(`get-department-faculties/${facultyAssign.department_id}`)
+                .then(response => {
+                    setDeptFaculties(response.data)
+                });
+        }
+        if (facultyAssign.department_id) {
+            getDeptFaculty()
+        }
+    }, [facultyAssign.department_id])
+
+    const [isAssignNewModalOpen, setIsAssignNewModalOpen] = useState(false);
+    const [searchFaculty, setSearchFaculty] = useState("");
+
+
+    const submitAssign = async (id) => {
+        console.log(id)
+        await axiosInstance.post(`assign-program-head`, { department_id: facultyAssign.department_id, faculty_id: id })
             .then(response => {
                 if (response.data.message === "success") {
                     setDepartmentsCourses(response.data.departments);
                     setIsAssignModalOpen(false)
                     setFacultyAssign({
-                        faculty_id: '',
                         department_id: '',
                     });
+                    setSearchFaculty('')
                 }
                 console.log(response.data)
             })
     }
-
-    const [isAssignNewModalOpen, setIsAssignNewModalOpen] = useState(false);
-    const [facultyAssignNew, setFacultyAssignNew] = useState({
-        faculty_id: '',
-        department_id: '',
-    });
-
-    const submitAssignNew = async (e) => {
-        e.preventDefault();
-        console.log(facultyAssignNew)
-        await axiosInstance.post(`assign-new-program-head`, facultyAssignNew)
+    const submitAssignNew = async (id) => {
+        await axiosInstance.post(`assign-new-program-head`, { department_id: facultyAssign.department_id, faculty_id: id })
             .then(response => {
                 if (response.data.message === "success") {
                     setDepartmentsCourses(response.data.departments);
                     setIsAssignNewModalOpen(false)
-                    setFacultyAssignNew({
-                        faculty_id: '',
-                        department_id: '',
-                    });
                 }
                 console.log(response.data)
             })
@@ -149,7 +153,7 @@ function Department() {
                                 {department.full_name}
                             </h1>
 
-                            {department.user_id_no == null ? (
+                            {department.full_name == null ? (
                                 <button
                                     className="bg-secondaryColor text-white px-2 rounded-md hover:bg-blue-600 transition duration-200 ease-in-out mb-2"
                                     onClick={() => {
@@ -162,10 +166,10 @@ function Department() {
                                 >Assign Department Head</button>
                             ) : (
                                 <button
-                                        className="bg-secondaryColor text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-200 ease-in-out mb-2"
+                                    className="bg-secondaryColor text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-200 ease-in-out mb-2"
                                     onClick={() => {
                                         setIsAssignNewModalOpen(!isAssignModalOpen),
-                                            setFacultyAssignNew(prev => ({
+                                            setFacultyAssign(prev => ({
                                                 ...prev,
                                                 department_id: department.id
                                             }));
@@ -316,41 +320,65 @@ function Department() {
 
             {isAssignModalOpen &&
                 (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-                        <div className="bg-white p-6 rounded-md w-1/1">
-                            <h2 className="text-lg font-bold mb-4">Assign Program Head</h2>
-                            <form>
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+                        <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg">
+                            <h2 id="modal-title" className="text-lg font-bold mb-4 text-gray-900">Assign Program Head</h2>
+                            <form onSubmit={submitAssign}>
+                                {/* Search Input */}
                                 <div className="mb-4">
-                                    <label className="block text-gray-700">Faculty ID no:</label>
+                                    <label htmlFor="faculty-search" className="block text-gray-700 font-medium mb-2">
+                                        Search Faculty:
+                                    </label>
                                     <input
+                                        id="faculty-search"
                                         type="text"
-                                        value={facultyAssign.faculty_id}
+                                        value={searchFaculty}
                                         name="faculty_id"
-                                        onChange={(e) => {
-                                            setFacultyAssign(prev => ({
-                                                ...prev,
-                                                faculty_id: e.target.value
-                                            }));
-                                        }}
-                                        className="w-full px-3 py-2 border rounded-md"
-                                        placeholder="Enter Department Name"
+                                        onChange={(e) => setSearchFaculty(e.target.value)}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primaryColor focus:border-transparent"
+                                        placeholder="Enter faculty name or ID"
+                                        aria-label="Search for faculty members"
                                     />
                                 </div>
-                                <div className="flex justify-end">
+
+                                {/* Faculty List */}
+                                <div className="mb-4 max-h-60 overflow-y-auto">
+                                    {searchFaculty ? (
+                                        <ul className="divide-y divide-gray-200">
+                                            {deptFaculties
+                                                .filter(deptFaculty =>
+                                                    deptFaculty.full_name.toLowerCase().includes(searchFaculty.toLowerCase()) ||
+                                                    deptFaculty.user_id_no.toLowerCase().includes(searchFaculty.toLowerCase())
+                                                )
+                                                .map((deptFaculty, index) => (
+                                                    <li key={index} className="p-2 flex justify-between items-center hover:bg-gray-50 transition-colors">
+                                                        <div>
+                                                            <span className="font-medium text-gray-900">{deptFaculty.user_id_no}</span> -
+                                                            <span className="ml-2 text-gray-700">{deptFaculty.full_name}</span>
+                                                        </div>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => { submitAssign(deptFaculty.id) }}
+                                                            className={`bg-primaryColor text-white py-2 px-4 rounded-md hover:bg-primaryColor-dark transition ${submitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                        >
+                                                            {submitting ? 'Assigning...' : 'Assign'}
+                                                        </button>
+                                                    </li>
+                                                ))}
+                                        </ul>
+                                    ) : (
+                                        <p className="text-gray-500">Start typing to search for faculty members.</p>
+                                    )}
+                                </div>
+
+                                {/* Action Buttons */}
+                                <div className="flex justify-start space-x-2 mt-4">
                                     <button
                                         type="button"
-                                        className="bg-thirdColor text-white py-1 px-3 rounded-md mr-2"
-                                        onClick={() => { setIsAssignModalOpen(!isAssignModalOpen) }}
+                                        className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 transition"
+                                        onClick={() => setIsAssignModalOpen(false)}
                                     >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        disabled={submitting}
-                                        type="submit"
-                                        className="bg-primaryColor text-white py-1 px-3 rounded-md"
-                                        onClick={submitAssign}
-                                    >
-                                        Assign
+                                        Close
                                     </button>
                                 </div>
                             </form>
@@ -365,37 +393,65 @@ function Department() {
                         <div className="bg-white p-6 rounded-md w-1/1">
                             <h2 className="text-lg font-bold mb-4">Assign New Program Head</h2>
                             <form>
+                                {/* Search Input */}
                                 <div className="mb-4">
-                                    <label className="block text-gray-700">Faculty ID no:</label>
+                                    <label htmlFor="faculty-search" className="block text-gray-700 font-medium mb-2">
+                                        Search Faculty:
+                                    </label>
                                     <input
+                                        id="faculty-search"
                                         type="text"
-                                        value={facultyAssignNew.faculty_id}
+                                        value={searchFaculty}
                                         name="faculty_id"
-                                        onChange={(e) => {
-                                            setFacultyAssignNew(prev => ({
-                                                ...prev,
-                                                faculty_id: e.target.value
-                                            }));
-                                        }}
-                                        className="w-full px-3 py-2 border rounded-md"
-                                        placeholder="Enter Department Name"
+                                        onChange={(e) => setSearchFaculty(e.target.value)}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primaryColor focus:border-transparent"
+                                        placeholder="Enter faculty name or ID"
+                                        aria-label="Search for faculty members"
                                     />
                                 </div>
-                                <div className="flex justify-end">
+
+                                {/* Faculty List */}
+                                <div className="mb-4 max-h-60 overflow-y-auto">
+                                    {searchFaculty ? (
+                                        <ul className="divide-y divide-gray-200">
+                                            {deptFaculties
+                                                .filter(deptFaculty =>
+                                                    deptFaculty.full_name.toLowerCase().includes(searchFaculty.toLowerCase()) ||
+                                                    deptFaculty.user_id_no.toLowerCase().includes(searchFaculty.toLowerCase())
+                                                )
+                                                .map((deptFaculty, index) => (
+                                                    <li key={index} className="p-2 flex justify-between items-center hover:bg-gray-50 transition-colors">
+                                                        <div>
+                                                            <span className="font-medium text-gray-900">{deptFaculty.user_id_no}</span> -
+                                                            <span className="ml-2 text-gray-700">{deptFaculty.full_name}</span>
+                                                        </div>
+                                                        <button
+                                                            disabled={deptFaculty.user_role == 'program_head'}
+                                                            type="button"
+                                                            onClick={() => { submitAssignNew(deptFaculty.id) }}
+                                                            className={`${deptFaculty.user_role == 'program_head' || submitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-primaryColor hover:bg-primaryColor-dark'
+                                                                } text-white py-2 px-4 rounded-md transition ${submitting ? 'opacity-50' : ''
+                                                                }`}
+                                                        >
+                                                            {submitting ? 'Assigning...' : 'Assign'}
+                                                        </button>
+
+                                                    </li>
+                                                ))}
+                                        </ul>
+                                    ) : (
+                                        <p className="text-gray-500">Start typing to search for faculty members.</p>
+                                    )}
+                                </div>
+
+                                {/* Action Buttons */}
+                                <div className="flex justify-start space-x-2 mt-4">
                                     <button
                                         type="button"
-                                        className="bg-thirdColor text-white py-1 px-3 rounded-md mr-2"
+                                        className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 transition"
                                         onClick={() => { setIsAssignNewModalOpen(!isAssignNewModalOpen) }}
                                     >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        disabled={submitting}
-                                        type="submit"
-                                        className="bg-primaryColor text-white py-1 px-3 rounded-md"
-                                        onClick={submitAssignNew}
-                                    >
-                                        Assign
+                                        Close
                                     </button>
                                 </div>
                             </form>
