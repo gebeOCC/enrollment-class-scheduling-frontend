@@ -11,6 +11,7 @@ import SchoolYearDetails from "./pages/Registrar/SchoolYearDetails";
 import { useAuth } from "./context/AuthContext";
 import Courses from "./pages/ProgramHead/Courses";
 import CourseInfo from "./pages/ProgramHead/CourseInfo";
+import Curriculum from "./pages/ProgramHead/curriculum";
 
 function App() {
     const { userRole, fetching } = useAuth();
@@ -38,6 +39,7 @@ function App() {
             <Route path="/" element={<Navigate to="/courses" />} />
             <Route path="/courses" element={<Courses />} />
             <Route path="/courses/:courseid" element={<CourseInfo />} />
+            <Route path="/courses/:courseid/curriculum" element={<Curriculum />} />
             <Route path="*" element={<Navigate to="/courses" />} />
         </>
     );
