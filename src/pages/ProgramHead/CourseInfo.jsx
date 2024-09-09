@@ -46,10 +46,10 @@ function CourseInfo() {
         console.log(courseid, schoolYearId)
         await axiosInstance.post(`add-course-curriculum/${courseid}`, { school_year_id: schoolYearId })
             .then(response => {
-                // if (response.data.message === 'success') {
-                //     setIsModalOpen(false);
-                //     showToast('Added successfully!', 'success')
-                // }
+                if (response.data.message === 'success') {
+                    setIsModalOpen(false);
+                    showToast('Added successfully!', 'success')
+                }
                 console.log(response.data)
             });
     };

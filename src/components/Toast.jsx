@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CSSTransition } from 'react-transition-group';
-import './Toast.css'; // Import the custom CSS for animations
+import './Toast.css';
 
 let toastHandler = null;
 
@@ -11,7 +11,6 @@ const Toast = () => {
         toastHandler = ({ message, type }) => {
             setToast({ show: true, message, type });
 
-            // Hide the toast after 3 seconds
             setTimeout(() => {
                 setToast({ show: false, message: '', type: '' });
             }, 3000);
