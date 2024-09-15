@@ -5,15 +5,38 @@ import Toast from '../../components/Toast';
 import { showToast } from '../../components/Toast';
 
 function Curriculum() {
-    const [submitting, setSubmitting] = useState(false);
     const { courseid } = useParams();
     const [searchParams] = useSearchParams();
     const schoolYear = searchParams.get('school_year');
-    const [courseName, setCourseName] = useState('');
-    const [yearLevels, setYearLevels] = useState([]);
+
+    const [submitting, setSubmitting] = useState(false);
     const [editing, setEditing] = useState(false);
-    const [semesters, setSemesters] = useState([]);
+
+    const [courseName, setCourseName] = useState('');
     const [curriculumId, setCurriculumId] = useState(0);
+
+    const [yearLevels, setYearLevels] = useState([]);
+    const [semesters, setSemesters] = useState([]);
+    const [subjects, setSubjects] = useState([]);
+
+    const [addSemester, setAddSemester] = useState({
+        id: '',
+        semester_id: '',
+        year_level_id: '',
+        semester_name: '',
+        curriculum_id: curriculumId,
+    })
+
+    const [subjectForm, setSubjectForm] = useState({
+        subject_id: '',
+        curriculum_term_id: 0,
+        subject_code: '',
+        descriptive_title: '',
+        credit_units: '',
+        lecture_hours: '',
+        laboratory_hours: '',
+        pre_requisite_subject_id: '',
+    })
 
     const getYearLevels = async () => {
         await axiosInstance.get(`get-curriculum-terms-subjects/${courseid}/${schoolYear}`)
@@ -23,7 +46,6 @@ function Curriculum() {
                 setCurriculumId(response.data.curriculumId);
             });
     };
-
 
     useEffect(() => {
         const getCourseName = async () => {
@@ -47,31 +69,6 @@ function Curriculum() {
     const toggleEditing = () => {
         setEditing(!editing);
     };
-
-
-    // const schoolYearsData = schoolYears.map((schoolYear) => (
-    //     <>
-    //         {schoolYear.semester_name === 'First' &&
-    //             <option key={schoolYear.id} value={schoolYear.id}>
-    //                 {schoolYear.school_year} {schoolYear.semester_name}-Semester
-    //             </option>
-    //         }
-    //     </>
-    // ));
-
-    // schoolYearsData.unshift(
-    //     <option key="default" disabled value="">
-    //         Select school year...
-    //     </option>
-    // );
-
-    const [addSemester, setAddSemester] = useState({
-        id: '',
-        semester_id: '',
-        year_level_id: '',
-        semester_name: '',
-        curriculum_id: curriculumId,
-    })
 
     let termLength = 0;
     useEffect(() => {
@@ -117,12 +114,89 @@ function Curriculum() {
             })
     }
 
+    const subjectCodeExist = (subjectCode) => {
+        const subject = subjects.find(subject => subject.subject_code === subjectCode);
+
+        if (subject) {
+            setSubjectForm(prev => ({
+                ...prev,
+                subject_code: subject.subject_code,
+                subject_id: subject.id,
+                descriptive_title: subject.descriptive_title,
+                credit_units: subject.credit_units,
+                lecture_hours: subject.lecture_hours,
+                laboratory_hours: subject.laboratory_hours
+            }));
+        } else {
+            setSubjectForm(prev => ({
+                ...prev,
+                subject_id: '',
+                descriptive_title: '',
+                credit_units: '',
+                lecture_hours: '',
+                laboratory_hours: ''
+            }));
+        }
+    };
+
+
+    const [typingTimeout, setTypingTimeout] = useState(null);
+
+    const handleSubjectFormChange = (e) => {
+        setSubjectForm(prev => ({
+            ...prev,
+            [e.target.name]: e.target.name === 'subject_code' ? e.target.value.toUpperCase() : e.target.value
+        }))
+
+        if (e.target.name === 'subject_code') {
+            if (typingTimeout) {
+                clearTimeout(typingTimeout);
+            }
+
+            const newTimeout = setTimeout(() => {
+                subjectCodeExist(e.target.value)
+            }, 1000);
+
+            setTypingTimeout(newTimeout);
+        }
+    }
+
+    const submitSubjectForm = async () => {
+        await axiosInstance.post(`add-curr-term-subject`, subjectForm)
+            .then(response => {
+                console.log(response.data)
+            })
+        // console.log(subjectForm)
+    }
+
+    const getSubjects = async () => {
+        if (subjects.length < 1) {
+            await axiosInstance.get(`get-subjects`)
+                .then(response => {
+                    setSubjects(response.data)
+                    console.log(response.data)
+                })
+        }
+    }
+
+    const subjectsData = subjects.map((subject) => (
+        <option key={subject.id} value={subject.id}>
+            {subject.subject_code}
+        </option>
+    ));
+
+    subjectsData.unshift(
+        <option key="default" value="">
+            none
+        </option>
+    );
+
     return (
         <div className="container mx-auto p-6">
             <div className="flex justify-between items-center mb-6">
                 {courseName &&
                     <>
-                        <h1 className="text-3xl font-bold text-primaryColor">
+                        <h1 className="text-4xl font-bold text-blue-600">
                             {courseName} ({schoolYear})
                         </h1>
 
@@ -138,81 +212,217 @@ function Curriculum() {
 
             <div className="space-y-6">
                 {yearLevels.map((yearLevel, yearIndex) => (
-                    <div key={yearIndex} className="bg-white shadow-md p-6 rounded-lg">
-                        <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-2xl font-semibold text-secondaryColor">
+                    <div key={yearIndex} className="bg-white shadow-lg p-6 rounded-xl border border-gray-200">
+                        <div className="flex justify-between items-center mb-2">
+                            <h2 className="text-2xl font-bold text-blue-600">
                                 {yearLevel.year_level_name}
                             </h2>
-                            {editing && (
-                                <>
-                                    {yearLevel.curriculum_term.length !== 3 &&
-                                        <button
-                                            onClick={() => {
-                                                setAddSemester(prev => ({
-                                                    ...prev,
-                                                    year_level_id: yearLevel.id
-                                                }));
-                                            }}
-                                            className="bg-green-500 text-white px-3 py-1 rounded-lg hover:bg-green-600 transition">
-                                            Add Semester
-                                        </button>
-                                    }
-                                </>
+                            {editing && yearLevel.curriculum_term.length !== 3 && (
+                                <button
+                                    onClick={() => {
+                                        setAddSemester(prev => ({
+                                            ...prev,
+                                            year_level_id: yearLevel.id,
+                                        }));
+                                    }}
+                                    className="bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 transition"
+                                >
+                                    Add Semester
+                                </button>
                             )}
                         </div>
 
                         {yearLevel.curriculum_term.map((curriculumTerm, termIndex) => (
-                            <div key={termIndex} className="mb-6">
-                                {/* Subject Table */}
-                                <div className="overflow-x-auto">
-                                    <table className="min-w-full bg-white border">
-                                        <thead className="bg-gray-100">
-                                            {/* Semester Name Row */}
-                                            <tr>
-                                                <th className="py-3 px-4 border text-lg font-semibold text-center bg-gray-200" colSpan="7">
-                                                    {curriculumTerm.semester_name} Semester
-                                                </th>
-                                            </tr>
-                                            {/* Column Headers */}
-                                            <tr>
-                                                <th className="py-2 px-4 border">Subject Code</th>
-                                                <th className="py-2 px-4 border">Descriptive Title</th>
-                                                <th className="py-2 px-4 border">Credit Units</th>
-                                                <th className="py-2 px-4 border">Lecture Hours</th>
-                                                <th className="py-2 px-4 border">Laboratory Hours</th>
-                                                <th className="py-2 px-4 border">Hrs/Week</th>
-                                                <th className="py-2 px-4 border">Pre-requisites</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {curriculumTerm.curriculum_term_subject.map((subject, subjectIndex) => (
-                                                <tr key={subjectIndex} className="text-center">
-                                                    <td className="py-2 px-4 border">{subject.subject_code}</td>
-                                                    <td className="py-2 px-4 border">{subject.descriptive_title}</td>
-                                                    <td className="py-2 px-4 border">{subject.credit_units}</td>
-                                                    <td className="py-2 px-4 border">{subject.lecture_hours}</td>
-                                                    <td className="py-2 px-4 border">{subject.laboratory_hours}</td>
-                                                    <td className="py-2 px-4 border">
-                                                        {Number(subject.lecture_hours) + Number(subject.laboratory_hours)}
-                                                    </td>
-                                                    <td className="py-2 px-4 border">{subject.pre_requisite_subject_code}</td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
+                            <div key={termIndex}>
+                                {/* Semester Section */}
+                                <div className="p-4 border border-gray-200 bg-gray-100 shadow-sm mb-4 rounded-md">
+                                    <h3 className="text-lg font-semibold">
+                                        {curriculumTerm.semester_name} Semester
+                                    </h3>
 
-                                {/* Add Subject Button */}
-                                {editing && (
-                                    <button className="bg-blue-500 text-white px-3 py-1 rounded-lg mt-4 hover:bg-blue-600 transition">
-                                        Add Subject
-                                    </button>
-                                )}
+                                    {/* Subject Table */}
+                                    <div className="overflow-x-auto text-xs">
+                                        <table className="min-w-full bg-white border border-gray-300 rounded-lg">
+                                            <thead>
+                                                <tr>
+                                                    <th className="py-2 px-4 border border-gray-400">Subject Code</th>
+                                                    <th className="py-2 px-4 border border-gray-400">Descriptive Title</th>
+                                                    <th className="py-2 px-4 border border-gray-400">Credit Units</th>
+                                                    <th className="py-2 px-4 border border-gray-400">Lecture Hours</th>
+                                                    <th className="py-2 px-4 border border-gray-400">Laboratory Hours</th>
+                                                    <th className="py-2 px-4 border border-gray-400">Hrs/Week</th>
+                                                    <th className="py-2 px-4 border border-gray-400">Pre-requisites</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {curriculumTerm.curriculum_term_subject.map((subject, subjectIndex) => (
+                                                    <tr key={subjectIndex} className="text-center hover:bg-gray-50">
+                                                        <td className="py-2 px-4 border border-gray-400">{subject.subject_code}</td>
+                                                        <td className="py-2 px-4 border border-gray-400">{subject.descriptive_title}</td>
+                                                        <td className="py-2 px-4 border border-gray-400">{subject.credit_units}</td>
+                                                        <td className="py-2 px-4 border border-gray-400">{subject.lecture_hours}</td>
+                                                        <td className="py-2 px-4 border border-gray-400">{subject.laboratory_hours}</td>
+                                                        <td className="py-2 px-4 border border-gray-400">
+                                                            {Number(subject.lecture_hours) + Number(subject.laboratory_hours)}
+                                                        </td>
+                                                        <td className="py-2 px-4 border border-gray-400">{subject.pre_requisite_subject_code || ''}</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    {editing && subjectForm.curriculum_term_id === curriculumTerm.id && (
+                                        <div className="mt-2 py-2 px-4 bg-white rounded-lg shadow-md">
+                                            <div className="grid grid-cols-11 gap-4 text-sm">
+                                                <div className="relative col-span-2">
+                                                    <label htmlFor="subject_code" className="truncate">Subject Code</label>
+                                                    <input
+                                                        value={subjectForm.subject_code}
+                                                        onChange={handleSubjectFormChange}
+                                                        name='subject_code'
+                                                        type="text"
+                                                        className="text-center h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                                    />
+
+                                                    {/* Conditionally render the dropdown */}
+                                                    {subjectForm.subject_code && (!subjectForm.subject_id) && (
+                                                        <div className="absolute left-0 right-0 bg-gray-100 max-h-32 overflow-y-auto z-10 mt-1">
+                                                            {subjects
+                                                                .filter(subject =>
+                                                                    subject.subject_code.toUpperCase().includes(subjectForm.subject_code.toUpperCase())
+                                                                )
+                                                                .map((subject, index) => (
+                                                                    <div
+                                                                        key={index}
+                                                                        className="px-2 py-1 hover:bg-gray-200 cursor-pointer"
+                                                                        onClick={() => {
+                                                                            setSubjectForm(prev => ({
+                                                                                ...prev,
+                                                                                subject_code: subject.subject_code,
+                                                                                subject_id: subject.id,
+                                                                                descriptive_title: subject.descriptive_title,
+                                                                                credit_units: subject.credit_units,
+                                                                                lecture_hours: subject.lecture_hours,
+                                                                                laboratory_hours: subject.laboratory_hours
+                                                                            }))
+                                                                        }}
+                                                                    >
+                                                                        {subject.subject_code}
+                                                                    </div>
+                                                                ))}
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                <div className='col-span-3'>
+                                                    <label htmlFor="descriptive_title" className="truncate">Descriptive Title</label>
+                                                    <input
+                                                        disabled={subjectForm.subject_id}
+                                                        value={subjectForm.descriptive_title}
+                                                        onChange={handleSubjectFormChange}
+                                                        name='descriptive_title'
+                                                        type="text"
+                                                        className="text-center h-8  w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                                    />
+                                                </div>
+
+                                                <div>
+                                                    <label htmlFor="credit_units" className="truncate">Credit Units</label>
+                                                    <input
+                                                        disabled={subjectForm.subject_id}
+                                                        value={subjectForm.credit_units}
+                                                        onChange={handleSubjectFormChange}
+                                                        name='credit_units'
+                                                        type="text"
+                                                        className="text-center h-8  w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                                    />
+                                                </div>
+
+                                                <div>
+                                                    <label htmlFor="lecture_hours" className="truncate">Lec Hours</label>
+                                                    <input
+                                                        disabled={subjectForm.subject_id}
+                                                        value={subjectForm.lecture_hours}
+                                                        onChange={handleSubjectFormChange}
+                                                        name='lecture_hours'
+                                                        type="text"
+                                                        className="text-center h-8  w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                                    />
+                                                </div>
+
+                                                <div>
+                                                    <label htmlFor="laboratory_hours" className="truncate">Lab Hours</label>
+                                                    <input
+                                                        disabled={subjectForm.subject_id}
+                                                        value={subjectForm.laboratory_hours}
+                                                        onChange={handleSubjectFormChange}
+                                                        name='laboratory_hours'
+                                                        type="text"
+                                                        className="text-center h-8  w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                                    />
+                                                </div>
+
+                                                <div className='col-span-2'>
+                                                    <label htmlFor="pre_requisite_subject_code" className="truncate">Pre-requisite</label>
+                                                    <select
+                                                        value={subjectForm.pre_requisite_subject_id}
+                                                        onChange={handleSubjectFormChange}
+                                                        name='pre_requisite_subject_id'
+                                                        type="text"
+                                                        className="text-center h-8  w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                                    >
+                                                        {subjectsData}
+                                                    </select>
+                                                </div>
+
+                                                <div className='flex gap-2 mt-5'>
+                                                    <button
+                                                        onClick={() => { setSubjectForm(prev => ({ ...prev, curriculum_term_id: 0 })); }}
+                                                        className="h-8 w-10 px-2 py-1 bg-gray-500 text-white hover:bg-gray-600 transition flex items-center justify-center"
+                                                    >
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
+                                                            <path fillRule="evenodd" d="M5.47 5.47a.75.75 0 0 1 1.06 0L12 10.94l5.47-5.47a.75.75 0 1 1 1.06 1.06L13.06 12l5.47 5.47a.75.75 0 1 1-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 0 1-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
+                                                        </svg>
+                                                    </button>
+
+                                                    <button
+                                                        onClick={submitSubjectForm}
+                                                        className="h-8 w-10 px-2 py-1 bg-blue-500 text-white hover:bg-blue-600 transition flex items-center justify-center"
+                                                    >
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
+                                                            <path fillRule="evenodd" d="M19.916 4.626a.75.75 0 0 1 .208 1.04l-9 13.5a.75.75 0 0 1-1.154.114l-6-6a.75.75 0 0 1 1.06-1.06l5.353 5.353 8.493-12.74a.75.75 0 0 1 1.04-.207Z" clipRule="evenodd" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Add Subject Button */}
+                                    {editing && subjectForm.curriculum_term_id === 0 && (
+                                        <div className="mt-2 flex justify-end">
+                                            <button
+                                                onClick={
+                                                    () => {
+                                                        setSubjectForm(prev => ({
+                                                            ...prev, curriculum_term_id: curriculumTerm.id
+                                                        }));
+                                                        getSubjects();
+                                                    }}
+                                                className="bg-blue-600 text-white px-3 py-1 hover:bg-blue-700 transition"
+                                            >
+                                                Add Subject
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         ))}
                     </div>
                 ))}
             </div>
+
             {addSemester.year_level_id && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
                     <div className="bg-white p-6 rounded-md w-1/4">

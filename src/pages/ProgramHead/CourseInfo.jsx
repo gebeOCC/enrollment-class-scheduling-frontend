@@ -72,12 +72,10 @@ function CourseInfo() {
 
     return (
         <div className="container mx-auto p-6">
-            {/* Course Name */}
             <h1 className="text-3xl font-bold text-primaryColor mb-6">
                 {courseName}
             </h1>
 
-            {/* Add Curriculum Button */}
             <div className="mb-6">
                 <button
                     className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-200"
@@ -87,7 +85,6 @@ function CourseInfo() {
                 </button>
             </div>
 
-            {/* Curriculums Section */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {curriculums.map((curriculum, index) => (
                     <Link to={`curriculum?school_year=${curriculum.school_year}`} key={index}>
@@ -99,7 +96,6 @@ function CourseInfo() {
                 ))}
             </div>
 
-            {/* Modal for Adding a New Curriculum */}
             {
                 isModalOpen && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
