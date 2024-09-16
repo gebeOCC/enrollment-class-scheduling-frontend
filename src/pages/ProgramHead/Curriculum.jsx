@@ -139,7 +139,6 @@ function Curriculum() {
         }
     };
 
-
     const [typingTimeout, setTypingTimeout] = useState(null);
 
     const handleSubjectFormChange = (e) => {

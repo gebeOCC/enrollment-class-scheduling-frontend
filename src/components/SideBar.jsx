@@ -4,11 +4,11 @@ import Header from "./Header";
 import { useAuth } from "../context/AuthContext";
 
 function SideBar() {
-    const { userRole, fetching } = useAuth();
-    console.log(userRole);
+    const { userRole, fetching, enrollmentOngoing, courses } = useAuth();
+    // console.log(userRole);
 
     if (fetching) {
-        return <div>Loading...</div>; // Show a loader or blank if fetching
+        return <div>Loading...</div>;
     }
 
     return (
@@ -127,8 +127,8 @@ function SideBar() {
                                         </li>
                                     </>
                                 );
-                            }else if(userRole === "program_head"){
-                                return(
+                            } else if (userRole === "program_head") {
+                                return (
                                     <>
                                         <li className="px-4">
                                             <NavLink
@@ -142,6 +142,39 @@ function SideBar() {
                                                 <span>Courses</span>
                                             </NavLink>
                                         </li>
+                                        {enrollmentOngoing &&
+                                            <>
+                                                <p className="px-4 text-sm text-gray-400">ENROLLMENT</p>
+                                                {courses.map((course, index) => (
+                                                    <li key={index} className="px-4">
+                                                        <NavLink
+                                                            to={`enrollment/${course.hashed_course_id}`}
+                                                            className={({ isActive }) =>
+                                                                isActive
+                                                                    ? "bg-[#3d7cb1] p-2 rounded-md flex items-center space-x-2 py-2"
+                                                                    : "p-2 flex items-center space-x-2 py-2"
+                                                            }
+                                                        >
+                                                            <i className="fas fa-calendar-alt"></i>
+                                                            <span>{course.course_name_abbreviation}</span>
+                                                        </NavLink>
+                                                    </li>
+                                                ))}
+                                                <li className="px-4">
+                                                    <NavLink
+                                                        to="pre-enrollment"
+                                                        className={({ isActive }) =>
+                                                            isActive
+                                                                ? "bg-[#3d7cb1] p-2 rounded-md flex items-center space-x-2 py-2"
+                                                                : "p-2 flex items-center space-x-2 py-2"
+                                                        }
+                                                    >
+                                                        <i className="fas fa-calendar-alt"></i>
+                                                        <span>Pre Enrollment</span>
+                                                    </NavLink>
+                                                </li>
+                                            </>
+                                        }
                                     </>
                                 )
                             }

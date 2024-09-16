@@ -12,9 +12,10 @@ import { useAuth } from "./context/AuthContext";
 import Courses from "./pages/ProgramHead/Courses";
 import CourseInfo from "./pages/ProgramHead/CourseInfo";
 import Curriculum from "./pages/ProgramHead/curriculum";
+import EnrollmentCourse from "./pages/ProgramHead/EnrollmentCourse";
 
 function App() {
-    const { userRole, fetching } = useAuth();
+    const { userRole, fetching, enrollmentOngoing } = useAuth();
     console.log(userRole);
 
     if (fetching) {
@@ -40,6 +41,9 @@ function App() {
             <Route path="/courses" element={<Courses />} />
             <Route path="/courses/:courseid" element={<CourseInfo />} />
             <Route path="/courses/:courseid/curriculum" element={<Curriculum />} />
+            {enrollmentOngoing &&
+                <Route path="/enrollment/:courseid" element={<EnrollmentCourse />} />
+            }
             <Route path="*" element={<Navigate to="/courses" />} />
         </>
     );
