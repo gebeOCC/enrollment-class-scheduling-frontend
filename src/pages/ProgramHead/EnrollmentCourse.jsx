@@ -1,9 +1,9 @@
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axiosInstance from "../../../axios/axiosInstance";
 function EnrollmentCourse() {
     const { courseid } = useParams();
-    const [courseName, setCourseName] = useState('');
+    const [course, setCourse] = useState([]);
 
     const [yearLevels, setYearLevels] = useState([]);
 
@@ -18,7 +18,7 @@ function EnrollmentCourse() {
         const getCourseName = async () => {
             await axiosInstance.get(`get-course-name/${courseid}`)
                 .then(response => {
-                    setCourseName(response.data);
+                    setCourse(response.data);
                 });
         };
 
@@ -64,22 +64,22 @@ function EnrollmentCourse() {
     };
 
     return (
-        <div className="container mx-auto p-6">
-            year level: {yearSectionForm.year_level_id}
-            <div className="flex justify-between items-center mb-6">
-                {courseName &&
+        <>
+            <div className="bg-white p-4 rounded-lg shadow overflow-hidden mb-6 text-center">
+                {course.course_name &&
                     <>
                         <h1 className="text-4xl font-bold text-blue-600">
-                            {courseName}
+                            {course.course_name}
                         </h1>
                     </>
                 }
             </div>
+
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
                 {yearLevels.map((yearLevel, index) => (
                     <div key={index} className="bg-white p-4 rounded-lg shadow overflow-hidden">
                         <div className="mb-4 flex justify-between">
-                            <h2 className="text-xl font-bold inline-block self-center">{yearLevel.year_level}</h2>
+                            <h2 className="text-xl font-bold inline-block self-center">{yearLevel.year_level_name}</h2>
                             <button
                                 onClick={() => { createNewSection(yearLevel.id) }}
                                 className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
@@ -101,8 +101,16 @@ function EnrollmentCourse() {
                                         <td className="p-2">{section.section}</td>
                                         <td className="p-2">{section.student_count}/{section.max_students}</td>
                                         <td className="p-2 space-x-2">
-                                            <button className="text-white px-2 py-1 rounded bg-primaryColor hover:opacity-80 active:opacity-90 active:bg-blue-700">Subjects</button>
-                                            <button className="bg-green-400 text-white px-2 py-1 rounded hover:bg-green-500">Students</button>
+                                            <Link to={`${yearLevel.year_level_name.replace(/\s+/g, '-')}?section=${section.section}`}>
+                                                <button
+                                                    className="text-white px-2 py-1 rounded bg-primaryColor hover:opacity-80 active:opacity-90 active:bg-blue-700">
+                                                    Subjects
+                                                </button>
+                                            </Link>
+                                            <button
+                                                className="bg-green-400 text-white px-2 py-1 rounded hover:bg-green-500">
+                                                Students
+                                            </button>
                                         </td>
                                     </tr>
                                 ))}
@@ -158,7 +166,7 @@ function EnrollmentCourse() {
                     </div>
                 </div>
             }
-        </div>
+        </>
     )
 }
 

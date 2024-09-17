@@ -12,7 +12,7 @@ function Curriculum() {
     const [submitting, setSubmitting] = useState(false);
     const [editing, setEditing] = useState(false);
 
-    const [courseName, setCourseName] = useState('');
+    const [course, setCourse] = useState('');
     const [curriculumId, setCurriculumId] = useState(0);
 
     const [yearLevels, setYearLevels] = useState([]);
@@ -51,7 +51,7 @@ function Curriculum() {
         const getCourseName = async () => {
             await axiosInstance.get(`get-course-name/${courseid}`)
                 .then(response => {
-                    setCourseName(response.data);
+                    setCourse(response.data);
                 });
         };
 
@@ -191,17 +191,16 @@ function Curriculum() {
     );
 
     return (
-        <div className="container mx-auto p-6">
-            <div className="flex justify-between items-center mb-6">
-                {courseName &&
+        <>
+            <div className="bg-white p-4 rounded-lg shadow overflow-hidden mb-6 text-center flex justify-between items-center">
+                {course.course_name &&
                     <>
                         <h1 className="text-4xl font-bold text-blue-600">
-                            {courseName} ({schoolYear})
+                            {course.course_name} ({schoolYear})
                         </h1>
-
                         <button
                             onClick={toggleEditing}
-                            className={`px-4 py-2 rounded-lg ${editing ? 'bg-red-500' : 'bg-blue-500'} text-white hover:bg-opacity-90 transition`}
+                            className={`px-4 py-2 rounded ${editing ? 'bg-red-500' : 'bg-blue-500'} text-white hover:bg-opacity-90 transition`}
                         >
                             {editing ? 'Stop Editing' : 'Edit'}
                         </button>
@@ -444,7 +443,7 @@ function Curriculum() {
                 </div>
             )}
             <Toast />
-        </div>
+        </>
     );
 }
 

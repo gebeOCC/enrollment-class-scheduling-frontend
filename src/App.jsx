@@ -13,6 +13,7 @@ import Courses from "./pages/ProgramHead/Courses";
 import CourseInfo from "./pages/ProgramHead/CourseInfo";
 import Curriculum from "./pages/ProgramHead/curriculum";
 import EnrollmentCourse from "./pages/ProgramHead/EnrollmentCourse";
+import YearLevelSectionSubejcts from "./pages/ProgramHead/YearLevelSectionSubjects";
 
 function App() {
     const { userRole, fetching, enrollmentOngoing } = useAuth();
@@ -44,6 +45,7 @@ function App() {
             {enrollmentOngoing &&
                 <Route path="/enrollment/:courseid" element={<EnrollmentCourse />} />
             }
+            <Route path="/enrollment/:courseid/:yearlevel" element={<YearLevelSectionSubejcts />} />
             <Route path="*" element={<Navigate to="/courses" />} />
         </>
     );

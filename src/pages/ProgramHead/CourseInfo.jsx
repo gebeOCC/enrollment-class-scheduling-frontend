@@ -6,7 +6,7 @@ import { showToast } from "../../components/Toast";
 
 function CourseInfo() {
     const { courseid } = useParams();
-    const [courseName, setCourseName] = useState('');
+    const [course, setCourse] = useState([]);
     const [curriculums, setCurriculums] = useState([]);
     const [schoolYears, setSchoolYear] = useState([])
 
@@ -17,7 +17,7 @@ function CourseInfo() {
         const getCourseName = async () => {
             await axiosInstance.get(`get-course-name/${courseid}`)
                 .then(response => {
-                    setCourseName(response.data);
+                    setCourse(response.data);
                 });
         };
 
@@ -73,7 +73,7 @@ function CourseInfo() {
     return (
         <div className="container mx-auto p-6">
             <h1 className="text-3xl font-bold text-primaryColor mb-6">
-                {courseName}
+                {course.course_name}
             </h1>
 
             <div className="mb-6">
