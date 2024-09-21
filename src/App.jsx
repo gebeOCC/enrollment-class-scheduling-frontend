@@ -17,7 +17,6 @@ import YearLevelSectionSubejcts from "./pages/ProgramHead/YearLevelSectionSubjec
 
 function App() {
     const { userRole, fetching, enrollmentOngoing } = useAuth();
-    console.log(userRole);
 
     if (fetching) {
         return <div></div>;

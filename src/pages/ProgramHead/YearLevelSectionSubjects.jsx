@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import axiosInstance from '../../../axios/axiosInstance';
+import { convert24HourTimeToMinutes, convertAMPMTo24Hour, convertMinutesTo24HourTime, convertToAMPM } from '../../utilities/utils';
+
 
 function YearLevelSectionSubjects() {
     const { courseid, yearlevel } = useParams();
@@ -10,30 +12,128 @@ function YearLevelSectionSubjects() {
 
     const formattedYearLevel = yearlevel.replace(/-/g, ' ');
 
+    const [yearLevelSectionId, setYearLevelSectionId] = useState(0);
+
     const [addingSubject, setAddingSubject] = useState(false);
 
+    const [classes, setClasses] = useState([]);
     const [course, setCourse] = useState([]);
+    const [subjects, setSubjects] = useState([]);
+    const [rooms, setRooms] = useState([]);
+    const [instructors, setInstructors] = useState([]);
+
+    const [facultyName, setFacultyName] = useState('');
+    const [yearSectionId, setYearSectionId] = useState(0);
 
     const [classForm, setClassForm] = useState({
         class_code: '',
         subject_id: '',
         day: '',
-        start_time: '',
+        start_time: '7:00',
         end_time: '',
-        faculty_id: '',
+        faculty_id: 0,
         room_id: '',
 
         descriptive_title: '',
     });
 
     const handleClassFormChange = (e) => {
+        const { name, value } = e.target;
+
         setClassForm(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    const [startTime, setStartTime] = useState({
+        hours: '7',
+        minutes: '00',
+        time_indicator: 'AM',
+        end: 180,
+    });
+
+    const startTimeChange = (e) => {
+        const { name, value } = e.target;
+
+        setClassForm(prev => {
+            const updatedTime = {
+                hours: name === 'hours' ? value : startTime.hours,
+                minutes: name === 'minutes' ? value : startTime.minutes,
+                time_indicator: name === 'time_indicator' ? value : startTime.time_indicator,
+            };
+
+            return {
+                ...prev,
+                start_time: convertAMPMTo24Hour(
+                    `${updatedTime.hours}:${updatedTime.minutes} ${updatedTime.time_indicator}`
+                )
+            };
+        });
+
+        setStartTime(prev =>
+        ({
             ...prev,
             [e.target.name]: e.target.value
         }))
     }
 
     useEffect(() => {
+        setClassForm(prev => ({
+            ...prev,
+            end_time: convertMinutesTo24HourTime(Number(convert24HourTimeToMinutes(classForm.start_time)) + Number(startTime.end))
+        }))
+    }, [classForm.start_time, startTime.end])
+
+    const subjectCodeExist = (subjectCode) => {
+        const subject = subjects.find(subject => subject.subject_code === subjectCode);
+        if (subject) {
+            setClassForm(prev => ({
+                ...prev,
+                subject_code: subject.subject_code,
+                subject_id: subject.id,
+                descriptive_title: subject.descriptive_title,
+            }));
+        } else {
+            setClassForm(prev => ({
+                ...prev,
+                subject_id: '',
+                descriptive_title: '',
+            }));
+        }
+    };
+
+    const [typingTimeout, setTypingTimeout] = useState(null);
+
+    const handleSubectCodeChange = (e) => {
+        setClassForm(prev => ({
+            ...prev,
+            [e.target.name]: e.target.value.toUpperCase()
+        }))
+
+        if (e.target.name === 'subject_code') {
+            if (typingTimeout) {
+                clearTimeout(typingTimeout);
+            }
+
+            const newTimeout = setTimeout(() => {
+                subjectCodeExist(e.target.value)
+            }, 1000);
+
+            setTypingTimeout(newTimeout);
+        }
+    }
+
+    useEffect(() => {
+        const getClasses = async () => {
+            await axiosInstance.get(`get-classes/${courseid}/${formattedYearLevel}/${section}`)
+                .then(response => {
+                    setClasses(response.data.classes);
+                    console.log(response.data.classes);
+                    setYearSectionId(response.data.yearSectionId);
+                })
+        }
+
         const getCourseName = async () => {
             await axiosInstance.get(`get-course-name/${courseid}`)
                 .then(response => {
@@ -41,8 +141,76 @@ function YearLevelSectionSubjects() {
                 });
         };
 
+        const getSubjects = async () => {
+            await axiosInstance.get(`get-subjects`)
+                .then(response => {
+                    setSubjects(response.data)
+                })
+        }
+
+        const getDeptRooms = async () => {
+            await axiosInstance.get(`get-department-rooms`)
+                .then(response => {
+                    setRooms(response.data)
+                })
+        }
+
+        const getInstructors = async () => {
+            await axiosInstance.get(`get-instructors`)
+                .then(response => {
+                    setInstructors(response.data)
+                })
+        }
+
+        getClasses()
         getCourseName()
+        getSubjects()
+        getDeptRooms()
+        getInstructors()
     }, [courseid]);
+
+    const [isActive, setIsActive] = useState(false);
+
+    const handleFocus = () => {
+        setIsActive(true);
+    };
+
+    const handleBlur = () => {
+        setIsActive(false);
+    };
+
+    const [instructorInFocus, setInstructorInFocus] = useState(false);
+
+    const handleInstructorFocus = () => {
+        setInstructorInFocus(true);
+    };
+
+    const handleInstructorBlur = () => {
+        setInstructorInFocus(false);
+        if (facultyName == "") [
+            setClassForm(prev => ({
+                ...prev,
+                faculty_id: 0
+            }))
+        ]
+    };
+
+    useEffect(() => {
+        if (classForm.faculty_id != 0) {
+            const instructor = instructors.find(instructor => instructor.id === classForm.faculty_id);
+            setFacultyName(instructor.first_name + ',' + ' ' + instructor.last_name);
+        } else[
+            setFacultyName("")
+        ]
+    }, [classForm.faculty_id, instructorInFocus])
+
+
+    const submitClass = async () => {
+        await axiosInstance.post(`add-class/${yearLevelSectionId}`, classForm)
+            .then(response => [
+                console.log(response.data)
+            ])
+    };
 
     return (
         <>
@@ -55,8 +223,51 @@ function YearLevelSectionSubjects() {
                     </>
                 }
             </div>
+            <table className="min-w-full bg-white mb-4">
+                <thead>
+                    <tr className="w-full bg-[#00b6cf] text-white text-left">
+                        <th className="py-2 px-1">Class Code</th>
+                        <th className="py-2 px-1">Subject Code</th>
+                        <th className="py-2 px-1">Descriptive Title</th>
+                        <th className="py-2 px-1">Day</th>
+                        <th className="py-2 px-1">Time</th>
+                        <th className="py-2 px-1">Room</th>
+                        <th className="py-2 px-1">Instructor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {classes.length > 0 ? (
+                        classes.map((classSubject, index) => (
+                            <tr
+                                key={index}
+                                className={`border-b ${index % 2 === 0 ? "bg-white" : "bg-[#deeced]"}`}
+                            >
+                                <td className="py-2 px-1">{classSubject.class_code}</td>
+                                <td className="py-2 px-1">{classSubject.subject_code}</td>
+                                <td className="py-2 px-1 truncate max-w-xs overflow-hidden whitespace-nowrap">
+                                    {classSubject.descriptive_title}
+                                </td>
+                                <td className="py-2 px-1">{classSubject.day}</td>
+                                <td className="py-2 px-1">
+                                    {convertAMPMTo24Hour(classSubject.start_time) + '-' + convertAMPMTo24Hour(classSubject.end_time)}
+                                </td>
+                                <td className="py-2 px-1">{classSubject.room_name}</td>
+                                <td className="py-2 px-1 truncate max-w-xs overflow-hidden whitespace-nowrap">
+                                    {classSubject.last_name + ', ' + classSubject.first_name}
+                                </td>
+                            </tr>
+                        ))
+                    ) : (
+                        <tr>
+                            <td className="py-2 px-4" colSpan="6">
+                                No Data
+                            </td>
+                        </tr>
+                    )}
+                </tbody>
+            </table>
             {addingSubject &&
-                <div className="mb-6 py-2 px-4 bg-white rounded-lg shadow-md">
+                <div className="mb-4 py-2 px-4 bg-white rounded-lg shadow-md">
                     <div className="grid grid-cols-9 gap-4 text-sm">
                         <div className='col-span-1'>
                             <label htmlFor="descriptive_title" className="truncate">Class Code</label>
@@ -68,20 +279,45 @@ function YearLevelSectionSubjects() {
                                 className="h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400"
                             />
                         </div>
-                        <div className='col-span-1'>
+                        <div className="relative col-span-1">
                             <label htmlFor="descriptive_title" className="truncate">Subject Code</label>
                             <input
                                 value={classForm.subject_code}
-                                onChange={handleClassFormChange}
+                                onChange={handleSubectCodeChange}
                                 name='subject_code'
                                 type="text"
                                 className="h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400"
                             />
+
+                            {classForm.subject_code && (!classForm.subject_id) && (
+                                <div className="absolute left-0 right-0 bg-gray-100 max-h-32 overflow-y-auto z-10 mt-1">
+                                    {subjects
+                                        .filter(subject =>
+                                            subject.subject_code.toUpperCase().includes(classForm.subject_code.toUpperCase())
+                                        )
+                                        .map((subject, index) => (
+                                            <div
+                                                key={index}
+                                                className="px-2 py-1 hover:bg-gray-200 cursor-pointer"
+                                                onClick={() => {
+                                                    setClassForm(prev => ({
+                                                        ...prev,
+                                                        subject_id: subject.id,
+                                                        subject_code: subject.subject_code,
+                                                        descriptive_title: subject.descriptive_title,
+                                                    }))
+                                                }}
+                                            >
+                                                {subject.subject_code}
+                                            </div>
+                                        ))}
+                                </div>
+                            )}
                         </div>
-                        <div className='col-span-2'>
+                        <div className='col-span-1'>
                             <label htmlFor="descriptive_title" className="truncate">Descriptive Title</label>
                             <input
-                                // readOnly={true}
+                                readOnly={true}
                                 value={classForm.descriptive_title}
                                 onChange={handleClassFormChange}
                                 name='descriptive_title'
@@ -107,49 +343,146 @@ function YearLevelSectionSubjects() {
                             </select>
                         </div>
 
-                        <div className='col-span-1'>
-                            <label htmlFor="descriptive_title" className="truncate">Start Time</label>
-                            <input
-                                // readOnly={true}
-                                value={classForm.start_time}
-                                onChange={handleClassFormChange}
-                                name='start_time'
-                                type="text"
-                                className="h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400"
-                            />
+                        <div className='col-span-2'>
+                            <label htmlFor="day" className="truncate">Start Time</label>
+                            <div className='flex items-center gap-1'>
+                                <select
+                                    style={{ WebkitAppearance: 'none' }}
+                                    value={startTime.hours}
+                                    onChange={startTimeChange}
+                                    name='hours'
+                                    className="text-center h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                >
+                                    <option value="" disabled>...</option>
+                                    {startTime.time_indicator === 'PM' &&
+                                        <>
+                                            <option value="12">12</option>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                            <option value="5">5</option>
+                                        </>
+                                    }
+                                    {startTime.time_indicator === 'AM' &&
+                                        <>
+                                            <option value="7">7</option>
+                                            <option value="8">8</option>
+                                            <option value="9">9</option>
+                                            <option value="10">10</option>
+                                            <option value="11">11</option>
+                                        </>
+                                    }
+                                </select>
+                                :
+                                <select
+                                    style={{ WebkitAppearance: 'none' }}
+                                    value={startTime.minutes}
+                                    onChange={startTimeChange}
+                                    name='minutes'
+                                    className="text-center h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                >
+                                    <option value="00">00</option>
+                                    <option value="30">30</option>
+                                </select>
+                                <select
+                                    style={{ WebkitAppearance: 'none' }}
+                                    value={startTime.time_indicator}
+                                    onChange={startTimeChange}
+                                    name='time_indicator'
+                                    className="text-center h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                >
+                                    <option value="AM">AM</option>
+                                    <option value="PM">PM</option>
+                                </select>
+                            </div>
                         </div>
                         <div className='col-span-1'>
                             <label htmlFor="descriptive_title" className="truncate">End Time</label>
-                            <input
-                                // readOnly={true}
-                                value={classForm.end_time}
-                                onChange={handleClassFormChange}
-                                name='end_time'
-                                type="text"
-                                className="h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400"
-                            />
+                            <div className="relative col-span-1">
+                                <input
+                                    readOnly={true}
+                                    value={convertToAMPM(classForm.end_time)}
+                                    onFocus={handleFocus}
+                                    onBlur={() => setTimeout(handleBlur, 100)}
+                                    name='end_time'
+                                    type="text"
+                                    className="h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                />
+                                {isActive && (
+                                    <div className="absolute left-0 right-0 bg-gray-100 max-h-32 overflow-y-auto z-10 mt-1">
+                                        <div
+                                            onMouseDown={() => setStartTime(prev => ({ ...prev, end: 120 }))}
+                                            className="px-2 py-1 hover:bg-gray-200 cursor-pointer"
+                                        >
+                                            +2hrs
+                                        </div>
+                                        <div
+                                            onMouseDown={() => setStartTime(prev => ({ ...prev, end: 180 }))}
+                                            className="px-2 py-1 hover:bg-gray-200 cursor-pointer"
+                                        >
+                                            +3hrs
+                                        </div>
+                                        <div
+                                            onMouseDown={() => setStartTime(prev => ({ ...prev, end: 300 }))}
+                                            className="px-2 py-1 hover:bg-gray-200 cursor-pointer"
+                                        >
+                                            +5hrs
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                         <div className='col-span-1'>
                             <label htmlFor="descriptive_title" className="truncate">Room</label>
-                            <input
-                                // readOnly={true}
+                            <select
                                 value={classForm.room_id}
                                 onChange={handleClassFormChange}
                                 name='room_id'
                                 type="text"
                                 className="h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400"
-                            />
+                            >
+                                <option disabled value="">...</option>
+                                {rooms.map((room, index) => (
+                                    <option key={index} value={room.id}>{room.room_name}</option>
+                                ))}
+                            </select>
                         </div>
-                        <div className='col-span-1'>
+                        <div className='relative col-span-1'>
                             <label htmlFor="descriptive_title" className="truncate">Instructor</label>
                             <input
-                                // readOnly={true}
-                                value={classForm.faculty_id}
-                                onChange={handleClassFormChange}
+                                value={facultyName}
+                                onChange={(e) => { setFacultyName(e.target.value) }}
                                 name='faculty_id'
                                 type="text"
                                 className="h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                onFocus={handleInstructorFocus}
+                                onBlur={() => setTimeout(handleInstructorBlur, 200)}
                             />
+
+                            {instructorInFocus && facultyName && (
+                                <div className="absolute left-0 right-0 bg-gray-100 max-h-32 overflow-y-auto z-10 mt-1">
+                                    {instructors
+                                        .filter(instructor =>
+                                            (instructor.last_name.toUpperCase() + ',' + ' ' + instructor.first_name.toUpperCase()).includes(facultyName.toUpperCase())
+                                        )
+                                        .map((instructor, index) => (
+                                            <div
+                                                key={index}
+                                                className="px-2 py-1 hover:bg-gray-200 cursor-pointer"
+                                                onClick={() => {
+                                                    setClassForm(prev => ({
+                                                        ...prev,
+                                                        faculty_id: instructor.id
+                                                    }))
+                                                    setFacultyName(instructor.last_name + ',' + ' ' + instructor.last_name)
+                                                }}
+                                            >
+                                                {instructor.last_name}, {instructor.last_name}
+                                            </div>
+                                        ))}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -166,6 +499,7 @@ function YearLevelSectionSubjects() {
             </button>
             {addingSubject &&
                 <button
+                    onClick={submitClass}
                     className={`bg-blue-500 text-white px-4 py-2 rounded hover:bg-opacity-90 transition`}>
                     Submit
                 </button>

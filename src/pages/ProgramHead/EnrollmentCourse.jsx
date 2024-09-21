@@ -25,7 +25,7 @@ function EnrollmentCourse() {
         const getYearLevels = async () => {
             await axiosInstance.get(`enrollment/${courseid}`)
                 .then(response => {
-                    console.log(response.data);
+                    // console.log(response.data);
                     setYearLevels(response.data);
                 });
         };
@@ -132,7 +132,7 @@ function EnrollmentCourse() {
                             value={yearSectionForm.section}
                             className="mb-4 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primaryColor focus:border-transparent" />
                         <label htmlFor="faculty-search" className="block text-gray-700 font-medium mb-2">
-                            Maimum Students:
+                            Maximum Students:
                         </label>
                         <input
                             value={yearSectionForm.max_students}

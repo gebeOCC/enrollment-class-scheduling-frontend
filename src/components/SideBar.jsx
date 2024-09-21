@@ -17,7 +17,7 @@ function SideBar() {
             <div className="w-64 bg-[#3e5c76] text-white flex-shrink-0 flex flex-col justify-between">
                 <div>
                     {/* Logo and Sidebar Title */}
-                    <div className="p-4 flex items-center h-16">
+                    <div className="p-4 flex items-center h-14">
                         <img src={OCC_LOGO} alt="Logo" className="w-12 h-12 mr-2" />
                         <h2 className="text-4xl font-bold">OCC</h2>
                     </div>
@@ -188,12 +188,12 @@ function SideBar() {
             <div className="flex flex-col flex-grow">
 
                 {/* Header */}
-                <div className="h-16 bg-white text-black flex items-center justify-between px-4">
+                <div className="h-14 max-h-14 bg-white text-black flex items-center justify-between px-4">
                     <Header />
                 </div>
 
                 {/* Content */}
-                <div className="flex-grow p-6 bg-[#F0F4F8] overflow-auto">
+                <div className="flex-grow p-4 bg-[#F0F4F8] overflow-auto">
                     <Outlet />
                 </div>
             </div>
