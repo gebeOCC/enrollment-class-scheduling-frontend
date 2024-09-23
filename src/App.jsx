@@ -14,6 +14,8 @@ import CourseInfo from "./pages/ProgramHead/CourseInfo";
 import Curriculum from "./pages/ProgramHead/curriculum";
 import EnrollmentCourse from "./pages/ProgramHead/EnrollmentCourse";
 import YearLevelSectionSubejcts from "./pages/ProgramHead/YearLevelSectionSubjects";
+import Classes from "./pages/Faculty/Classes";
+import CLassStudents from "./pages/Faculty/ClassStudents";
 
 function App() {
     const { userRole, fetching, enrollmentOngoing } = useAuth();
@@ -31,7 +33,9 @@ function App() {
             <Route path="/student-list" element={<StudentList />} />
             <Route path="/school-year" element={<SchoolYear />} />
             <Route path="/school-year/:schoolYear/:semester" element={<SchoolYearDetails />} />
-            <Route path="*" element={<Navigate to="/department" />} />
+            <Route path="/classes" element={<Classes />} />
+            <Route path="/classes/:classId" element={<CLassStudents />} />
+            <Route path="*" element={<Navigate to="/classes" />} />
         </>
     );
 
@@ -45,7 +49,24 @@ function App() {
                 <Route path="/enrollment/:courseid" element={<EnrollmentCourse />} />
             }
             <Route path="/enrollment/:courseid/:yearlevel" element={<YearLevelSectionSubejcts />} />
-            <Route path="*" element={<Navigate to="/courses" />} />
+            <Route path="/classes" element={<Classes />} />
+            <Route path="/classes/:classId" element={<CLassStudents />} />
+            <Route path="*" element={<Navigate to="/classes" />} />
+        </>
+    );
+
+    const FacultyRoutes = (
+        <>
+            <Route path="/classes" element={<Classes />} />
+            <Route path="/classes/:classId" element={<CLassStudents />} />
+            <Route path="*" element={<Navigate to="/classes" />} />
+        </>
+    );
+
+    const studentRoutes = (
+        <>
+            <Route path="/classes" element={<Classes />} />
+            <Route path="*" element={<Navigate to="/classes" />} />
         </>
     );
 
@@ -62,6 +83,8 @@ function App() {
                         <Route path="/" element={<SideBar />}>
                             {userRole === "registrar" && registrarRoutes}
                             {userRole === "program_head" && programHeadRoutes}
+                            {userRole === "faculty" && FacultyRoutes}
+                            {userRole === "student" && studentRoutes}
                         </Route>
                         <Route path="*" element={<NotFound />} />
                     </>

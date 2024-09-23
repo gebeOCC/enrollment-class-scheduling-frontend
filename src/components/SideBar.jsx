@@ -17,7 +17,7 @@ function SideBar() {
             <div className="w-64 bg-[#3e5c76] text-white flex-shrink-0 flex flex-col justify-between">
                 <div>
                     {/* Logo and Sidebar Title */}
-                    <div className="p-4 flex items-center h-14">
+                    <div className="p-4 flex items-center h-14 mb-4">
                         <img src={OCC_LOGO} alt="Logo" className="w-12 h-12 mr-2" />
                         <h2 className="text-4xl font-bold">OCC</h2>
                     </div>
@@ -175,6 +175,52 @@ function SideBar() {
                                                 </li>
                                             </>
                                         }
+                                        <li className="px-4">
+                                            <NavLink
+                                                to="/classes"
+                                                className={({ isActive }) =>
+                                                    isActive ? "bg-[#3d7cb1] p-2 rounded-md flex items-center space-x-2 py-2"
+                                                        : "p-2 flex items-center space-x-2 py-2"
+                                                }
+                                            >
+                                                <i className="fas fa-book"></i>
+                                                <span>Classes</span>
+                                            </NavLink>
+                                        </li>
+                                    </>
+                                )
+                            } else if (userRole === "faculty") {
+                                return (
+                                    <>
+                                        <li className="px-4">
+                                            <NavLink
+                                                to="/classes"
+                                                className={({ isActive }) =>
+                                                    isActive ? "bg-[#3d7cb1] p-2 rounded-md flex items-center space-x-2 py-2"
+                                                        : "p-2 flex items-center space-x-2 py-2"
+                                                }
+                                            >
+                                                <i className="fas fa-book"></i>
+                                                <span>Classes</span>
+                                            </NavLink>
+                                        </li>
+                                    </>
+                                )
+                            } else if (userRole === "student") {
+                                return (
+                                    <>
+                                        <li className="px-4">
+                                            <NavLink
+                                                to="/classes"
+                                                className={({ isActive }) =>
+                                                    isActive ? "bg-[#3d7cb1] p-2 rounded-md flex items-center space-x-2 py-2"
+                                                        : "p-2 flex items-center space-x-2 py-2"
+                                                }
+                                            >
+                                                <i className="fas fa-book"></i>
+                                                <span>Classes</span>
+                                            </NavLink>
+                                        </li>
                                     </>
                                 )
                             }

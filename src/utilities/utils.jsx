@@ -44,3 +44,17 @@ export function convertAMPMTo24Hour(time) {
 
     return `${formattedHours}:${formattedMinutes}`;
 }
+
+export function hasTimeConflict(start1, end1, start2, end2) {
+    return !(end1 <= start2 || end2 <= start1);
+}
+
+export function capitalizeFirstLetter(word) {
+    if (!word) return '';
+    return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+}
+
+export function getFirstLetter(word) {
+    if (!word) return ''; // Handle empty string
+    return word.charAt(0);
+}

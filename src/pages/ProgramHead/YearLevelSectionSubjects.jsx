@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import axiosInstance from '../../../axios/axiosInstance';
-import { convert24HourTimeToMinutes, convertAMPMTo24Hour, convertMinutesTo24HourTime, convertToAMPM } from '../../utilities/utils';
+import { convert24HourTimeToMinutes, convertAMPMTo24Hour, convertMinutesTo24HourTime, convertToAMPM, hasTimeConflict } from '../../utilities/utils';
 
 
 function YearLevelSectionSubjects() {
@@ -23,7 +23,6 @@ function YearLevelSectionSubjects() {
     const [instructors, setInstructors] = useState([]);
 
     const [facultyName, setFacultyName] = useState('');
-    const [yearSectionId, setYearSectionId] = useState(0);
 
     const [classForm, setClassForm] = useState({
         class_code: '',
@@ -32,10 +31,30 @@ function YearLevelSectionSubjects() {
         start_time: '7:00',
         end_time: '',
         faculty_id: 0,
-        room_id: '',
+        room_id: 0,
 
         descriptive_title: '',
     });
+
+    const [roomClassesTime, setRoomClassesTime] = useState([]);
+    const [instructorClassesTimes, setInstructorClassesTimes] = useState([]);
+
+    const getRoomClassesTime = async (roomId) => {
+        const id = roomId || classForm.room_id;
+        return await axiosInstance.get(`get-room-time/${yearLevelSectionId}/${id}`)
+            .then(response => {
+                setRoomClassesTime(response.data);
+            })
+    };
+
+    const getInstructorClassesTime = async (instructorId) => {
+        const id = instructorId || classForm.faculty_id;
+        return await axiosInstance.get(`get-instructor-time/${yearLevelSectionId}/${id}`)
+            .then(response => {
+                setInstructorClassesTimes(response.data);
+            })
+    };
+
 
     const handleClassFormChange = (e) => {
         const { name, value } = e.target;
@@ -44,6 +63,17 @@ function YearLevelSectionSubjects() {
             ...prev,
             [name]: value
         }));
+
+        if (name === 'day') {
+            if (classForm.room_id !== 0) [
+                getRoomClassesTime()
+            ]
+            if (classForm.faculty_id !== 0) [
+                getInstructorClassesTime()
+            ]
+        } else if (name === 'room_id' && classForm.day !== '') {
+            getRoomClassesTime(value)
+        }
     };
 
     const [startTime, setStartTime] = useState({
@@ -130,7 +160,7 @@ function YearLevelSectionSubjects() {
                 .then(response => {
                     setClasses(response.data.classes);
                     console.log(response.data.classes);
-                    setYearSectionId(response.data.yearSectionId);
+                    setYearLevelSectionId(response.data.yearSectionId);
                 })
         }
 
@@ -206,6 +236,7 @@ function YearLevelSectionSubjects() {
 
 
     const submitClass = async () => {
+        console.log(classForm)
         await axiosInstance.post(`add-class/${yearLevelSectionId}`, classForm)
             .then(response => [
                 console.log(response.data)
@@ -242,18 +273,39 @@ function YearLevelSectionSubjects() {
                                 key={index}
                                 className={`border-b ${index % 2 === 0 ? "bg-white" : "bg-[#deeced]"}`}
                             >
-                                <td className="py-2 px-1">{classSubject.class_code}</td>
-                                <td className="py-2 px-1">{classSubject.subject_code}</td>
+                                <td className="py-2 px-1">
+                                    {classSubject.class_code}
+                                </td>
+                                <td className="py-2 px-1">
+                                    {classSubject.subject_code}
+                                </td>
                                 <td className="py-2 px-1 truncate max-w-xs overflow-hidden whitespace-nowrap">
                                     {classSubject.descriptive_title}
                                 </td>
-                                <td className="py-2 px-1">{classSubject.day}</td>
                                 <td className="py-2 px-1">
-                                    {convertAMPMTo24Hour(classSubject.start_time) + '-' + convertAMPMTo24Hour(classSubject.end_time)}
+                                    {classSubject.day}
                                 </td>
-                                <td className="py-2 px-1">{classSubject.room_name}</td>
+                                <td
+                                    className={`py-2 px-1 ${hasTimeConflict(
+                                        convert24HourTimeToMinutes(classSubject.start_time),
+                                        convert24HourTimeToMinutes(classSubject.end_time),
+                                        convert24HourTimeToMinutes(classForm.start_time),
+                                        convert24HourTimeToMinutes(classForm.end_time)
+                                    ) &&
+                                        classForm.room_id.toString() === classSubject.room_id.toString() &&
+                                        classForm.day.toUpperCase() === classSubject.day.toUpperCase() &&
+                                        addingSubject
+                                        ? 'bg-red-500 text-white'
+                                        : ''
+                                        }`}
+                                >
+                                    {`${convertToAMPM(classSubject.start_time)} - ${convertToAMPM(classSubject.end_time)}`}
+                                </td>
+                                <td className="py-2 px-1">
+                                    {`${classSubject.room_name}`}
+                                </td>
                                 <td className="py-2 px-1 truncate max-w-xs overflow-hidden whitespace-nowrap">
-                                    {classSubject.last_name + ', ' + classSubject.first_name}
+                                    {`${classSubject.last_name}, ${classSubject.first_name}`}
                                 </td>
                             </tr>
                         ))
@@ -382,7 +434,9 @@ function YearLevelSectionSubjects() {
                                     name='minutes'
                                     className="text-center h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400"
                                 >
-                                    <option value="00">00</option>
+                                    {startTime.hours !== '7' &&
+                                        <option value="00">00</option>
+                                    }
                                     <option value="30">30</option>
                                 </select>
                                 <select
@@ -442,7 +496,7 @@ function YearLevelSectionSubjects() {
                                 type="text"
                                 className="h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400"
                             >
-                                <option disabled value="">...</option>
+                                <option disabled value="0">...</option>
                                 {rooms.map((room, index) => (
                                     <option key={index} value={room.id}>{room.room_name}</option>
                                 ))}
@@ -461,7 +515,7 @@ function YearLevelSectionSubjects() {
                             />
 
                             {instructorInFocus && facultyName && (
-                                <div className="absolute left-0 right-0 bg-gray-100 max-h-32 overflow-y-auto z-10 mt-1">
+                                <div className="w-max absolute right-0 bg-gray-100 max-h-32 overflow-y-auto z-10 mt-1">
                                     {instructors
                                         .filter(instructor =>
                                             (instructor.last_name.toUpperCase() + ',' + ' ' + instructor.first_name.toUpperCase()).includes(facultyName.toUpperCase())
@@ -476,6 +530,9 @@ function YearLevelSectionSubjects() {
                                                         faculty_id: instructor.id
                                                     }))
                                                     setFacultyName(instructor.last_name + ',' + ' ' + instructor.last_name)
+                                                    if (classForm.day !== '') {
+                                                        getInstructorClassesTime(instructor.id)
+                                                    }
                                                 }}
                                             >
                                                 {instructor.last_name}, {instructor.last_name}
@@ -504,6 +561,57 @@ function YearLevelSectionSubjects() {
                     Submit
                 </button>
             }
+            <div className='mt-4 grid grid-cols-1 md:grid-cols-2 gap-6 w-max'>
+                {/* Room Schedule */}
+                {roomClassesTime && addingSubject && (
+                    <div className='w-full md:w-64 bg-white rounded-lg shadow-lg p-4 flex flex-col'>
+                        <div className="text-lg font-semibold mb-4 text-gray-800">Room Schedule</div>
+                        {roomClassesTime.length > 0 ? (
+                            roomClassesTime.map((classTime, index) => (
+                                <div key={index} className={`bg-gray-100 rounded-md p-2 shadow-sm my-1
+                                ${hasTimeConflict(
+                                    convert24HourTimeToMinutes(classTime.start_time),
+                                    convert24HourTimeToMinutes(classTime.end_time),
+                                    convert24HourTimeToMinutes(classForm.start_time),
+                                    convert24HourTimeToMinutes(classForm.end_time)
+                                )
+                                        ? 'bg-red-500 text-white'
+                                        : ''
+                                    }`}>
+                                    {`${convertToAMPM(classTime.start_time)} - ${convertToAMPM(classTime.end_time)}`}
+                                </div>
+                            ))
+                        ) : (
+                            <div className="text-gray-500">No schedule available</div>
+                        )}
+                    </div>
+                )}
+
+                {/* Instructor Schedule */}
+                {instructorClassesTimes && addingSubject && (
+                    <div className='w-full md:w-64 bg-white rounded-lg shadow-lg p-4 flex flex-col'>
+                        <div className="text-lg font-semibold mb-4 text-gray-800">Instructor Schedule</div>
+                        {instructorClassesTimes.length > 0 ? (
+                            instructorClassesTimes.map((instructorTime, index) => (
+                                <div key={index} className={`bg-gray-100 rounded-md p-2 shadow-sm my-1
+                                ${hasTimeConflict(
+                                    convert24HourTimeToMinutes(instructorTime.start_time),
+                                    convert24HourTimeToMinutes(instructorTime.end_time),
+                                    convert24HourTimeToMinutes(classForm.start_time),
+                                    convert24HourTimeToMinutes(classForm.end_time)
+                                )
+                                        ? 'bg-red-500 text-white'
+                                        : ''
+                                    }`}>
+                                    {`${convertToAMPM(instructorTime.start_time)} - ${convertToAMPM(instructorTime.end_time)}`}
+                                </div>
+                            ))
+                        ) : (
+                            <div className="text-gray-500">No schedule available</div>
+                        )}
+                    </div>
+                )}
+            </div>
         </>
     );
 }
