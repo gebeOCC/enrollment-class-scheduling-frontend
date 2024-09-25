@@ -13,7 +13,7 @@ const daysOrder = {
     "Sunday": 7,
 };
 
-function Classes() {
+function FacultyClasses() {
     const [classes, setClasses] = useState([]);
 
     const sortClassesByDay = (data) => {
@@ -29,7 +29,7 @@ function Classes() {
                     console.log(response.data);
                 })
         }
-
+        
         getClasses();
     }, [])
     return (
@@ -67,4 +67,4 @@ function Classes() {
         </>
     )
 }
-export default Classes;
+export default FacultyClasses;

@@ -4,7 +4,7 @@ import LoginPage from "./pages/Guest/LoginPage";
 import Department from "./pages/registrar/department";
 import Rooms from "./pages/Registrar/Rooms";
 import FacultyList from "./pages/Registrar/facultyList";
-import StudentList from "./pages/Registrar/StudentList";
+import StudentList from "./pages/Registrar/studentList";
 import SchoolYear from "./pages/Registrar/SchoolYear";
 import NotFound from "./pages/All/NotFound";
 import SchoolYearDetails from "./pages/Registrar/SchoolYearDetails";
@@ -14,8 +14,9 @@ import CourseInfo from "./pages/ProgramHead/CourseInfo";
 import Curriculum from "./pages/ProgramHead/curriculum";
 import EnrollmentCourse from "./pages/ProgramHead/EnrollmentCourse";
 import YearLevelSectionSubejcts from "./pages/ProgramHead/YearLevelSectionSubjects";
-import Classes from "./pages/Faculty/Classes";
+import FacultyClasses from "./pages/Faculty/FacultyClasses";
 import CLassStudents from "./pages/Faculty/ClassStudents";
+import PreEnrollment from "./pages/ProgramHead/PreEnrollment";
 
 function App() {
     const { userRole, fetching, enrollmentOngoing } = useAuth();
@@ -33,7 +34,7 @@ function App() {
             <Route path="/student-list" element={<StudentList />} />
             <Route path="/school-year" element={<SchoolYear />} />
             <Route path="/school-year/:schoolYear/:semester" element={<SchoolYearDetails />} />
-            <Route path="/classes" element={<Classes />} />
+            <Route path="/classes" element={<FacultyClasses />} />
             <Route path="/classes/:classId" element={<CLassStudents />} />
             <Route path="*" element={<Navigate to="/classes" />} />
         </>
@@ -46,10 +47,13 @@ function App() {
             <Route path="/courses/:courseid" element={<CourseInfo />} />
             <Route path="/courses/:courseid/curriculum" element={<Curriculum />} />
             {enrollmentOngoing &&
-                <Route path="/enrollment/:courseid" element={<EnrollmentCourse />} />
+                <>
+                    <Route path="/enrollment/:courseid" element={<EnrollmentCourse />} />
+                    <Route path="/enrollment/:courseid/:yearlevel" element={<YearLevelSectionSubejcts />} />
+                    <Route path="/pre-enrollment" element={<PreEnrollment />} />
+                </>
             }
-            <Route path="/enrollment/:courseid/:yearlevel" element={<YearLevelSectionSubejcts />} />
-            <Route path="/classes" element={<Classes />} />
+            <Route path="/classes" element={<FacultyClasses />} />
             <Route path="/classes/:classId" element={<CLassStudents />} />
             <Route path="*" element={<Navigate to="/classes" />} />
         </>
@@ -57,7 +61,7 @@ function App() {
 
     const FacultyRoutes = (
         <>
-            <Route path="/classes" element={<Classes />} />
+            <Route path="/classes" element={<FacultyClasses />} />
             <Route path="/classes/:classId" element={<CLassStudents />} />
             <Route path="*" element={<Navigate to="/classes" />} />
         </>
@@ -65,7 +69,7 @@ function App() {
 
     const studentRoutes = (
         <>
-            <Route path="/classes" element={<Classes />} />
+            <Route path="/classes" element={<FacultyClasses />} />
             <Route path="*" element={<Navigate to="/classes" />} />
         </>
     );

@@ -55,6 +55,21 @@ export function capitalizeFirstLetter(word) {
 }
 
 export function getFirstLetter(word) {
-    if (!word) return ''; // Handle empty string
+    if (!word) return '';
     return word.charAt(0);
+}
+
+export function formatPhoneNumber(phoneNumber) {
+    const cleaned = phoneNumber.replace(/\D/g, '');
+
+    if (cleaned.length !== 11) {
+        return removeHyphens(cleaned);
+    }
+
+    const formatted = `${cleaned.slice(0, 4)}-${cleaned.slice(4, 7)}-${cleaned.slice(7)}`;
+    return formatted;
+}
+
+export function removeHyphens(phoneNumber) {
+    return phoneNumber.replace(/-/g, '');
 }
