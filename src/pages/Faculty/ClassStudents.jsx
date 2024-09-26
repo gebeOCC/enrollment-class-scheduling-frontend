@@ -25,7 +25,7 @@ function CLassStudents() {
     }, [])
     return (
         <>
-            <section className="bg-white p-6 rounded-lg shadow-md mb-6 text-center flex justify-center items-center mb-4">
+            <section className="bg-white p-6 rounded-lg shadow-md text-center flex justify-center items-center mb-4">
                 {classInfo.subject_code && (
                     <div className="grid grid-cols-[1fr_auto_auto_auto] gap-4 items-center">
                         <h1 className="text-xl font-bold">

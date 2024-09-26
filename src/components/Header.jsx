@@ -3,7 +3,7 @@ import { useState } from "react";
 import ProfilePic from '../images/OCC_LOGO.png';
 import axiosInstance from "../../axios/axiosInstance";
 
-function Header() {
+function Header({ sidebarOpen, toggleSidebar }) {
     const [dropdownOpen, setDropdownOpen] = useState(false);
 
     const toggleDropdown = () => {
@@ -23,7 +23,15 @@ function Header() {
     return (
         <>
             {/* Header */}
-            <h1 className="text-xl font-semibold"></h1>
+            <svg onClick={toggleSidebar} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 cursor-pointer transition-transform duration-300 ease-in-out transform rotate-0">
+                <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d={`${sidebarOpen ? 'm18.75 4.5-7.5 7.5 7.5 7.5m-6-15L5.25 12l7.5 7.5' : 'm5.25 4.5 7.5 7.5-7.5 7.5m6-15 7.5 7.5-7.5 7.5'}`}
+                    className={`transition-opacity duration-300 ease-in-out`}
+                />
+            </svg>
+
 
             {/* Profile Picture and Dropdown */}
             <div className="relative">

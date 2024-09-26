@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { CSSTransition } from 'react-transition-group';
 import './Toast.css';
 
@@ -6,6 +6,7 @@ let toastHandler = null;
 
 const Toast = () => {
     const [toast, setToast] = useState({ show: false, message: '', type: '' });
+    const toastRef = useRef(null); // Create a ref for the toast
 
     useEffect(() => {
         toastHandler = ({ message, type }) => {
@@ -30,8 +31,10 @@ const Toast = () => {
             timeout={300}
             classNames="toast"
             unmountOnExit
+            nodeRef={toastRef} // Pass the ref to CSSTransition
         >
             <div
+                ref={toastRef} // Attach the ref to the toast element
                 className={`fixed bottom-4 left-1/2 transform -translate-x-1/2 p-4 rounded-lg shadow-lg flex items-center space-x-2 ${typeStyles[toast.type]}`}
             >
                 <div className="text-xl">

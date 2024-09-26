@@ -84,7 +84,7 @@ function FacultyList() {
     const submitUserInfo = async (event) => {
         event.preventDefault();
         console.log(form)
-        // setSubmitting(true);
+        setSubmitting(true);
         await axiosInstance.post(`add-faculty/`, form)
             .then(response => {
                 if (response.data.message === "success") {
