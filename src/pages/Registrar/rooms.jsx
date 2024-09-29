@@ -8,6 +8,8 @@ function Rooms() {
     const [isRoomModalOpen, setIsRoomModalOpen] = useState(false)
     const [roomName, setRoomName] = useState("")
     const [deptId, setDeptId] = useState("")
+    const [roomNameInputEmpty, setRoomNameInputEmpty] = useState(false)
+    const [roomExist, setRoomExist] = useState(false)
 
     useEffect(() => {
         axiosInstance.get(`get-rooms/`)
@@ -19,14 +21,24 @@ function Rooms() {
     }, [])
 
     const submitRoom = async () => {
-        // console.log(roomName)
         setSubmitting(true)
+
+        if (roomName === "") {
+            setRoomNameInputEmpty(true);
+            setSubmitting(false)
+            return;
+        } else {
+            setRoomNameInputEmpty(false);
+        }
+
         try {
             const response = await axiosInstance.post(`add-room/`, { room_name: roomName });
             console.log(response.data)
             if (response.data.message === "success") {
                 setRooms(response.data.rooms);
                 setRoomName("");
+            } else if (response.data.message === "Room already exists") {
+                setRoomExist(true)
             }
         } finally {
             setSubmitting(false);
@@ -85,6 +97,7 @@ function Rooms() {
                                     <>
                                         {deptId ?
                                             <button
+                                                disabled={submitting}
                                                 style={{ color: '#00FF1A' }}
                                                 onClick={() => { assignRoom(room.id) }}>
                                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
@@ -112,17 +125,34 @@ function Rooms() {
                     {departmentRooms.map((departmentRoom, index) => (
                         <div
                             key={index}
-                            className={`w-[220px] bg-white p-4 rounded-md shadow-custom-light ${departmentRoom.id == deptId ? 'border-2 border-[#00ff1a]' : ''}`}>
-                            <h3
-                                onClick={() => { setDeptId(departmentRoom.id) }}
-                                className="text-black font-bold text-lg mb-4 cursor-pointer">
-                                {departmentRoom.department_name_abbreviation}
-                            </h3>
+                            className={`w-[220px] bg-white p-4 rounded-md shadow-custom-light ${departmentRoom.id == deptId ? 'border border-[#00ff1a]' : ''}`}>
+                            <div className="flex justify-between mb-4">
+                                <h3
+                                    className="text-black font-bold text-lgcursor-pointer inline-block self-center text-2xl">
+                                    {departmentRoom.department_name_abbreviation}
+                                </h3>
+
+                                {departmentRoom.id == deptId ? (
+                                    <button
+                                        className="bg-green-500 text-white px-2 py-1 rounded opacity-75 cursor-not-allowed">
+                                        Selected
+                                    </button>
+                                ) : (
+                                    <button
+                                        onClick={() => { setDeptId(departmentRoom.id) }}
+                                        className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 transition duration-150 ease-in-out">
+                                        Select
+                                    </button>
+                                )}
+                            </div>
+
+
                             <div className="space-y-2">
                                 {departmentRoom.room.map((room, index) => (
                                     <div key={index} className="bg-yellow-400 text-black flex justify-between items-center px-3 py-2 rounded-md" style={{ backgroundColor: "#FFC107" }}>
                                         <span style={{ color: "495057" }}>{room.room_name}</span>
                                         <button
+                                            disabled={submitting}
                                             style={{ color: "#C82333" }}
                                             onClick={() => { unAssignRoom(room.id) }}>
                                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
@@ -142,18 +172,21 @@ function Rooms() {
                     <div className="bg-white p-6 rounded-md w-[300px]">
                         <h2 className="text-lg font-bold mb-4">Add Room</h2>
                         <form>
-                            <div className="mb-4">
+                            <div>
                                 <label className="block text-gray-700">Name:</label>
                                 <input
                                     type="text"
                                     value={roomName}
                                     name="room_name"
                                     onChange={(e) => { setRoomName(e.target.value) }}
-                                    className="w-full px-3 py-2 border rounded-md"
+                                    className={`w-full px-3 py-2 border rounded-md ${roomNameInputEmpty && 'border-red-300'}`}
                                     placeholder="Room Name"
                                 />
                             </div>
-                            <div className="flex justify-end">
+                            {roomExist &&
+                                <p className="text-sm text-red-500">Room already exists</p>
+                            }
+                            <div className="flex justify-end mt-4">
                                 <button
                                     type="button"
                                     className="bg-thirdColor text-white py-1 px-3 rounded-md mr-2"

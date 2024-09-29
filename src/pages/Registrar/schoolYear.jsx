@@ -2,10 +2,12 @@ import { useState, useEffect } from "react";
 import axiosInstance from "../../../axios/axiosInstance";
 import { Link } from "react-router-dom";
 function SchoolYear() {
+    const [submitting, setSubmitting] = useState(false);
+    const [schoolYearExist, setSchoolYearExist] = useState(false);
     const [semesters, setSemesters] = useState([]);
     const [schoolYears, setSchoolYears] = useState([]);
+    
     useEffect(() => {
-
         axiosInstance.get(`get-school-years`)
             .then(response => {
                 setSchoolYears(response.data.school_years)
@@ -13,17 +15,6 @@ function SchoolYear() {
             })
     }, [])
 
-    const semestersData = semesters.map((semesters) => (
-        <option key={semesters.id} value={semesters.id}>
-            {semesters.semester_name}
-        </option>
-    ));
-
-    semestersData.unshift(
-        <option key="default" disabled value="">
-            Select sem...
-        </option>
-    );
 
     const [isSchoolYearModalOpen, setIsSchoolYearModalOpen] = useState(false)
     const [form, setForm] = useState({
@@ -38,12 +29,36 @@ function SchoolYear() {
         }));
     };
 
+    const [shoolYearInvalidFields, setShoolYearInvalidFields] = useState([""]);
+
     const submitSchoolYear = async (event) => {
         event.preventDefault();
-        console.log(form);
+
+        const invalidFields = [];
+
+        if (!form.school_year) invalidFields.push('school_year');
+        if (!form.semester_id) invalidFields.push('semester_id');
+
+        setShoolYearInvalidFields(invalidFields);
+
+        if (invalidFields.length > 0) {
+            setSubmitting(false);
+            return;
+        }
+
         await axiosInstance.post(`add-school-year`, form)
             .then(response => {
-                console.log(response.data);
+                if (response.data.message === "School year and semester already exist") {
+                    setSchoolYearExist(true);
+                } else if (response.data.message === "Success") {
+                    setSchoolYears(response.data.schoolYear)
+                    setSchoolYearExist(false);
+                    setIsSchoolYearModalOpen(false);
+                    setForm({
+                        school_year: '',
+                        semester_id: '',
+                    });
+                }
             })
     }
 
@@ -87,22 +102,34 @@ function SchoolYear() {
                                     name="school_year"
                                     onChange={handleFormChange}
                                     type="text"
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                                    className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 ${shoolYearInvalidFields.includes('school_year') && 'border-red-300'}`} />
                             </div>
-                            <div className="mb-4">
+                            <div>
                                 <label className="block text-sm font-medium mb-1">Semester</label>
                                 <select
                                     value={form.semester_id}
                                     name="semester_id"
                                     onChange={handleFormChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
-                                    {semestersData}
+                                    className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 ${shoolYearInvalidFields.includes('semester_id') && 'border-red-300'}`}>
+                                    {!form.semester_id &&
+                                        <option value="" disabled>Select sem...</option>
+                                    }
+                                    {semesters.map((semesters) => (
+                                        <option key={semesters.id} value={semesters.id}>
+                                            {semesters.semester_name}
+                                        </option>
+                                    ))
+                                    }
                                 </select>
                             </div>
+                            {schoolYearExist &&
+                                <p className="text-sm text-red-500">School year already exist</p>
+                            }
                             <button
+                                disabled={submitting}
                                 type="submit"
                                 onClick={submitSchoolYear}
-                                className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 mb-2">
+                                className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 mb-2 mt-4">
                                 Submit
                             </button>
                             <button

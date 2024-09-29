@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import axiosInstance from "../../../axios/axiosInstance";
+import Toast from "../../components/Toast";
+import { showToast } from "../../components/Toast";
 
 function Department() {
     const [submitting, setSubmitting] = useState(false);
@@ -26,11 +28,26 @@ function Department() {
         setIsDeptModalOpen(false);
     };
 
+    const [deptInvalidFields, setDeptInvalidFields] = useState([""]);
+
     const [departmentsCourses, setDepartmentsCourses] = useState([]);
 
     const saveDepartment = async (event) => {
         event.preventDefault();
         setSubmitting(true);
+
+        const invalidFields = [];
+
+        if (!deptForm.department_name) invalidFields.push('department_name');
+        if (!deptForm.department_name_abbreviation) invalidFields.push('department_name_abbreviation');
+
+        setDeptInvalidFields(invalidFields);
+
+        if (invalidFields.length > 0) {
+            setSubmitting(false);
+            return;
+        }
+
         await axiosInstance.post(`add-department/`, deptForm)
             .then(response => {
                 if (response.data.message === "success") {
@@ -39,6 +56,7 @@ function Department() {
                         department_name: '',
                         department_name_abbreviation: '',
                     });
+                    showToast(`${deptForm.department_name_abbreviation} Department Added`, 'success')
                     setDepartmentsCourses(response.data.department);
                 }
             }).finally(() => {
@@ -69,9 +87,24 @@ function Department() {
         }));
     };
 
+    const [courseInvalidFields, setCourseInvalidFields] = useState([""]);
+
     const submitCourse = async (event) => {
         event.preventDefault();
         setSubmitting(true);
+
+        const invalidFields = [];
+
+        if (!courseForm.course_name) invalidFields.push('course_name');
+        if (!courseForm.course_name_abbreviation) invalidFields.push('course_name_abbreviation');
+
+        setCourseInvalidFields(invalidFields);
+
+        if (invalidFields.length > 0) {
+            setSubmitting(false);
+            return;
+        }
+
         await axiosInstance.post(`add-course/`, courseForm)
             .then(response => {
                 if (response.data.message === "success") {
@@ -80,13 +113,13 @@ function Department() {
                         course_name: '',
                         course_name_abbreviation: '',
                     });
+                    showToast(`${courseForm.course_name_abbreviation} Course Added`, 'success')
                     setDepartmentsCourses(response.data.department);
                 }
             }).finally(() => {
                 setSubmitting(false);
             })
     };
-
 
     const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
     const [facultyAssign, setFacultyAssign] = useState({
@@ -126,6 +159,7 @@ function Department() {
                 console.log(response.data)
             })
     }
+
     const submitAssignNew = async (id) => {
         await axiosInstance.post(`assign-new-program-head`, { department_id: facultyAssign.department_id, faculty_id: id })
             .then(response => {
@@ -217,13 +251,13 @@ function Department() {
                         <h2 className="text-lg font-bold mb-4">Add Department</h2>
                         <form>
                             <div className="mb-4">
-                                <label className="block text-gray-700">Department Name:</label>
+                                <label className={` text-gray-700`}>Department Name:</label>
                                 <input
                                     type="text"
                                     value={deptForm.department_name}
                                     name="department_name"
                                     onChange={handleDeptChange}
-                                    className="w-full px-3 py-2 border rounded-md"
+                                    className={`w-full px-3 py-2 border rounded-md ${deptInvalidFields.includes('department_name') && 'border-red-300'}`}
                                     placeholder="Enter Department Name"
                                 />
                             </div>
@@ -234,7 +268,7 @@ function Department() {
                                     value={deptForm.department_name_abbreviation}
                                     name="department_name_abbreviation"
                                     onChange={handleDeptChange}
-                                    className="w-full px-3 py-2 border rounded-md"
+                                    className={`w-full px-3 py-2 border rounded-md ${deptInvalidFields.includes('department_name_abbreviation') && 'border-red-300'}`}
                                     placeholder="Enter Abbreviation"
                                 />
                             </div>
@@ -276,7 +310,7 @@ function Department() {
                                     value={courseForm.course_name}
                                     name="course_name"
                                     onChange={handleCourseChange}
-                                    className="w-full px-3 py-2 border rounded-md"
+                                    className={`w-full px-3 py-2 border rounded-md ${courseInvalidFields.includes('course_name') && 'border-red-300'}`}
                                     placeholder="Enter Program Name"
                                 />
                             </div>
@@ -287,7 +321,7 @@ function Department() {
                                     value={courseForm.course_name_abbreviation}
                                     name="course_name_abbreviation"
                                     onChange={handleCourseChange}
-                                    className="w-full px-3 py-2 border rounded-md"
+                                    className={`w-full px-3 py-2 border rounded-md ${courseInvalidFields.includes('course_name_abbreviation') && 'border-red-300'}`}
                                     placeholder="Enter Abbreviation"
                                 />
                             </div>
@@ -459,6 +493,7 @@ function Department() {
                     </div>
                 )
             }
+            <Toast />
         </>
     );
 }

@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react"
 import axiosInstance from "../../../axios/axiosInstance"
-import { formatPhoneNumber, removeHyphens } from "../../utilities/utils";
+import { capitalizeFirstLetter, formatPhoneNumber, getFirstLetter, isValidEmail, removeHyphens } from "../../utilities/utils";
 function Studentlist() {
     const [submitting, setSubmitting] = useState(false);
+    const [userIdExist, setUserIdExist] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
     const [searchBar, setSearchBar] = useState('')
     const [students, setStudents] = useState([])
 
@@ -10,6 +12,7 @@ function Studentlist() {
         axiosInstance.get(`get-student-list`)
             .then(response => {
                 setStudents(response.data)
+                console.log(response.data)
             })
     }, [])
 
@@ -25,7 +28,7 @@ function Studentlist() {
         middle_name: '',
         gender: '',
         birthday: '',
-        contact_number: '',
+        contact_number: '09',
         email_address: '',
         present_address: '',
         zip_code: '',
@@ -41,7 +44,6 @@ function Studentlist() {
 
         if (step === 1) {
             if (form.first_name === '') newWarnings.first_name = 'First name is required';
-            if (form.middle_name === '') newWarnings.middle_name = 'Middle name is required';
             if (form.last_name === '') newWarnings.last_name = 'Last name is required';
             if (form.gender === '') newWarnings.gender = 'Gender is required';
             if (form.birthday === '') newWarnings.birthday = 'Birthday is required';
@@ -52,8 +54,8 @@ function Studentlist() {
         } else if (step === 2) {
             if (form.present_address === '') newWarnings.present_address = 'Address is required';
             if (form.zip_code === '') newWarnings.zip_code = 'Zip code is required';
-            if (form.contact_number === '') newWarnings.contact_number = 'Contact number is required';
-            if (form.email_address === '') newWarnings.email_address = 'Email address is required';
+            if (form.contact_number === '' || form.contact_number.length !== 11) newWarnings.contact_number = 'Contact number is required';
+            if (form.email_address === '' || !isValidEmail(form.email_address)) newWarnings.email_address = 'Email address is required';
 
             if (Object.keys(newWarnings).length === 0) {
                 setStep(step + 1);
@@ -63,13 +65,16 @@ function Studentlist() {
         setWarnings(newWarnings);
     };
 
-
-
     const handleFormChange = (e) => {
         const { name, value } = e.target;
         if (name === 'contact_number') {
-            let formattedNumber = removeHyphens(value)
-            if (isNaN(formattedNumber) || (form.contact_number.length == 11 && formattedNumber.length > 11)) {
+            let formattedNumber = removeHyphens(value);
+
+            if (isNaN(formattedNumber) || formattedNumber.length > 11) {
+                return;
+            }
+
+            if (!formattedNumber.startsWith('09')) {
                 return;
             }
         }
@@ -95,13 +100,6 @@ function Studentlist() {
         }
     }, [form.first_name, form.last_name, form.middle_name, form.present_address]);
 
-    const handleGenderChange = (e) => {
-        setForm(prev => ({
-            ...prev,
-            gender: e.target.value
-        }));
-    };
-
     const lastName = form.last_name.toLowerCase();
     const birthYear = form.birthday.split('-')[0];
     const defaultPassword = lastName + birthYear;
@@ -118,7 +116,18 @@ function Studentlist() {
     const submitUserInfo = async (event) => {
         event.preventDefault();
         setSubmitting(true);
-        console.log(form)
+
+        let newWarnings = {};
+
+        if (form.user_id_no === '') newWarnings.user_id_no = 'User Id is required';
+
+        setWarnings(newWarnings);
+
+        if (Object.keys(newWarnings).length > 0) {
+            setSubmitting(false);
+            return;
+        }
+
         await axiosInstance.post(`add-student/`, form)
             .then(response => {
                 if (response.data.message === "success") {
@@ -136,9 +145,10 @@ function Studentlist() {
                         present_address: '',
                         zip_code: '',
                     });
-                    setIsStudentModalOpen(false)
+                    setIsStudentModalOpen(false);
+                } else if (response.data.message === "User ID already exists") {
+                    setUserIdExist(true);
                 }
-                console.log(response.data)
             }).finally(() => {
                 setSubmitting(false);
             })
@@ -189,21 +199,18 @@ function Studentlist() {
                     <tbody>
                         {students.length > 0 ? (
                             students.map((student, index) => (
-                                <>
-                                    {(searchBar === "" || student.user_id_no.toLowerCase().includes(searchBar.toLowerCase()) || student.full_name.toLowerCase().includes(searchBar.toLowerCase())) &&
-                                        <tr
-                                            key={index}
-                                            className={`border-b ${index % 2 === 0 ? "bg-white" : "bg-[#deeced]"}`}
-                                        >
-                                            <td className="py-2 px-4">{student.id}</td>
-                                            <td className="py-2 px-4">{student.user_id_no}</td>
-                                            <td className="py-2 px-4">{student.full_name}</td>
-                                            <td className="py-2 px-4">{student.email_address}</td>
-                                            <td className="py-2 px-4">{student.contact_number}</td>
-                                            <td className="py-2 px-4">Action</td>
-                                        </tr>
-                                    }
-                                </>
+                                (searchBar === "" || student.user_id_no.toLowerCase().includes(searchBar.toLowerCase()) || (String(student.last_name) + String(student.first_name) + getFirstLetter(String(student.middle_name))).toLowerCase().includes(searchBar.toLowerCase())) &&
+                                <tr
+                                    key={index}
+                                    className={`border-b ${index % 2 === 0 ? "bg-white" : "bg-[#deeced]"}`}
+                                >
+                                    <td className="py-2 px-4">{index + 1}</td>
+                                    <td className="py-2 px-4">{student.user_id_no}</td>
+                                    <td className="py-2 px-4">{capitalizeFirstLetter(student.last_name)}, {capitalizeFirstLetter(student.first_name)} {student.middle_name && getFirstLetter(student.middle_name) + '.'}</td>
+                                    <td className="py-2 px-4">{student.email_address}</td>
+                                    <td className="py-2 px-4">{student.contact_number}</td>
+                                    <td className="py-2 px-4">Action</td>
+                                </tr>
                             ))
                         ) : (
                             <tr>
@@ -358,18 +365,45 @@ function Studentlist() {
                                             onChange={handleFormChange}
                                             type="text"
                                             className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400  ${warnings.user_id_no && 'border-red-300'}`} />
+                                        <div
+                                            onClick={() => setShowPassword(prev => !prev)}
+                                            className="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer" // Center the icon vertically
+                                        >
+                                        </div>
+                                        {userIdExist &&
+                                            <p className="text-sm text-red-500">User Id number already exists</p>
+                                        }
                                     </div>
+
 
                                     <div className="mb-4">
                                         <label className="block text-sm font-medium">Password</label>
                                         <div className="flex items-center">
-                                            <input
-                                                value={form.password}
-                                                name="password"
-                                                onChange={handleFormChange}
-                                                type="password"
-                                                disabled={isDefaultChecked}
-                                                className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400  ${warnings.password && 'border-red-300'}`} />
+                                            <div className="relative w-full">
+                                                <input
+                                                    value={form.password}
+                                                    name="password"
+                                                    onChange={handleFormChange}
+                                                    type={showPassword ? "text" : "password"}
+                                                    disabled={isDefaultChecked}
+                                                    className={` w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400  ${warnings.password && 'border-red-300'}`} />
+                                                <div
+                                                    onClick={() => setShowPassword(prev => !prev)}
+                                                    className="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer" // Center the icon vertically
+                                                >
+                                                    {showPassword ? (
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                                        </svg>
+                                                    ) : (
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+                                                        </svg>
+                                                    )}
+                                                </div>
+                                            </div>
+
                                             <label className="flex items-center ml-4 cursor-pointer">
                                                 <input
                                                     type="checkbox"
@@ -379,6 +413,7 @@ function Studentlist() {
                                                     onChange={defaultPasswordChange} />
                                                 <span className="ml-2 text-sm">Default <span className="text-gray-500">lastname1998</span></span>
                                             </label>
+
                                         </div>
                                     </div>
                                 </>
@@ -405,6 +440,7 @@ function Studentlist() {
                                     </button>
                                 ) : (
                                     <button
+                                        disabled={submitting}
                                         type="button"
                                         onClick={submitUserInfo}
                                         className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">

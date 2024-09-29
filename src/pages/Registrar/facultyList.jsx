@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import axiosInstance from "../../../axios/axiosInstance";
+import { capitalizeFirstLetter, getFirstLetter } from "../../utilities/utils";
 
 function FacultyList() {
     const [searchBar, setSearchBar] = useState('')
@@ -166,22 +167,19 @@ function FacultyList() {
                     </thead>
                     <tbody>
                         {faculties.length > 0 ? (
-                            faculties.map((faculty, index) => (
-                                <>
-                                    {(searchBar === "" || faculty.user_id_no.toLowerCase().includes(searchBar.toLowerCase()) || faculty.full_name.toLowerCase().includes(searchBar.toLowerCase())) &&
-                                        <tr
-                                            key={index}
-                                            className={`border-b ${index % 2 === 0 ? "bg-white" : "bg-[#deeced]"}`}
-                                        >
-                                            <td className="py-2 px-4">{faculty.id}</td>
-                                            <td className="py-2 px-4">{faculty.user_id_no}</td>
-                                            <td className="py-2 px-4">{faculty.full_name}</td>
-                                            <td className="py-2 px-4">{faculty.email_address}</td>
-                                            <td className="py-2 px-4">{faculty.department_name_abbreviation}</td>
-                                            <td className="py-2 px-4">Action</td>
-                                        </tr>
-                                    }
-                                </>
+                            faculties.map((faculty) => (
+                                (searchBar === "" || faculty.user_id_no.toLowerCase().includes(searchBar.toLowerCase()) || faculty.full_name.toLowerCase().includes(searchBar.toLowerCase())) &&
+                                <tr
+                                    key={faculty.id} // Use faculty.id as the unique key
+                                    className={`border-b ${faculty.id % 2 === 0 ? "bg-[#deeced]" : "bg-white"}`}
+                                >
+                                    <td className="py-2 px-4">{faculty.id}</td>
+                                    <td className="py-2 px-4">{faculty.user_id_no}</td>
+                                    <td className="py-2 px-4">{capitalizeFirstLetter(faculty.last_name)}, {capitalizeFirstLetter(faculty.first_name)} {faculty.middle_name && getFirstLetter(capitalizeFirstLetter(faculty.middle_name)) + '.'}</td>
+                                    <td className="py-2 px-4">{faculty.email_address}</td>
+                                    <td className="py-2 px-4">{faculty.department_name_abbreviation}</td>
+                                    <td className="py-2 px-4">Action</td>
+                                </tr>
                             ))
                         ) : (
                             <tr>
@@ -191,6 +189,7 @@ function FacultyList() {
                             </tr>
                         )}
                     </tbody>
+
 
                 </table>
             </div>

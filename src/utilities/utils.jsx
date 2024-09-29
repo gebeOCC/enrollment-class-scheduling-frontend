@@ -1,9 +1,11 @@
+// nalimot ko asa ni ge naapil ra ni og copy sa daan na codes
 export const formatDate = (dateString) => {
     const options = { month: 'long', day: 'numeric', year: 'numeric' };
     const date = new Date(dateString);
     return date.toLocaleString('en-US', options);
 };
 
+// convert 24 hours to am pm
 export function convertToAMPM(time) {
     const date = new Date(`2000-01-01T${time}`);
     let hours = date.getHours();
@@ -15,6 +17,7 @@ export function convertToAMPM(time) {
     return formattedTime;
 }
 
+// convert minutes to 24 hours
 export function convertMinutesTo24HourTime(minutes) {
     const hours = Math.floor(minutes / 60);
     const remainingMinutes = minutes % 60;
@@ -23,12 +26,14 @@ export function convertMinutesTo24HourTime(minutes) {
     return `${formattedHours}:${formattedMinutes}`;
 }
 
+// convert 24 hours to minutes
 export function convert24HourTimeToMinutes(time) {
     const [hours, minutes] = time.split(':').map(Number);
     const totalMinutes = hours * 60 + minutes;
     return totalMinutes;
 }
 
+// convert am pm to 24 hours
 export function convertAMPMTo24Hour(time) {
     let [timePart, modifier] = time.split(' ');
     let [hours, minutes] = timePart.split(':').map(Number);
@@ -45,20 +50,24 @@ export function convertAMPMTo24Hour(time) {
     return `${formattedHours}:${formattedMinutes}`;
 }
 
+// collect two schedules with start and end time (formatted in minutes), returns true if has conflict otherwise false 
 export function hasTimeConflict(start1, end1, start2, end2) {
     return !(end1 <= start2 || end2 <= start1);
 }
 
+// Capitalize the first letter (use for displaying names)
 export function capitalizeFirstLetter(word) {
     if (!word) return '';
     return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
 }
 
+// return the first letter (use for middle names)
 export function getFirstLetter(word) {
     if (!word) return '';
     return word.charAt(0);
 }
 
+// this adds hyphens to phone number if the length is 11 (ex. 0934-567-8901)
 export function formatPhoneNumber(phoneNumber) {
     const cleaned = phoneNumber.replace(/\D/g, '');
 
@@ -70,6 +79,13 @@ export function formatPhoneNumber(phoneNumber) {
     return formatted;
 }
 
-export function removeHyphens(phoneNumber) {
-    return phoneNumber.replace(/-/g, '');
+// this remove the hyphens (use for removing the hyphens of the phone number)
+export function removeHyphens(text) {
+    return text.replace(/-/g, '');
+}
+
+// this return true if the email is valid otherwise false
+export function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
 }
