@@ -35,7 +35,37 @@ function SideBar() {
                             if (userRole === "registrar") {
                                 return (
                                     <>
-                                        <li className="px-4 py-2">
+                                        {enrollmentOngoing &&
+                                            <>
+                                                <li className="px-4">
+                                                    <NavLink
+                                                        to="dashboard"
+                                                        className={({ isActive }) =>
+                                                            isActive
+                                                                ? "bg-[#3d7cb1] p-2 rounded-md flex items-center space-x-2 py-2"
+                                                                : "p-2 flex items-center space-x-2 py-2"
+                                                        }
+                                                    >
+                                                        <i className="fas fa-calendar-alt"></i>
+                                                        <span>Dashboard</span>
+                                                    </NavLink>
+                                                </li>
+                                                <li className="px-4">
+                                                    <NavLink
+                                                        to="pre-enrollment-list"
+                                                        className={({ isActive }) =>
+                                                            isActive
+                                                                ? "bg-[#3d7cb1] p-2 rounded-md flex items-center space-x-2 py-2"
+                                                                : "p-2 flex items-center space-x-2 py-2"
+                                                        }
+                                                    >
+                                                        <i className="fas fa-calendar-alt"></i>
+                                                        <span>Pre Enrollment List</span>
+                                                    </NavLink>
+                                                </li>
+                                            </>
+                                        }
+                                        <li className="px-4 py">
                                             <NavLink
                                                 to="/department"
                                                 className={({ isActive }) =>
@@ -137,6 +167,23 @@ function SideBar() {
                             } else if (userRole === "program_head") {
                                 return (
                                     <>
+                                        {enrollmentOngoing &&
+                                            <>
+                                                <li className="px-4">
+                                                    <NavLink
+                                                        to="dashboard"
+                                                        className={({ isActive }) =>
+                                                            isActive
+                                                                ? "bg-[#3d7cb1] p-2 rounded-md flex items-center space-x-2 py-2"
+                                                                : "p-2 flex items-center space-x-2 py-2"
+                                                        }
+                                                    >
+                                                        <i className="fas fa-calendar-alt"></i>
+                                                        <span>Dashboard</span>
+                                                    </NavLink>
+                                                </li>
+                                            </>
+                                        }
                                         <li className="px-4">
                                             <NavLink
                                                 to="/courses"
@@ -261,7 +308,37 @@ function SideBar() {
                             if (userRole === "registrar") {
                                 return (
                                     <>
-                                        <li className="px-4 py-2">
+                                        {enrollmentOngoing &&
+                                            <>
+                                                <li className="px-4">
+                                                    <NavLink
+                                                        to="dashboard"
+                                                        className={({ isActive }) =>
+                                                            isActive
+                                                                ? "bg-[#3d7cb1] p-2 rounded-md flex items-center space-x-2 py-2"
+                                                                : "p-2 flex items-center space-x-2 py-2"
+                                                        }
+                                                    >
+                                                        <i className="fas fa-calendar-alt"></i>
+                                                        <span>Dashboard</span>
+                                                    </NavLink>
+                                                </li>
+                                                <li className="px-4">
+                                                    <NavLink
+                                                        to="pre-enrollment-list"
+                                                        className={({ isActive }) =>
+                                                            isActive
+                                                                ? "bg-[#3d7cb1] p-2 rounded-md flex items-center space-x-2 py-2"
+                                                                : "p-2 flex items-center space-x-2 py-2"
+                                                        }
+                                                    >
+                                                        <i className="fas fa-calendar-alt"></i>
+                                                        <span>Pre Enrollment List</span>
+                                                    </NavLink>
+                                                </li>
+                                            </>
+                                        }
+                                        <li className="px-4">
                                             <NavLink
                                                 to="/department"
                                                 className={({ isActive }) =>
@@ -363,6 +440,23 @@ function SideBar() {
                             } else if (userRole === "program_head") {
                                 return (
                                     <>
+                                        {enrollmentOngoing &&
+                                            <>
+                                                <li className="px-4">
+                                                    <NavLink
+                                                        to="dashboard"
+                                                        className={({ isActive }) =>
+                                                            isActive
+                                                                ? "bg-[#3d7cb1] p-2 rounded-md flex items-center space-x-2 py-2"
+                                                                : "p-2 flex items-center space-x-2 py-2"
+                                                        }
+                                                    >
+                                                        <i className="fas fa-calendar-alt"></i>
+                                                        <span>Dashboard</span>
+                                                    </NavLink>
+                                                </li>
+                                            </>
+                                        }
                                         <li className="px-4">
                                             <NavLink
                                                 to="/courses"

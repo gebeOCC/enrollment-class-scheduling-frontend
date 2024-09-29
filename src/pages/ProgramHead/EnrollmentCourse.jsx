@@ -14,6 +14,8 @@ function EnrollmentCourse() {
         max_students: 0
     })
 
+    const [submitting, setSubmitting] = useState(false);
+
     useEffect(() => {
         const getCourseName = async () => {
             await axiosInstance.get(`get-course-name/${courseid}`)
@@ -25,7 +27,6 @@ function EnrollmentCourse() {
         const getYearLevels = async () => {
             await axiosInstance.get(`enrollment/${courseid}`)
                 .then(response => {
-                    // console.log(response.data);
                     setYearLevels(response.data);
                 });
         };
@@ -35,9 +36,20 @@ function EnrollmentCourse() {
     }, [courseid]);
 
     const submitNewSection = async () => {
-        axiosInstance.post('add-new-section', yearSectionForm)
+        setSubmitting(true);
+        axiosInstance.post(`add-new-section/${courseid}`, yearSectionForm)
             .then(response => {
-                console.log(response.data.message);
+                if (response.data.message === 'success') {
+                    setYearSectionForm(prev => ({
+                        ...prev,
+                        year_level_id: 0,
+                        section: '',
+                    }))
+                    setYearLevels(response.data.yearLevels);
+                }
+            })
+            .finally(() => {
+                setSubmitting(false)
             })
     }
 
@@ -146,7 +158,7 @@ function EnrollmentCourse() {
                             type="number"
                             className="mb-4 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primaryColor focus:border-transparent" />
                         <button
-                            // disabled={submitting}
+                            disabled={submitting}
                             type="submit"
                             onClick={submitNewSection}
                             className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 mb-2">

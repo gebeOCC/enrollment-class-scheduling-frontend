@@ -3,7 +3,6 @@ import { useParams, useLocation } from 'react-router-dom';
 import axiosInstance from '../../../axios/axiosInstance';
 import { convert24HourTimeToMinutes, convertAMPMTo24Hour, convertMinutesTo24HourTime, convertToAMPM, hasTimeConflict } from '../../utilities/utils';
 
-
 function YearLevelSectionSubjects() {
     const { courseid, yearlevel } = useParams();
     const location = useLocation();
@@ -39,17 +38,19 @@ function YearLevelSectionSubjects() {
     const [roomClassesTime, setRoomClassesTime] = useState([]);
     const [instructorClassesTimes, setInstructorClassesTimes] = useState([]);
 
-    const getRoomClassesTime = async (roomId) => {
+    const getRoomClassesTime = async (roomId, day) => {
         const id = roomId || classForm.room_id;
-        return await axiosInstance.get(`get-room-time/${yearLevelSectionId}/${id}`)
+        const dayName = day || classForm.day;
+        return await axiosInstance.get(`get-room-time/${yearLevelSectionId}/${id}/${dayName}`)
             .then(response => {
                 setRoomClassesTime(response.data);
             })
     };
 
-    const getInstructorClassesTime = async (instructorId) => {
+    const getInstructorClassesTime = async (instructorId, day) => {
+        const dayName = day || classForm.day;
         const id = instructorId || classForm.faculty_id;
-        return await axiosInstance.get(`get-instructor-time/${yearLevelSectionId}/${id}`)
+        return await axiosInstance.get(`get-instructor-time/${yearLevelSectionId}/${id}/${dayName}`)
             .then(response => {
                 setInstructorClassesTimes(response.data);
             })
@@ -66,10 +67,10 @@ function YearLevelSectionSubjects() {
 
         if (name === 'day') {
             if (classForm.room_id !== 0) [
-                getRoomClassesTime()
+                getRoomClassesTime(undefined, value)
             ]
             if (classForm.faculty_id !== 0) [
-                getInstructorClassesTime()
+                getInstructorClassesTime(undefined, value)
             ]
         } else if (name === 'room_id' && classForm.day !== '') {
             getRoomClassesTime(value)

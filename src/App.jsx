@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useAuth } from "./context/AuthContext";
 import SideBar from "./components/SideBar";
 import LoginPage from "./pages/Guest/LoginPage";
 import Department from "./pages/registrar/department";
@@ -8,15 +9,17 @@ import StudentList from "./pages/Registrar/studentList";
 import SchoolYear from "./pages/Registrar/SchoolYear";
 import NotFound from "./pages/All/NotFound";
 import SchoolYearDetails from "./pages/Registrar/SchoolYearDetails";
-import { useAuth } from "./context/AuthContext";
 import Courses from "./pages/ProgramHead/Courses";
 import CourseInfo from "./pages/ProgramHead/CourseInfo";
-import Curriculum from "./pages/ProgramHead/curriculum";
+import Curriculum from "./pages/ProgramHead/Curriculum";
 import EnrollmentCourse from "./pages/ProgramHead/EnrollmentCourse";
 import YearLevelSectionSubejcts from "./pages/ProgramHead/YearLevelSectionSubjects";
 import FacultyClasses from "./pages/Faculty/FacultyClasses";
 import CLassStudents from "./pages/Faculty/ClassStudents";
 import PreEnrollment from "./pages/ProgramHead/PreEnrollment";
+import PreEnrollmentList from "./pages/Registrar/PreEnrollmentList";
+import EnrollmentDashboardRegistrar from "./pages/Registrar/EnrollmentDashboardRegistrar";
+import EnrollmentDashboardProgramHead from "./pages/ProgramHead/EnrollmentDashboardProgramHead";
 
 function App() {
     const { userRole, fetching, enrollmentOngoing } = useAuth();
@@ -36,6 +39,13 @@ function App() {
             <Route path="/school-year/:schoolYear/:semester" element={<SchoolYearDetails />} />
             <Route path="/classes" element={<FacultyClasses />} />
             <Route path="/classes/:classId" element={<CLassStudents />} />
+            {enrollmentOngoing &&
+                <>
+                    <Route path="/pre-enrollment-list" element={<PreEnrollmentList />} />
+                    <Route path="/dashboard" element={<EnrollmentDashboardRegistrar />} />
+                    <Route path="*" element={<Navigate to="/dashboard" />} />
+                </>
+            }
             <Route path="*" element={<Navigate to="/classes" />} />
         </>
     );
@@ -51,6 +61,8 @@ function App() {
                     <Route path="/enrollment/:courseid" element={<EnrollmentCourse />} />
                     <Route path="/enrollment/:courseid/:yearlevel" element={<YearLevelSectionSubejcts />} />
                     <Route path="/pre-enrollment" element={<PreEnrollment />} />
+                    <Route path="/dashboard" element={<EnrollmentDashboardProgramHead />} />
+                    <Route path="*" element={<Navigate to="/dashboard" />} />
                 </>
             }
             <Route path="/classes" element={<FacultyClasses />} />

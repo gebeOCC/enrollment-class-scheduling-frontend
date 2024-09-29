@@ -7,15 +7,15 @@ export const formatDate = (dateString) => {
 
 // convert 24 hours to am pm
 export function convertToAMPM(time) {
-    const date = new Date(`2000-01-01T${time}`);
-    let hours = date.getHours();
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12;
-    hours = hours ? hours : 12;
-    const formattedTime = `${hours}:${minutes} ${ampm}`;
-    return formattedTime;
-}
+    const [hour, minute] = time.split(':').map(Number);
+    
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    
+    const convertedHour = hour % 12 || 12;
+    
+    return `${convertedHour}:${minute.toString().padStart(2, '0')} ${ampm}`;
+  }
+  
 
 // convert minutes to 24 hours
 export function convertMinutesTo24HourTime(minutes) {
@@ -55,10 +55,13 @@ export function hasTimeConflict(start1, end1, start2, end2) {
     return !(end1 <= start2 || end2 <= start1);
 }
 
-// Capitalize the first letter (use for displaying names)
-export function capitalizeFirstLetter(word) {
-    if (!word) return '';
-    return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+// Capitalize the first letter of each word in a string (use for displaying names)
+export function capitalizeFirstLetter(str) {
+    if (!str) return '';
+    return str
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ');
 }
 
 // return the first letter (use for middle names)

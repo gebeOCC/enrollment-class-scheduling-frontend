@@ -142,21 +142,31 @@ function Curriculum() {
     const [typingTimeout, setTypingTimeout] = useState(null);
 
     const handleSubjectFormChange = (e) => {
-        setSubjectForm(prev => ({
-            ...prev,
-            [e.target.name]: e.target.name === 'subject_code' ? e.target.value.toUpperCase() : e.target.value
-        }))
+        const { name, value } = e.target;
+        if (name === 'subject_code') {
 
-        if (e.target.name === 'subject_code') {
+            const trimmedValue = value.replace(/\s+/g, '');
+
+            setSubjectForm(prev => ({
+                ...prev,
+                [name]: name === 'subject_code' ? trimmedValue.toUpperCase() : trimmedValue
+            }))
+
             if (typingTimeout) {
                 clearTimeout(typingTimeout);
             }
 
             const newTimeout = setTimeout(() => {
-                subjectCodeExist(e.target.value)
+                subjectCodeExist(value)
+                console.log('hahahha')
             }, 1000);
 
             setTypingTimeout(newTimeout);
+        } else {
+            setSubjectForm(prev => ({
+                ...prev,
+                [name]: name === 'subject_code' ? value.toUpperCase() : value
+            }))
         }
     }
 
@@ -164,8 +174,18 @@ function Curriculum() {
         await axiosInstance.post(`add-curr-term-subject`, subjectForm)
             .then(response => {
                 console.log(response.data)
+                if (response.data.message === 'success') {
+                    setSubjectForm(prev => ({
+                        ...prev,
+                        subject_code: '',
+                        subject_id: '',
+                        descriptive_title: '',
+                        credit_units: '',
+                        lecture_hours: '',
+                        laboratory_hours: ''
+                    }));
+                }
             })
-        // console.log(subjectForm)
     }
 
     const getSubjects = async () => {

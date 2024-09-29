@@ -238,6 +238,7 @@ function PreEnrollment() {
                         present_address: '',
                         zip_code: '',
                     })
+                    setStep(1)
                 }
                 console.log(response.data)
             }).finally(() => {
