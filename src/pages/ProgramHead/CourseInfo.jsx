@@ -31,7 +31,6 @@ function CourseInfo() {
         const getSchoolYears = async () => {
             await axiosInstance.get(`get-school-years`)
                 .then(response => {
-                    console.log(response.data.school_years)
                     setSchoolYear(response.data.school_years)
                 })
         }
@@ -50,7 +49,6 @@ function CourseInfo() {
                     setIsModalOpen(false);
                     showToast('Added successfully!', 'success')
                 }
-                console.log(response.data)
             });
     };
 
@@ -109,7 +107,15 @@ function CourseInfo() {
                                         name="school_year_id"
                                         onChange={(e) => { setSchoolYearId(e.target.value) }}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
-                                        {schoolYearsData}
+                                            {!schoolYearId && 
+                                                <option value={""} disabled>select shool year...</option>
+                                            }
+                                        {schoolYears.map((schoolYear, index) => (
+                                            schoolYear.semester_name === 'First' &&
+                                            <option key={schoolYear.id} value={schoolYear.id}>
+                                                {schoolYear.school_year} {schoolYear.semester_name}-Semester
+                                            </option>
+                                        ))}
                                     </select>
                                 </div>
                                 <div className="flex justify-end">

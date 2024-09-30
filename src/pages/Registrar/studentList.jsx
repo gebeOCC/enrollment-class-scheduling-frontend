@@ -204,7 +204,7 @@ function Studentlist() {
                                     key={index}
                                     className={`border-b ${index % 2 === 0 ? "bg-white" : "bg-[#deeced]"}`}
                                 >
-                                    <td className="py-2 px-4">{index + 1}</td>
+                                    <td className="py-2 px-4">{index + 1}.</td>
                                     <td className="py-2 px-4">{student.user_id_no}</td>
                                     <td className="py-2 px-4">{capitalizeFirstLetter(student.last_name)}, {capitalizeFirstLetter(student.first_name)} {student.middle_name && getFirstLetter(student.middle_name) + '.'}</td>
                                     <td className="py-2 px-4">{student.email_address}</td>

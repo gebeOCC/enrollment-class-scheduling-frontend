@@ -8,6 +8,7 @@ function YearLevelSectionSubjects() {
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const section = searchParams.get('section');
+    const [submitting, setSubmitting] = useState(false);
 
     const formattedYearLevel = yearlevel.replace(/-/g, ' ');
 
@@ -27,7 +28,7 @@ function YearLevelSectionSubjects() {
         class_code: '',
         subject_id: '',
         day: '',
-        start_time: '7:00',
+        start_time: '7:30',
         end_time: '',
         faculty_id: 0,
         room_id: 0,
@@ -155,15 +156,16 @@ function YearLevelSectionSubjects() {
         }
     }
 
+    const getClasses = async () => {
+        await axiosInstance.get(`get-classes/${courseid}/${formattedYearLevel}/${section}`)
+            .then(response => {
+                setClasses(response.data.classes);
+                console.log(response.data.classes);
+                setYearLevelSectionId(response.data.yearSectionId);
+            })
+    }
+
     useEffect(() => {
-        const getClasses = async () => {
-            await axiosInstance.get(`get-classes/${courseid}/${formattedYearLevel}/${section}`)
-                .then(response => {
-                    setClasses(response.data.classes);
-                    console.log(response.data.classes);
-                    setYearLevelSectionId(response.data.yearSectionId);
-                })
-        }
 
         const getCourseName = async () => {
             await axiosInstance.get(`get-course-name/${courseid}`)
@@ -237,11 +239,30 @@ function YearLevelSectionSubjects() {
 
 
     const submitClass = async () => {
-        console.log(classForm)
+        setSubmitting(true)
+        // console.log(classForm)
         await axiosInstance.post(`add-class/${yearLevelSectionId}`, classForm)
-            .then(response => [
-                console.log(response.data)
-            ])
+            .then(response => {
+                if (response.data.message === 'success') {
+                    getClasses();
+                    setAddingSubject(false)
+                    setClassForm({
+                        class_code: '',
+                        subject_id: '',
+                        day: '',
+                        start_time: '7:00',
+                        end_time: '',
+                        faculty_id: 0,
+                        room_id: 0,
+
+                        descriptive_title: '',
+                    });
+
+                }
+            })
+            .finally(() => {
+                setSubmitting(false)
+            })
     };
 
     return (
@@ -557,6 +578,7 @@ function YearLevelSectionSubjects() {
             </button>
             {addingSubject &&
                 <button
+                    disabled={submitting}
                     onClick={submitClass}
                     className={`bg-blue-500 text-white px-4 py-2 rounded hover:bg-opacity-90 transition`}>
                     Submit

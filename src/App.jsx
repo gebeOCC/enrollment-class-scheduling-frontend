@@ -20,6 +20,7 @@ import PreEnrollment from "./pages/ProgramHead/PreEnrollment";
 import PreEnrollmentList from "./pages/Registrar/PreEnrollmentList";
 import EnrollmentDashboardRegistrar from "./pages/Registrar/EnrollmentDashboardRegistrar";
 import EnrollmentDashboardProgramHead from "./pages/ProgramHead/EnrollmentDashboardProgramHead";
+import StudentClasses from "./pages/Student/StudentClasses";
 
 function App() {
     const { userRole, fetching, enrollmentOngoing } = useAuth();
@@ -81,7 +82,7 @@ function App() {
 
     const studentRoutes = (
         <>
-            <Route path="/classes" element={<FacultyClasses />} />
+            <Route path="/classes" element={<StudentClasses />} />
             <Route path="*" element={<Navigate to="/classes" />} />
         </>
     );

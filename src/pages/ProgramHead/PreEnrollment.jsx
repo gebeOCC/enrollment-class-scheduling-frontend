@@ -150,7 +150,6 @@ function PreEnrollment() {
 
         if (step === 1) {
             if (form.first_name === '') newWarnings.first_name = 'First name is required';
-            if (form.middle_name === '') newWarnings.middle_name = 'Middle name is required';
             if (form.last_name === '') newWarnings.last_name = 'Last name is required';
             if (form.gender === '') newWarnings.gender = 'Gender is required';
             if (form.birthday === '') newWarnings.birthday = 'Birthday is required';
@@ -256,6 +255,8 @@ function PreEnrollment() {
                 if (response.data.message === 'success') {
                     setStudentSubjects(response.data.subjects);
                 }
+
+                console.log(response.data)
             })
     }
 

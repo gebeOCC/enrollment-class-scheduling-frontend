@@ -11,6 +11,7 @@ function Curriculum() {
 
     const [submitting, setSubmitting] = useState(false);
     const [editing, setEditing] = useState(false);
+    const [subjectExist, setSubjectExist] = useState(false);
 
     const [course, setCourse] = useState('');
     const [curriculumId, setCurriculumId] = useState(0);
@@ -41,7 +42,6 @@ function Curriculum() {
     const getYearLevels = async () => {
         await axiosInstance.get(`get-curriculum-terms-subjects/${courseid}/${schoolYear}`)
             .then(response => {
-                console.log(response.data.yearLevels);
                 setYearLevels(response.data.yearLevels);
                 setCurriculumId(response.data.curriculumId);
             });
@@ -75,7 +75,6 @@ function Curriculum() {
         yearLevels.some((yearLevel) => {
             if (yearLevel.id == addSemester.year_level_id) {
                 termLength = yearLevel.curriculum_term.length;
-                console.log(termLength)
                 switch (termLength) {
                     case 0:
                         setAddSemester(prev => ({ ...prev, semester_id: 1 }));
@@ -108,6 +107,7 @@ function Curriculum() {
                 if (response.data.message === 'success') {
                     setAddSemester(prev => ({ ...prev, year_level_id: '' }));
                     showToast('Added successfully!', 'success');
+                    getYearLevels();
                 }
             }).finally(() => {
                 setSubmitting(false);
@@ -144,7 +144,6 @@ function Curriculum() {
     const handleSubjectFormChange = (e) => {
         const { name, value } = e.target;
         if (name === 'subject_code') {
-
             const trimmedValue = value.replace(/\s+/g, '');
 
             setSubjectForm(prev => ({
@@ -158,7 +157,6 @@ function Curriculum() {
 
             const newTimeout = setTimeout(() => {
                 subjectCodeExist(value)
-                console.log('hahahha')
             }, 1000);
 
             setTypingTimeout(newTimeout);
@@ -170,32 +168,54 @@ function Curriculum() {
         }
     }
 
+    const getSubjects = async () => {
+        await axiosInstance.get(`get-subjects`)
+            .then(response => {
+                setSubjects(response.data)
+            })
+    }
+
+    const [subjectFormFields, setSubjectFormFields] = useState([""]);
+
     const submitSubjectForm = async () => {
+        setSubmitting(true);
+        console.log(subjectForm)
+        const invalidFields = [];
+        if (!subjectForm.subject_code) invalidFields.push('subject_code');
+        if (!subjectForm.descriptive_title) invalidFields.push('descriptive_title');
+        if (!subjectForm.credit_units) invalidFields.push('credit_units');
+
+        setSubjectFormFields(invalidFields);
+        if (invalidFields.length > 0) {
+            setSubmitting(false);
+            return;
+        }
+
         await axiosInstance.post(`add-curr-term-subject`, subjectForm)
             .then(response => {
-                console.log(response.data)
                 if (response.data.message === 'success') {
+                    showToast('Added successfully!', 'success');
+                    getYearLevels();
+                    getSubjects();
                     setSubjectForm(prev => ({
                         ...prev,
+                        curriculum_term_id: 0,
                         subject_code: '',
                         subject_id: '',
                         descriptive_title: '',
                         credit_units: '',
                         lecture_hours: '',
-                        laboratory_hours: ''
+                        laboratory_hours: '',
+                        pre_requisite_subject_id: '',
                     }));
+                    setSubjectExist(false)
+                } else if (response.data.message === 'Subject already exist in this term') {
+                    setSubjectExist(true)
                 }
             })
-    }
-
-    const getSubjects = async () => {
-        if (subjects.length < 1) {
-            await axiosInstance.get(`get-subjects`)
-                .then(response => {
-                    setSubjects(response.data)
-                    console.log(response.data)
-                })
-        }
+            .finally(() => {
+                setSubmitting(false);
+            })
     }
 
     const subjectsData = subjects.map((subject) => (
@@ -300,7 +320,7 @@ function Curriculum() {
                                                         onChange={handleSubjectFormChange}
                                                         name='subject_code'
                                                         type="text"
-                                                        className="text-center h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                                        className={`text-center h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400 ${subjectFormFields.includes('subject_code') && 'border-red-300'}`}
                                                     />
 
                                                     {/* Conditionally render the dropdown */}
@@ -341,44 +361,58 @@ function Curriculum() {
                                                         onChange={handleSubjectFormChange}
                                                         name='descriptive_title'
                                                         type="text"
-                                                        className="text-center h-8  w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                                        className={`text-center h-8  w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400 ${subjectFormFields.includes('descriptive_title') && 'border-red-300'}`}
                                                     />
                                                 </div>
 
                                                 <div>
                                                     <label htmlFor="credit_units" className="truncate">Credit Units</label>
-                                                    <input
+                                                    <select
                                                         disabled={subjectForm.subject_id}
                                                         value={subjectForm.credit_units}
                                                         onChange={handleSubjectFormChange}
                                                         name='credit_units'
                                                         type="text"
-                                                        className="text-center h-8  w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400"
-                                                    />
+                                                        className={`text-center h-8  w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400 ${subjectFormFields.includes('credit_units') && 'border-red-300'}`}
+                                                    >
+                                                        {!subjectForm.credit_units &&
+                                                            <option value="" disabled></option>
+                                                        }
+                                                        <option value="2">2</option>
+                                                        <option value="3">3</option>
+                                                        <option value="3">6</option>
+                                                    </select>
                                                 </div>
 
                                                 <div>
                                                     <label htmlFor="lecture_hours" className="truncate">Lec Hours</label>
-                                                    <input
+                                                    <select
                                                         disabled={subjectForm.subject_id}
                                                         value={subjectForm.lecture_hours}
                                                         onChange={handleSubjectFormChange}
                                                         name='lecture_hours'
                                                         type="text"
-                                                        className="text-center h-8  w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400"
-                                                    />
+                                                        className={`text-center h-8  w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400`}
+                                                    >
+                                                        <option value=""></option>
+                                                        <option value="3">3</option>
+                                                        <option value="2">2</option>
+                                                    </select>
                                                 </div>
 
                                                 <div>
                                                     <label htmlFor="laboratory_hours" className="truncate">Lab Hours</label>
-                                                    <input
+                                                    <select
                                                         disabled={subjectForm.subject_id}
                                                         value={subjectForm.laboratory_hours}
                                                         onChange={handleSubjectFormChange}
                                                         name='laboratory_hours'
                                                         type="text"
                                                         className="text-center h-8  w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400"
-                                                    />
+                                                    >
+                                                        <option value=""></option>
+                                                        <option value="3">3</option>
+                                                    </select>
                                                 </div>
 
                                                 <div className='col-span-2'>
@@ -396,7 +430,7 @@ function Curriculum() {
 
                                                 <div className='flex gap-2 mt-5'>
                                                     <button
-                                                        onClick={() => { setSubjectForm(prev => ({ ...prev, curriculum_term_id: 0 })); }}
+                                                        onClick={() => { setSubjectForm(prev => ({ ...prev, curriculum_term_id: 0 })); setSubjectExist(false) }}
                                                         className="h-8 w-10 px-2 py-1 bg-gray-500 text-white hover:bg-gray-600 transition flex items-center justify-center"
                                                     >
                                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
@@ -405,6 +439,7 @@ function Curriculum() {
                                                     </button>
 
                                                     <button
+                                                        disabled={submitting}
                                                         onClick={submitSubjectForm}
                                                         className="h-8 w-10 px-2 py-1 bg-blue-500 text-white hover:bg-blue-600 transition flex items-center justify-center"
                                                     >
@@ -413,6 +448,9 @@ function Curriculum() {
                                                         </svg>
                                                     </button>
                                                 </div>
+                                                {subjectExist &&
+                                                    <h1 className='col-span-4 text-red-500'>Subject already exist in the current term</h1>
+                                                }
                                             </div>
                                         </div>
                                     )}
