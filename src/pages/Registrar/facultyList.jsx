@@ -262,7 +262,7 @@ function FacultyList() {
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
                     <div className="bg-white p-4 rounded-md w-[600px] h-[515px] overflow-y-auto flex flex-col justify-between">
                         <div>
-                            <h2 className="text-2xl font-bold text-center mb-2">Add Student</h2>
+                            <h2 className="text-2xl font-bold text-center mb-2">Add Faculty </h2>
                             {step === 1 && (
                                 <>
                                     <div>

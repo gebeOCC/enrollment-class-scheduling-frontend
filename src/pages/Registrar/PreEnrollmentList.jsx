@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axiosInstance from "../../../axios/axiosInstance";
-import { capitalizeFirstLetter, convertToAMPM, getFirstLetter } from "../../utilities/utils";
+import { capitalizeFirstLetter, convert24HourTimeToMinutes, convertToAMPM, getFirstLetter, hasTimeConflict } from "../../utilities/utils";
 import Toast from "../../components/Toast";
 import { showToast } from "../../components/Toast";
 
@@ -11,6 +11,21 @@ function PreEnrollmentList() {
     const [studentPreEnrollmentSubjects, setStudentPreEnrollmentSubjects] = useState([]);
     const [sections, setSections] = useState([]);
     const [classes, setClasses] = useState([]);
+    const [subjectClasses, setSubjectClasses] = useState([]);
+    const [selectedClass, setSelectedClass] = useState({
+        class_code: "",
+        credit_units: 0,
+        day: "",
+        descriptive_title: "",
+        end_time: "",
+        faculty_id: 0,
+        id: 0,
+        room_id: 0,
+        start_time: "",
+        subject_code: "",
+        subject_id: 0,
+        year_section_id: 0,
+    });
 
     const [studentToEnrollInfo, setStudentToEnrollInfo] = useState({});
 
@@ -47,6 +62,7 @@ function PreEnrollmentList() {
             .then(response => {
                 if (response.data.message === 'success') {
                     setClasses(response.data.classes);
+                    console.log(response.data.classes);
                 }
             })
     }
@@ -98,6 +114,15 @@ function PreEnrollmentList() {
                 if (response.data.message === 'success') {
                     setStudentPreEnrollmentSubjects(response.data.subjects)
                 };
+            })
+    }
+
+    const getSubjectClasses = async (subjectId) => {
+        // console.log(subjectId);
+        await axiosInstance.get(`get-subject-classes/${subjectId}`)
+            .then(response => {
+                setSubjectClasses(response.data)
+                console.log(response.data)
             })
     }
 
@@ -269,8 +294,8 @@ function PreEnrollmentList() {
                         </svg>
                     </button>
 
-                    <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-                        <div className="bg-white p-4 rounded-lg shadow-md max-h-min  col-span-2">
+                    <div className="grid grid-cols-1 md:grid-cols-6 gap-6">
+                        <div className="bg-white p-4 rounded-lg shadow-md max-h-min  col-span-3">
                             <p className="text-lg font-medium">Name: {studentToEnrollInfo.first_name} {studentToEnrollInfo.last_name}</p>
                             <p className="text-lg font-medium">Course: {studentToEnrollInfo.course_name_abbreviation}</p>
                             <p className="text-lg font-medium">Student Type: {studentToEnrollInfo.student_type_name}</p>
@@ -287,6 +312,7 @@ function PreEnrollmentList() {
                                         return (
                                             <div className="flex gap-2" key={index}>
                                                 <svg
+                                                    onClick={() => { getSubjectClasses(subject.subject_id) }}
                                                     xmlns="http://www.w3.org/2000/svg"
                                                     fill="none"
                                                     viewBox="0 0 24 24"
@@ -300,7 +326,9 @@ function PreEnrollmentList() {
                                                         <p className="font-bold text-blue-600">{subject.subject_code} -</p>
                                                     </del>
                                                 ) : (
-                                                    <p className="font-bold text-blue-600">{subject.subject_code} -</p>
+                                                    <>
+                                                        <p className="font-bold text-blue-600">{subject.subject_code} -</p>
+                                                    </>
                                                 )}
                                                 <p className="text-gray-700">{subject.descriptive_title}</p>
                                             </div>
@@ -310,10 +338,11 @@ function PreEnrollmentList() {
                             </ul>
                         </div>
 
-                        <div className="flex flex-col">
+                        <div className="flex flex-col col-span-3">
                             <label htmlFor="">Section</label>
                             <select
                                 value={selectedSection}
+                                className="w-[50%] mt-1 block pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md cursor-pointer mb-4"
                                 onChange={(e) => {
                                     setSelectedSection(e.target.value)
                                     getYearLevelSectionSectionSubjects(e.target.value)
@@ -331,14 +360,92 @@ function PreEnrollmentList() {
                                     </option>
                                 ))}
                             </select>
+
+                            <label htmlFor="">Classes</label>
+                            {subjectClasses.map((subjectClass, index) => (
+                                <div key={index} className="flex justify-between items-center bg-white p-2 rounded shadow-sm mb-2">
+                                    <h1>
+                                        {subjectClass.course_name_abbreviation}-{subjectClass.year_level}{subjectClass.section} {subjectClass.subject_code} {subjectClass.day} {convertToAMPM(subjectClass.start_time)}-{convertToAMPM(subjectClass.end_time)}
+                                    </h1>
+                                    <div
+                                        className="flex gap-2">
+                                        {selectedClass.id === subjectClass.id ? (
+                                            <svg
+                                                onClick={() => {
+                                                    setClasses((previousClasses) => [
+                                                        ...previousClasses,
+                                                        selectedClass, // Add selectedClass to the classes array
+                                                    ]);
+
+                                                    // Reset selectedClass to its default values
+                                                    setSelectedClass({
+                                                        class_code: "",
+                                                        credit_units: 0,
+                                                        day: "",
+                                                        descriptive_title: "",
+                                                        end_time: "",
+                                                        faculty_id: 0,
+                                                        id: 0,
+                                                        room_id: 0,
+                                                        start_time: "",
+                                                        subject_code: "",
+                                                        subject_id: 0,
+                                                        year_section_id: 0,
+                                                    });
+                                                    // Reset subjectClasses to an empty array
+                                                    setSubjectClasses([]);
+                                                }}
+
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                viewBox="0 0 24 24"
+                                                fill="currentColor"
+                                                className="size-7 cursor-pointer text-green-500 hover:text-green-400">
+                                                <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z" clipRule="evenodd" />
+                                            </svg>
+                                        ) : (
+                                            <button
+                                                    className="text-white px-2 rounded bg-[#00b6cf] hover:opacity-80 active:opacity-90"
+                                                onClick={() => {
+                                                    setSelectedClass({
+                                                        class_code: subjectClass.class_code,
+                                                        credit_units: subjectClass.credit_units,
+                                                        day: subjectClass.day,
+                                                        descriptive_title: subjectClass.descriptive_title,
+                                                        end_time: subjectClass.end_time,
+                                                        faculty_id: subjectClass.faculty_id,
+                                                        id: subjectClass.id,
+                                                        room_id: subjectClass.room_id,
+                                                        start_time: subjectClass.start_time,
+                                                        subject_code: subjectClass.subject_code,
+                                                        subject_id: subjectClass.subject_id,
+                                                        year_section_id: subjectClass.year_section_id,
+                                                    })
+                                                }}>
+                                                compare
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
                         </div>
-                        <div className="col-start-3 col-span-3">
-                            <h1 className="text-2xl font-semibold mb-4">Student Subjects</h1>
+                        <div className="col-span-3">
+                            <h1 className="text-2xl font-semibold mb-4">Student Classes</h1>
                             <div className="space-y-2">
                                 {classes.map((classSubject, index) => (
-                                    <div key={index} className="flex justify-between items-center bg-white p-2 rounded shadow-sm">
+                                    <div key={index}
+                                        className={`flex justify-between items-center bg-white p-2 rounded shadow-sm
+                                    ${selectedClass.subject_id && hasTimeConflict(
+                                            convert24HourTimeToMinutes(classSubject.start_time),
+                                            convert24HourTimeToMinutes(classSubject.end_time),
+                                            convert24HourTimeToMinutes(selectedClass.start_time),
+                                            convert24HourTimeToMinutes(selectedClass.end_time)
+                                        ) &&
+                                                selectedClass.day.toUpperCase() === classSubject.day.toUpperCase()
+                                                ? 'bg-red-500 text-red-400'
+                                                : ''
+                                            }`}>
                                         <div>
-                                            <span className="font-semibold">{classSubject.subject_code}</span> - {classSubject.descriptive_title} {convertToAMPM(classSubject.start_time)} - {convertToAMPM(classSubject.end_time)}
+                                            <span className="font-semibold">{classSubject.subject_code}</span> - {classSubject.descriptive_title}  {classSubject.day} {convertToAMPM(classSubject.start_time)}-{convertToAMPM(classSubject.end_time)}
                                         </div>
                                         <svg
                                             onClick={() => {
@@ -365,7 +472,8 @@ function PreEnrollmentList() {
                         </div>
                     </div>
                 </>
-            )}
+            )
+            }
             <Toast />
         </>
     )

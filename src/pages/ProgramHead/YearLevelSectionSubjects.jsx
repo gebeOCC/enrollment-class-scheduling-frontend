@@ -42,7 +42,7 @@ function YearLevelSectionSubjects() {
     const getRoomClassesTime = async (roomId, day) => {
         const id = roomId || classForm.room_id;
         const dayName = day || classForm.day;
-        return await axiosInstance.get(`get-room-time/${yearLevelSectionId}/${id}/${dayName}`)
+        await axiosInstance.get(`get-room-time/${id}/${dayName}`)
             .then(response => {
                 setRoomClassesTime(response.data);
             })
@@ -51,9 +51,10 @@ function YearLevelSectionSubjects() {
     const getInstructorClassesTime = async (instructorId, day) => {
         const dayName = day || classForm.day;
         const id = instructorId || classForm.faculty_id;
-        return await axiosInstance.get(`get-instructor-time/${yearLevelSectionId}/${id}/${dayName}`)
+        await axiosInstance.get(`get-instructor-time/${id}/${dayName}`)
             .then(response => {
                 setInstructorClassesTimes(response.data);
+                console.log(response.data);
             })
     };
 
@@ -257,7 +258,8 @@ function YearLevelSectionSubjects() {
 
                         descriptive_title: '',
                     });
-
+                    setInstructorClassesTimes([]);
+                    setRoomClassesTime([]);
                 }
             })
             .finally(() => {
@@ -271,7 +273,12 @@ function YearLevelSectionSubjects() {
                 {course.course_name &&
                     <>
                         <h1 className="text-4xl font-bold text-blue-600">
-                            {course.course_name_abbreviation} - 1A
+                            {course.course_name_abbreviation} -
+                            {yearlevel === 'First-Year' ? '1' :
+                                yearlevel === 'Second-Year' ? '2' :
+                                    yearlevel === 'Third-Year' ? '3' :
+                                        yearlevel === 'Fourth-Year' ? '4' : ''}{section}
+
                         </h1>
                     </>
                 }
@@ -314,10 +321,11 @@ function YearLevelSectionSubjects() {
                                         convert24HourTimeToMinutes(classForm.start_time),
                                         convert24HourTimeToMinutes(classForm.end_time)
                                     ) &&
+                                        classSubject.room_id &&
                                         classForm.room_id.toString() === classSubject.room_id.toString() &&
                                         classForm.day.toUpperCase() === classSubject.day.toUpperCase() &&
                                         addingSubject
-                                        ? 'bg-red-500 text-white'
+                                        ? 'bg-red-500 text-white font-semibold'
                                         : ''
                                         }`}
                                 >
@@ -551,13 +559,13 @@ function YearLevelSectionSubjects() {
                                                         ...prev,
                                                         faculty_id: instructor.id
                                                     }))
-                                                    setFacultyName(instructor.last_name + ',' + ' ' + instructor.last_name)
+                                                    setFacultyName(instructor.last_name + ',' + ' ' + instructor.first_name)
                                                     if (classForm.day !== '') {
                                                         getInstructorClassesTime(instructor.id)
                                                     }
                                                 }}
                                             >
-                                                {instructor.last_name}, {instructor.last_name}
+                                                {instructor.last_name}, {instructor.first_name}
                                             </div>
                                         ))}
                                 </div>
@@ -598,7 +606,7 @@ function YearLevelSectionSubjects() {
                                     convert24HourTimeToMinutes(classForm.start_time),
                                     convert24HourTimeToMinutes(classForm.end_time)
                                 )
-                                        ? 'bg-red-500 text-white'
+                                        ? 'bg-red-500 text-white font-semibold'
                                         : ''
                                     }`}>
                                     {`${convertToAMPM(classTime.start_time)} - ${convertToAMPM(classTime.end_time)}`}
@@ -623,7 +631,7 @@ function YearLevelSectionSubjects() {
                                     convert24HourTimeToMinutes(classForm.start_time),
                                     convert24HourTimeToMinutes(classForm.end_time)
                                 )
-                                        ? 'bg-red-500 text-white'
+                                        ? 'bg-red-500 text-white font-semibold'
                                         : ''
                                     }`}>
                                     {`${convertToAMPM(instructorTime.start_time)} - ${convertToAMPM(instructorTime.end_time)}`}
