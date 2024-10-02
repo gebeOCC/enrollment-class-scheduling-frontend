@@ -133,6 +133,7 @@ function Department() {
             await axiosInstance.get(`get-department-faculties/${facultyAssign.department_id}`)
                 .then(response => {
                     setDeptFaculties(response.data)
+                    console.log(response.data)
                 });
         }
         if (facultyAssign.department_id) {
@@ -192,10 +193,9 @@ function Department() {
                                     className="bg-secondaryColor text-white px-2 rounded-md hover:bg-blue-600 transition duration-200 ease-in-out mb-2"
                                     onClick={() => {
                                         setIsAssignModalOpen(!isAssignNewModalOpen),
-                                            setFacultyAssign(prev => ({
-                                                ...prev,
+                                            setFacultyAssign({
                                                 department_id: department.id
-                                            }));
+                                            });
                                     }}
                                 >Assign Department Head</button>
                             ) : (
@@ -203,10 +203,9 @@ function Department() {
                                     className="bg-secondaryColor text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-200 ease-in-out mb-2"
                                     onClick={() => {
                                         setIsAssignNewModalOpen(!isAssignModalOpen),
-                                            setFacultyAssign(prev => ({
-                                                ...prev,
+                                            setFacultyAssign({
                                                 department_id: department.id
-                                            }));
+                                            });
                                     }}
                                 >Assign New Department Head</button>
                             )
@@ -409,7 +408,10 @@ function Department() {
                                     <button
                                         type="button"
                                         className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 transition"
-                                        onClick={() => setIsAssignModalOpen(false)}
+                                        onClick={() => {
+                                            setIsAssignModalOpen(false)
+                                            setSearchFaculty("");
+                                        }}
                                     >
                                         Close
                                     </button>
@@ -482,7 +484,10 @@ function Department() {
                                     <button
                                         type="button"
                                         className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 transition"
-                                        onClick={() => { setIsAssignNewModalOpen(!isAssignNewModalOpen) }}
+                                        onClick={() => {
+                                            setIsAssignNewModalOpen(!isAssignNewModalOpen);
+                                            setSearchFaculty("");
+                                        }}
                                     >
                                         Close
                                     </button>

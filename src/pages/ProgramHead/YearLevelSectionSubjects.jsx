@@ -96,6 +96,36 @@ function YearLevelSectionSubjects() {
                 time_indicator: name === 'time_indicator' ? value : startTime.time_indicator,
             };
 
+            if (name === 'time_indicator') {
+                if (value === "AM") {
+                    setStartTime({
+                        ...startTime,
+                        hours: '7',
+                        minutes: '30',
+                        time_indicator: 'AM',
+                    })
+                    return {
+                        ...prev,
+                        start_time: convertAMPMTo24Hour(
+                            `7:30 AM`
+                        )
+                    };
+                } else if (value === "PM") {
+                    setStartTime({
+                        ...startTime,
+                        hours: '12',
+                        minutes: '00',
+                        time_indicator: 'PM',
+                    })
+                    return {
+                        ...prev,
+                        start_time: convertAMPMTo24Hour(
+                            `12:00 PM`
+                        )
+                    };
+                }
+            }
+
             return {
                 ...prev,
                 start_time: convertAMPMTo24Hour(
@@ -239,9 +269,25 @@ function YearLevelSectionSubjects() {
     }, [classForm.faculty_id, instructorInFocus])
 
 
+    const [classInvalidFields, setClassInvalidFields] = useState([""]);
     const submitClass = async () => {
         setSubmitting(true)
-        // console.log(classForm)
+        const invalidFields = [];
+
+        if (!classForm.class_code) invalidFields.push('class_code');
+        if (!classForm.subject_id) invalidFields.push('subject_id');
+        if (!classForm.day) invalidFields.push('day');
+        if (!classForm.start_time) invalidFields.push('start_time');
+        if (!classForm.end_time) invalidFields.push('end_time');
+        if (classForm.faculty_id === 0) invalidFields.push('faculty_id');
+        if (classForm.room_id === 0) invalidFields.push('room_id');
+
+        setClassInvalidFields(invalidFields);
+
+        if (invalidFields.length > 0) {
+            setSubmitting(false);
+            return;
+        }
         await axiosInstance.post(`add-class/${yearLevelSectionId}`, classForm)
             .then(response => {
                 if (response.data.message === 'success') {
@@ -322,7 +368,6 @@ function YearLevelSectionSubjects() {
                                         convert24HourTimeToMinutes(classForm.end_time)
                                     ) &&
                                         classSubject.room_id &&
-                                        classForm.room_id.toString() === classSubject.room_id.toString() &&
                                         classForm.day.toUpperCase() === classSubject.day.toUpperCase() &&
                                         addingSubject
                                         ? 'bg-red-500 text-white font-semibold'
@@ -358,7 +403,7 @@ function YearLevelSectionSubjects() {
                                 onChange={handleClassFormChange}
                                 name='class_code'
                                 type="text"
-                                className="h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                className={`h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400 ${classInvalidFields.includes('class_code') && 'border-red-300'}`}
                             />
                         </div>
                         <div className="relative col-span-1">
@@ -368,7 +413,7 @@ function YearLevelSectionSubjects() {
                                 onChange={handleSubectCodeChange}
                                 name='subject_code'
                                 type="text"
-                                className="h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                className={`h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400 ${classInvalidFields.includes('subject_id') && 'border-red-300'}`}
                             />
 
                             {classForm.subject_code && (!classForm.subject_id) && (
@@ -404,7 +449,7 @@ function YearLevelSectionSubjects() {
                                 onChange={handleClassFormChange}
                                 name='descriptive_title'
                                 type="text"
-                                className="h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                className={`h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400 ${classInvalidFields.includes('subject_id') && 'border-red-300'}`}
                             />
                         </div>
                         <div className='col-span-1'>
@@ -413,7 +458,7 @@ function YearLevelSectionSubjects() {
                                 value={classForm.day}
                                 onChange={handleClassFormChange}
                                 name='day'
-                                className="h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                className={`h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400 ${classInvalidFields.includes('day') && 'border-red-300'}`}
                             >
                                 <option value="" disabled>...</option>
                                 <option value="Monday">Monday</option>
@@ -433,7 +478,7 @@ function YearLevelSectionSubjects() {
                                     value={startTime.hours}
                                     onChange={startTimeChange}
                                     name='hours'
-                                    className="text-center h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                    className={`text-center h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400 0 ${classInvalidFields.includes('start_time') && 'border-red-300'}`}
                                 >
                                     <option value="" disabled>...</option>
                                     {startTime.time_indicator === 'PM' &&
@@ -462,7 +507,7 @@ function YearLevelSectionSubjects() {
                                     value={startTime.minutes}
                                     onChange={startTimeChange}
                                     name='minutes'
-                                    className="text-center h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                    className={`text-center h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400 ${classInvalidFields.includes('start_time') && 'border-red-300'}`}
                                 >
                                     {startTime.hours !== '7' &&
                                         <option value="00">00</option>
@@ -474,7 +519,7 @@ function YearLevelSectionSubjects() {
                                     value={startTime.time_indicator}
                                     onChange={startTimeChange}
                                     name='time_indicator'
-                                    className="text-center h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                    className={`text-center h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400 ${classInvalidFields.includes('start_time') && 'border-red-300'}`}
                                 >
                                     <option value="AM">AM</option>
                                     <option value="PM">PM</option>
@@ -491,7 +536,7 @@ function YearLevelSectionSubjects() {
                                     onBlur={() => setTimeout(handleBlur, 100)}
                                     name='end_time'
                                     type="text"
-                                    className="h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                    className={`h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400 ${classInvalidFields.includes('end_time') && 'border-red-300'}`}
                                 />
                                 {isActive && (
                                     <div className="absolute left-0 right-0 bg-gray-100 max-h-32 overflow-y-auto z-10 mt-1">
@@ -524,7 +569,7 @@ function YearLevelSectionSubjects() {
                                 onChange={handleClassFormChange}
                                 name='room_id'
                                 type="text"
-                                className="h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                className={`h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400 ${classInvalidFields.includes('room_id') && 'border-red-300'}`}
                             >
                                 <option disabled value="0">...</option>
                                 {rooms.map((room, index) => (
@@ -533,13 +578,13 @@ function YearLevelSectionSubjects() {
                             </select>
                         </div>
                         <div className='relative col-span-1'>
-                            <label htmlFor="descriptive_title" className="truncate">Instructor</label>
+                            <label htmlFor="faculty_id" className="truncate">Instructor</label>
                             <input
                                 value={facultyName}
                                 onChange={(e) => { setFacultyName(e.target.value) }}
                                 name='faculty_id'
                                 type="text"
-                                className="h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                className={`h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400 ${classInvalidFields.includes('faculty_id') && 'border-red-300'}`}
                                 onFocus={handleInstructorFocus}
                                 onBlur={() => setTimeout(handleInstructorBlur, 200)}
                             />

@@ -191,7 +191,7 @@ function Curriculum() {
             return;
         }
 
-        await axiosInstance.post(`add-curr-term-subject`, subjectForm)
+        await axiosInstance.post(`add-curr-term-subject/${curriculumId}`, subjectForm)
             .then(response => {
                 if (response.data.message === 'success') {
                     showToast('Added successfully!', 'success');

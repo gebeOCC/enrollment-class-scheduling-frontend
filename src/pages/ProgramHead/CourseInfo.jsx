@@ -13,18 +13,22 @@ function CourseInfo() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [schoolYearId, setSchoolYearId] = useState('');
 
+    const [noSchoolYearId, setNoSchoolYearId] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [curriCulumExist, setCurriCulumExist] = useState(false);
+
+    const getCourseCurriculums = async () => {
+        await axiosInstance.get(`get-course-curriculums/${courseid}`)
+            .then(response => {
+                setCurriculums(response.data);
+            });
+    };
+
     useEffect(() => {
         const getCourseName = async () => {
             await axiosInstance.get(`get-course-name/${courseid}`)
                 .then(response => {
                     setCourse(response.data);
-                });
-        };
-
-        const getCourseCurriculums = async () => {
-            await axiosInstance.get(`get-course-curriculums/${courseid}`)
-                .then(response => {
-                    setCurriculums(response.data);
                 });
         };
 
@@ -42,13 +46,28 @@ function CourseInfo() {
 
     const handleAddCurriculum = async (event) => {
         event.preventDefault();
-        console.log(courseid, schoolYearId)
+        setIsLoading(true);
+        if (!schoolYearId) {
+            setNoSchoolYearId(true);
+            setIsLoading(false);
+            return;
+        } else {
+            setNoSchoolYearId(false);
+        }
+
         await axiosInstance.post(`add-course-curriculum/${courseid}`, { school_year_id: schoolYearId })
             .then(response => {
                 if (response.data.message === 'success') {
+                    getCourseCurriculums();
                     setIsModalOpen(false);
                     showToast('Added successfully!', 'success')
+                    setSchoolYearId('');
+                } else if (response.data.message === 'Curriculum already exists') {
+                    setCurriCulumExist(true);
                 }
+            })
+            .finally(() => {
+                setIsLoading(false);
             });
     };
 
@@ -106,10 +125,12 @@ function CourseInfo() {
                                         value={schoolYearId}
                                         name="school_year_id"
                                         onChange={(e) => { setSchoolYearId(e.target.value) }}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
-                                            {!schoolYearId && 
-                                                <option value={""} disabled>select shool year...</option>
-                                            }
+                                        className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400
+                                        ${noSchoolYearId && 'border-red-300'}`
+                                        }>
+                                        {!schoolYearId &&
+                                            <option value={""} disabled>select shool year...</option>
+                                        }
                                         {schoolYears.map((schoolYear, index) => (
                                             schoolYear.semester_name === 'First' &&
                                             <option key={schoolYear.id} value={schoolYear.id}>
@@ -117,16 +138,24 @@ function CourseInfo() {
                                             </option>
                                         ))}
                                     </select>
+                                    {curriCulumExist &&
+                                        <p className="text-sm text-red-500">Curriculum Already Exist</p>
+                                    }
                                 </div>
                                 <div className="flex justify-end">
                                     <button
                                         type="button"
                                         className="bg-gray-500 text-white py-1 px-3 rounded-md mr-2"
-                                        onClick={() => setIsModalOpen(false)}
+                                        onClick={() => {
+                                            setSchoolYearId('');
+                                            setIsModalOpen(false);
+                                            setCurriCulumExist(false);
+                                        }}
                                     >
                                         Cancel
                                     </button>
                                     <button
+                                        disabled={isLoading}
                                         type="submit"
                                         className="bg-primaryColor text-white py-1 px-3 rounded-md"
                                     >
