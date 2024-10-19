@@ -5,89 +5,65 @@ function SchoolYearDetails() {
     const { schoolYear } = useParams();
     const { semester } = useParams();
 
-    const [enrollmentStatus, setEnrollmentStatus] = useState('')
-
+    const [submitting, setSubmitting] = useState(false);
+    const [fetching, setFetching] = useState(true);
     const [schoolYeardetails, setSchoolYeardetails] = useState([])
 
-    useEffect(() => {
+    const getSChoolYearDetails = async () => {
         axiosInstance.get(`get-school-year-details/${schoolYear}/${semester}`)
             .then(response => {
                 if (response.data.message === "success") {
-                    setEnrollmentStatus(response.data.enrollmentStatus)
                     setSchoolYeardetails(response.data.schoolYearDetails)
+                    setFetching(false);
                 }
                 console.log(response.data)
             })
+    }
+    useEffect(() => {
+        getSChoolYearDetails();
     }, [])
 
-    const stopEnrollment = async () => {
-        console.log(schoolYeardetails.id);
-        await axiosInstance.post(`stop-enrollment/${schoolYeardetails.id}`)
-            .then(response => {
-                if (response.data.message === "success") {
-                    setSchoolYeardetails(prev => ({
-                        ...prev,
-                        enrollment_status: 'ended'
-                    }))
-                }
-            })
+    if (fetching) {
+        return <div></div>;
     }
 
-    const startEnrollment = async () => {
-        console.log(schoolYeardetails.id);
-        await axiosInstance.post(`start-enrollment/${schoolYeardetails.id}`)
+    const setAsDefault = async () => {
+        setSubmitting(true);
+        await axiosInstance.post(`set-sy-default/${schoolYeardetails.id}`)
             .then(response => {
-                if (response.data.message === "success") {
-                    setSchoolYeardetails(prev => ({
-                        ...prev,
-                        enrollment_status: 'ongoing'
-                    }))
+                if (response.data.message === 'success') {
+                    getSChoolYearDetails();
                 }
-                console.log(response.data)
             })
-    }
-
-    const resumeEnrollment = async () => {
-        console.log(schoolYeardetails.id);
-        await axiosInstance.post(`resume-enrollment/${schoolYeardetails.id}`)
-            .then(response => {
-                if (response.data.message === "success") {
-                    setSchoolYeardetails(prev => ({
-                        ...prev,
-                        enrollment_status: 'ongoing'
-                    }))
-                }
-                console.log(response.data)
+            .finally(() => {
+                setSubmitting(false);
             })
     }
 
     return (
-        <div className="p-6 bg-gray-100">
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold">2024-2025 First Semester</h1>
-                {schoolYeardetails.enrollment_status === "ongoing" && (
-                    <button
-                        onClick={stopEnrollment}
-                        className="bg-red-500 text-white px-4 py-2 rounded">
-                        Stop Enrollment
-                    </button>
-                )}
+        <>
+            <div className="flex flex-col sm:flex-row sm:justify-between items-center mb-4">
+                <h1 className="text-2xl font-bold w-max text-center sm:text-left">
+                    {schoolYeardetails.start_year}-{schoolYeardetails.end_year} {schoolYeardetails.semester_name} Semester
+                </h1>
+                <div className="mt-2 sm:mt-0 flex sm:flex-row items-center gap-2">
+                    {schoolYeardetails.is_current ? (
+                        <span className="bg-green-500 text-white text-xs font-bold rounded-full px-2 py-1 sm:mb-0">
+                            Current
+                        </span>
+                    ) : (
+                        <button
+                            disabled={submitting}
+                            onClick={setAsDefault}
+                            className="bg-blue-500 text-white text-xs font-bold uppercase rounded-full px-4 py-2 transition-transform duration-300 ease-in-out transform hover:scale-105 shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 border border-blue-600">
+                            Set as Current
+                        </button>
+                    )}
 
-                {schoolYeardetails.enrollment_status === "ended" && (
-                    <button
-                        onClick={resumeEnrollment}
-                        className="bg-orange-400 text-white px-4 py-2 rounded">
-                        Resume Enrollment
-                    </button>
-                )}
-
-                {schoolYeardetails.enrollment_status === null && (
-                    <button
-                        onClick={startEnrollment}
-                        className="bg-primaryColor text-white px-4 py-2 rounded">
-                        Start Enrollment
-                    </button>
-                )}
+                    {schoolYeardetails.enrollment_ongoing !== 0 && (
+                        <span className="bg-yellow-500 text-white text-xs font-bold rounded-full px-2 py-1">Enrollment Ongoing</span>
+                    )}
+                </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -104,7 +80,6 @@ function SchoolYearDetails() {
                             </tr>
                         </thead>
                         <tbody>
-                            {/* Add table rows here */}
                             <tr className="border-b">
                                 <td className="py-2">BSBA-FM</td>
                                 <td className="text-right">173</td>
@@ -112,7 +87,6 @@ function SchoolYearDetails() {
                                 <td className="text-right">102</td>
                                 <td className="text-right">75</td>
                             </tr>
-                            {/* Add more rows for other programs */}
                         </tbody>
                         <tfoot>
                             <tr className="font-semibold">
@@ -133,28 +107,23 @@ function SchoolYearDetails() {
                             <thead>
                                 <tr className="border-b">
                                     <th className="text-left py-2">Date</th>
-                                    {/* Add date columns */}
                                 </tr>
                             </thead>
                             <tbody>
-                                {/* Add rows for each program */}
                                 <tr className="border-b">
                                     <td className="py-2">BSBA-FM</td>
-                                    {/* Add enrollment data cells */}
                                 </tr>
-                                {/* Add more rows for other programs */}
                             </tbody>
                             <tfoot>
                                 <tr className="font-semibold">
                                     <td className="py-2">total</td>
-                                    {/* Add total cells */}
                                 </tr>
                             </tfoot>
                         </table>
                     </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 }
 

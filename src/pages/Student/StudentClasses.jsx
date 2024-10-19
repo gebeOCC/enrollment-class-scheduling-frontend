@@ -14,6 +14,7 @@ const daysOrder = {
 
 function StudentClasses() {
     const [classes, setClasses] = useState([]);
+    const [schoolYear, setSchoolYear] = useState([]);
 
     const sortClassesByDay = (data) => {
         return data.sort((a, b) => daysOrder[a.day] - daysOrder[b.day]);
@@ -22,8 +23,9 @@ function StudentClasses() {
     const getStudentClasses = async () => {
         await axiosInstance.get(`get-student-classes`)
             .then(response => {
-                const sortedClasses = sortClassesByDay(response.data);
+                const sortedClasses = sortClassesByDay(response.data.studentClasses);
                 setClasses(sortedClasses);
+                setSchoolYear(response.data.schoolYear)
                 console.log(response.data);
             })
     }
@@ -34,7 +36,7 @@ function StudentClasses() {
     return (
         <>
             <div className='bg-white p-4 rounded-lg shadow-lg overflow-hidden'>
-                <h1 className="text-2xl font-bold mb-4">Classes</h1>
+                <h1 className="text-2xl font-bold mb-4">Classes {schoolYear.school_year} {schoolYear.semester_name} semester</h1>
                 <table className="w-full bg-white">
                     <thead>
                         <tr className="bg-[#2980b9] text-white">

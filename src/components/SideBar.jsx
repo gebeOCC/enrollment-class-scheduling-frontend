@@ -18,19 +18,15 @@ function SideBar() {
     }
 
     return (
-        <div className="flex h-screen">
-            {/* Sidebar */}
-            <div className={`bg-[#3e5c76] text-white flex-shrink-0  flex-col justify-between hidden lg:block sm:hidden transition-all duration-300 ease-in-out ${sidebarOpen ? 'w-64 ' : 'w-20'}`}
-            >
-                <div>
-                    {/* Logo and Sidebar Title */}
+        <div className="flex h-screen overflow-hidden">
+            <div className={`bg-[#3e5c76] text-white flex-shrink-0 flex-col justify-between hidden lg:block sm:hidden transition-all duration-300 ease-in-out ${sidebarOpen ? 'w-64' : 'w-20'}`}>
+                <div className="flex flex-col h-full">
                     <div className="p-4 flex items-center h-14 mb-4">
                         <img src={OCC_LOGO} alt="Logo" className="w-12 h-12 mr-2" />
                         <h2 className="text-4xl font-bold">OCC</h2>
                     </div>
 
-                    {/* Sidebar Links */}
-                    <ul className="space-y-2">
+                    <ul className="space-y-2 flex-grow overflow-y-auto">
                         {(() => {
                             if (userRole === "registrar") {
                                 return (
@@ -48,19 +44,6 @@ function SideBar() {
                                                     >
                                                         <i className="fas fa-calendar-alt"></i>
                                                         <span>Dashboard</span>
-                                                    </NavLink>
-                                                </li>
-                                                <li className="px-4">
-                                                    <NavLink
-                                                        to="pre-enrollment-list"
-                                                        className={({ isActive }) =>
-                                                            isActive
-                                                                ? "bg-[#3d7cb1] p-2 rounded-md flex items-center space-x-2 py-2"
-                                                                : "p-2 flex items-center space-x-2 py-2"
-                                                        }
-                                                    >
-                                                        <i className="fas fa-calendar-alt"></i>
-                                                        <span>Pre Enrollment List</span>
                                                     </NavLink>
                                                 </li>
                                             </>
@@ -196,6 +179,18 @@ function SideBar() {
                                                 <span>Courses</span>
                                             </NavLink>
                                         </li>
+                                        <li className="px-4">
+                                            <NavLink
+                                                to="/faculty-list"
+                                                className={({ isActive }) =>
+                                                    isActive ? "bg-[#3d7cb1] p-2 rounded-md flex items-center space-x-2 py-2"
+                                                        : "p-2 flex items-center space-x-2 py-2"
+                                                }
+                                            >
+                                                <i className="fas fa-user-tie"></i>
+                                                <span>Faculty</span>
+                                            </NavLink>
+                                        </li>
                                         {enrollmentOngoing &&
                                             <>
                                                 <p className="px-4 text-sm text-gray-400">ENROLLMENT</p>
@@ -321,19 +316,6 @@ function SideBar() {
                                                     >
                                                         <i className="fas fa-calendar-alt"></i>
                                                         <span>Dashboard</span>
-                                                    </NavLink>
-                                                </li>
-                                                <li className="px-4">
-                                                    <NavLink
-                                                        to="pre-enrollment-list"
-                                                        className={({ isActive }) =>
-                                                            isActive
-                                                                ? "bg-[#3d7cb1] p-2 rounded-md flex items-center space-x-2 py-2"
-                                                                : "p-2 flex items-center space-x-2 py-2"
-                                                        }
-                                                    >
-                                                        <i className="fas fa-calendar-alt"></i>
-                                                        <span>Pre Enrollment List</span>
                                                     </NavLink>
                                                 </li>
                                             </>
@@ -488,19 +470,6 @@ function SideBar() {
                                                     </li >
                                                 ))
                                                 }
-                                                <li className="px-4">
-                                                    <NavLink
-                                                        to="pre-enrollment"
-                                                        className={({ isActive }) =>
-                                                            isActive
-                                                                ? "bg-[#3d7cb1] p-2 rounded-md flex items-center space-x-2 py-2"
-                                                                : "p-2 flex items-center space-x-2 py-2"
-                                                        }
-                                                    >
-                                                        <i className="fas fa-calendar-alt"></i>
-                                                        <span>Pre Enrollment</span>
-                                                    </NavLink>
-                                                </li>
                                             </>
                                         }
                                         <li className="px-4">
@@ -558,15 +527,11 @@ function SideBar() {
                 </div >
             </div >
 
-            {/* Main Content Area */}
             < div className="flex flex-col flex-grow" >
-
-                {/* Header */}
                 < div className="h-14 max-h-14 min-h-14 bg-white text-black flex items-center justify-between px-4" >
                     <Header sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
                 </div >
 
-                {/* Content */}
                 < div className="flex-grow p-4 bg-[#F0F4F8] overflow-auto" >
                     <Outlet />
                 </div >

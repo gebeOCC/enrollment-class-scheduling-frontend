@@ -30,6 +30,10 @@ export const AuthProvider = ({ children }) => {
         fetchUserRole();
     }, []);
 
+    if (fetching) {
+        return <div></div>;
+    }
+
     return (
         <AuthContext.Provider value={{ userRole, fetching, enrollmentOngoing, courses }}>
             {children}

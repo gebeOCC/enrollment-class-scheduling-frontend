@@ -23,12 +23,19 @@ function Header({ sidebarOpen, toggleSidebar }) {
     return (
         <>
             {/* Header */}
-            <svg onClick={toggleSidebar} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 cursor-pointer transition-transform duration-300 ease-in-out transform rotate-0">
+            <svg
+                onClick={toggleSidebar}
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className={`size-6 cursor-pointer transition-transform duration-300 ease-in-out transform`}
+            >
                 <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    d={`${sidebarOpen ? 'm18.75 4.5-7.5 7.5 7.5 7.5m-6-15L5.25 12l7.5 7.5' : 'm5.25 4.5 7.5 7.5-7.5 7.5m6-15 7.5 7.5-7.5 7.5'}`}
-                    className={`transition-opacity duration-300 ease-in-out`}
+                    d={`M3.75 6.75h16.5M3.75 12h16.5m-16.5 ${sidebarOpen ? '5.25H12' : '5.25h16.5'}`}
                 />
             </svg>
 
@@ -49,12 +56,12 @@ function Header({ sidebarOpen, toggleSidebar }) {
                         >
                             Profile
                         </NavLink>
-                        <NavLink
+                        <div
                             onClick={logout}
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
                         >
                             Logout
-                        </NavLink>
+                        </div>
                     </div>
                 )}
             </div>

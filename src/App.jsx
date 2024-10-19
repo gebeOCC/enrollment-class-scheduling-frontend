@@ -2,10 +2,10 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 import SideBar from "./components/SideBar";
 import LoginPage from "./pages/Guest/LoginPage";
-import Department from "./pages/registrar/department";
+import Department from "./pages/Registrar/Department";
 import Rooms from "./pages/Registrar/Rooms";
-import FacultyList from "./pages/Registrar/facultyList";
-import StudentList from "./pages/Registrar/studentList";
+import FacultyList from "./pages/Registrar/FacultyList";
+import StudentList from "./pages/Registrar/StudentList";
 import SchoolYear from "./pages/Registrar/SchoolYear";
 import NotFound from "./pages/All/NotFound";
 import SchoolYearDetails from "./pages/Registrar/SchoolYearDetails";
@@ -16,18 +16,13 @@ import EnrollmentCourse from "./pages/ProgramHead/EnrollmentCourse";
 import YearLevelSectionSubejcts from "./pages/ProgramHead/YearLevelSectionSubjects";
 import FacultyClasses from "./pages/Faculty/FacultyClasses";
 import CLassStudents from "./pages/Faculty/ClassStudents";
-import PreEnrollment from "./pages/ProgramHead/PreEnrollment";
-import PreEnrollmentList from "./pages/Registrar/PreEnrollmentList";
 import EnrollmentDashboardRegistrar from "./pages/Registrar/EnrollmentDashboardRegistrar";
 import EnrollmentDashboardProgramHead from "./pages/ProgramHead/EnrollmentDashboardProgramHead";
 import StudentClasses from "./pages/Student/StudentClasses";
+import PhFacultyList from "./pages/ProgramHead/PhFacultyList";
 
 function App() {
-    const { userRole, fetching, enrollmentOngoing } = useAuth();
-
-    if (fetching) {
-        return <div></div>;
-    }
+    const { userRole, enrollmentOngoing } = useAuth();
 
     const registrarRoutes = (
         <>
@@ -42,7 +37,6 @@ function App() {
             <Route path="/classes/:classId" element={<CLassStudents />} />
             {enrollmentOngoing &&
                 <>
-                    <Route path="/pre-enrollment-list" element={<PreEnrollmentList />} />
                     <Route path="/dashboard" element={<EnrollmentDashboardRegistrar />} />
                     <Route path="*" element={<Navigate to="/dashboard" />} />
                 </>
@@ -57,11 +51,11 @@ function App() {
             <Route path="/courses" element={<Courses />} />
             <Route path="/courses/:courseid" element={<CourseInfo />} />
             <Route path="/courses/:courseid/curriculum" element={<Curriculum />} />
+            <Route path="/faculty-list" element={<PhFacultyList />} />
             {enrollmentOngoing &&
                 <>
                     <Route path="/enrollment/:courseid" element={<EnrollmentCourse />} />
                     <Route path="/enrollment/:courseid/:yearlevel" element={<YearLevelSectionSubejcts />} />
-                    <Route path="/pre-enrollment" element={<PreEnrollment />} />
                     <Route path="/dashboard" element={<EnrollmentDashboardProgramHead />} />
                     <Route path="*" element={<Navigate to="/dashboard" />} />
                 </>

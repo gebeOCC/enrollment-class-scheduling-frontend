@@ -155,9 +155,9 @@ function Department() {
                     setFacultyAssign({
                         department_id: '',
                     });
-                    setSearchFaculty('')
+                    setSearchFaculty('');
+                    showToast(`Assigning success`, 'success');
                 }
-                console.log(response.data)
             })
     }
 
@@ -167,8 +167,8 @@ function Department() {
                 if (response.data.message === "success") {
                     setDepartmentsCourses(response.data.departments);
                     setIsAssignNewModalOpen(false)
+                    showToast(`Assigning success`, 'success');
                 }
-                console.log(response.data)
             })
     }
 

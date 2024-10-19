@@ -92,3 +92,15 @@ export function isValidEmail(email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
 }
+
+// Convert "YYYY-MM-DD" to "MMM DD, YYYY" format (e.g., "2024-12-30" to "Dec 30, 2024")
+export function formatDateShort(dateString) {
+    const options = { month: 'short', day: 'numeric', year: 'numeric' };
+    const date = new Date(dateString);
+    return date.toLocaleString('en-US', options);
+}
+
+export function formatFullName (userInfo) {
+    const { last_name, first_name, middle_name } = userInfo;
+    return `${capitalizeFirstLetter(last_name)}, ${capitalizeFirstLetter(first_name)}${middle_name ? ' ' + getFirstLetter(capitalizeFirstLetter(middle_name)) + '.' : ''}`;
+};
