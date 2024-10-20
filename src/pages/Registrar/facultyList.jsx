@@ -218,11 +218,11 @@ function FacultyList() {
                     <table className="min-w-full bg-white">
                         <thead>
                             <tr className="w-full bg-[#00b6cf] text-white text-left">
-                                <th className="py-2 px-2 md:px-4 hidden sm:block">#</th>
+                                <th className="py-2 px-2 md:px-4 hidden sm:table-cell">#</th>
                                 <th className="py-2 px-2 md:px-4">Faculty ID no.</th>
                                 <th className="py-2 px-2 md:px-4">Name</th>
-                                <th className="py-2 px-2 md:px-4 hidden sm:block">Email</th>
-                                <th className="py-2 px-2 md:px-4 hidden sm:block">Department</th>
+                                <th className="py-2 px-2 md:px-4 hidden sm:table-cell">Email</th>
+                                <th className="py-2 px-2 md:px-4 hidden sm:table-cell">Department</th>
                                 <th className="py-2 px-2 md:px-4">Action</th>
                             </tr>
                         </thead>
@@ -235,13 +235,13 @@ function FacultyList() {
                                         key={index}
                                         className={`border-b ${faculty.id % 2 === 0 ? "bg-[#deeced]" : "bg-white"}`}
                                     >
-                                        <td className="py-2 px-2 md:px-4 hidden sm:block">{index + 1}.</td>
+                                        <td className="py-2 px-2 md:px-4 hidden sm:table-cell">{index + 1}.</td>
                                         <td className="py-2 px-2 md:px-4">{faculty.user_id_no}</td>
                                         <td className="py-2 px-2 md:px-4">
                                             {capitalizeFirstLetter(faculty.last_name)}, {capitalizeFirstLetter(faculty.first_name)} {faculty.middle_name && getFirstLetter(capitalizeFirstLetter(faculty.middle_name)) + '.'}
                                         </td>
-                                        <td className="py-2 px-2 md:px-4 hidden sm:block">{faculty.email_address}</td>
-                                        <td className="py-2 px-2 md:px-4 hidden sm:block">{faculty.department_name_abbreviation}</td>
+                                        <td className="py-2 px-2 md:px-4 hidden sm:table-cell">{faculty.email_address}</td>
+                                        <td className="py-2 px-2 md:px-4 hidden sm:table-cell">{faculty.department_name_abbreviation}</td>
                                         <td className="py-2 px-2 md:px-4">Action</td>
                                     </tr>
                                 ))

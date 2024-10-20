@@ -22,7 +22,7 @@ import StudentClasses from "./pages/Student/StudentClasses";
 import PhFacultyList from "./pages/ProgramHead/PhFacultyList";
 
 function App() {
-    const { userRole, enrollmentOngoing } = useAuth();
+    const { userRole, enrollmentOngoing, preparation } = useAuth();
 
     const registrarRoutes = (
         <>
@@ -35,7 +35,7 @@ function App() {
             <Route path="/school-year/:schoolYear/:semester" element={<SchoolYearDetails />} />
             <Route path="/classes" element={<FacultyClasses />} />
             <Route path="/classes/:classId" element={<CLassStudents />} />
-            {enrollmentOngoing &&
+            {(enrollmentOngoing || preparation) &&
                 <>
                     <Route path="/dashboard" element={<EnrollmentDashboardRegistrar />} />
                     <Route path="*" element={<Navigate to="/dashboard" />} />
@@ -52,7 +52,7 @@ function App() {
             <Route path="/courses/:courseid" element={<CourseInfo />} />
             <Route path="/courses/:courseid/curriculum" element={<Curriculum />} />
             <Route path="/faculty-list" element={<PhFacultyList />} />
-            {enrollmentOngoing &&
+            {(enrollmentOngoing || preparation) &&
                 <>
                     <Route path="/enrollment/:courseid" element={<EnrollmentCourse />} />
                     <Route path="/enrollment/:courseid/:yearlevel" element={<YearLevelSectionSubejcts />} />

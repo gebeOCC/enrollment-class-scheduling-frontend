@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
 
 function SideBar() {
-    const { userRole, fetching, enrollmentOngoing, courses } = useAuth();
+    const { userRole, fetching, enrollmentOngoing, preparation, courses } = useAuth();
     // console.log(userRole);
     const [sidebarOpen, setSidebarOpen] = useState(true); // Sidebar is visible by default
 
@@ -150,7 +150,7 @@ function SideBar() {
                             } else if (userRole === "program_head") {
                                 return (
                                     <>
-                                        {enrollmentOngoing &&
+                                        {(enrollmentOngoing || preparation) &&
                                             <>
                                                 <li className="px-4">
                                                     <NavLink
@@ -191,7 +191,7 @@ function SideBar() {
                                                 <span>Faculty</span>
                                             </NavLink>
                                         </li>
-                                        {enrollmentOngoing &&
+                                        {(enrollmentOngoing || preparation) &&
                                             <>
                                                 <p className="px-4 text-sm text-gray-400">ENROLLMENT</p>
                                                 {courses.map((course, index) => (
@@ -210,19 +210,6 @@ function SideBar() {
                                                     </li >
                                                 ))
                                                 }
-                                                <li className="px-4">
-                                                    <NavLink
-                                                        to="pre-enrollment"
-                                                        className={({ isActive }) =>
-                                                            isActive
-                                                                ? "bg-[#3d7cb1] p-2 rounded-md flex items-center space-x-2 py-2"
-                                                                : "p-2 flex items-center space-x-2 py-2"
-                                                        }
-                                                    >
-                                                        <i className="fas fa-calendar-alt"></i>
-                                                        <span>Pre Enrollment</span>
-                                                    </NavLink>
-                                                </li>
                                             </>
                                         }
                                         <li className="px-4">

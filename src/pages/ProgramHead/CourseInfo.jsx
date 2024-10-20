@@ -88,8 +88,8 @@ function CourseInfo() {
     );
 
     return (
-        <div className="container mx-auto p-6">
-            <h1 className="text-3xl font-bold text-primaryColor mb-6">
+        <>
+            <h1 className="text-3xl font-bold text-primaryColor mb-4">
                 {course.course_name}
             </h1>
 
@@ -168,7 +168,7 @@ function CourseInfo() {
                 )
             }
             <Toast />
-        </div >
+        </ >
     );
 }
 
