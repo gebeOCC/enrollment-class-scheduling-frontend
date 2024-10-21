@@ -8,8 +8,13 @@ function CourseInfo() {
     const { courseid } = useParams();
     const [course, setCourse] = useState([]);
     const [curriculums, setCurriculums] = useState([]);
-    const [schoolYears, setSchoolYear] = useState([])
+    const currentYear = new Date().getFullYear();
+    const [form, setForm] = useState({
+        school_year_start: currentYear.toString(),
+        school_year_end: (currentYear + 1).toString(),
+    });
 
+    const [noSchoolYearStart, setNoSchoolYearStart] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [schoolYearId, setSchoolYearId] = useState('');
 
@@ -32,30 +37,16 @@ function CourseInfo() {
                 });
         };
 
-        const getSchoolYears = async () => {
-            await axiosInstance.get(`get-school-years`)
-                .then(response => {
-                    setSchoolYear(response.data.school_years)
-                })
-        }
-
         getCourseName();
         getCourseCurriculums();
-        getSchoolYears()
     }, [courseid]);
 
     const handleAddCurriculum = async (event) => {
         event.preventDefault();
         setIsLoading(true);
-        if (!schoolYearId) {
-            setNoSchoolYearId(true);
-            setIsLoading(false);
-            return;
-        } else {
-            setNoSchoolYearId(false);
-        }
 
-        await axiosInstance.post(`add-course-curriculum/${courseid}`, { school_year_id: schoolYearId })
+        console.log(form);
+        await axiosInstance.post(`add-course-curriculum/${courseid}`, { school_year_start: form.school_year_start, school_year_end: form.school_year_end })
             .then(response => {
                 if (response.data.message === 'success') {
                     getCourseCurriculums();
@@ -71,21 +62,23 @@ function CourseInfo() {
             });
     };
 
-    const schoolYearsData = schoolYears.map((schoolYear) => (
-        <>
-            {schoolYear.semester_name === 'First' &&
-                <option key={schoolYear.id} value={schoolYear.id}>
-                    {schoolYear.school_year} {schoolYear.semester_name}-Semester
-                </option>
-            }
-        </>
-    ));
+    const handleYearChange = (action) => {
+        const startYear = parseInt(form.school_year_start, 10);
+        if (action === 'increase') {
+            setForm({
+                ...form,
+                school_year_start: (startYear + 1).toString(),
+                school_year_end: (startYear + 2).toString(), // End year is always one year ahead
+            });
+        } else if (action === 'decrease' && startYear > 0) {
+            setForm({
+                ...form,
+                school_year_start: (startYear - 1).toString(),
+                school_year_end: (startYear).toString(), // Keep end year one year ahead
+            });
+        }
+    };
 
-    schoolYearsData.unshift(
-        <option key="default" disabled value="">
-            Select school year...
-        </option>
-    );
 
     return (
         <>
@@ -104,69 +97,82 @@ function CourseInfo() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {curriculums.map((curriculum, index) => (
-                    <Link to={`curriculum?school_year=${curriculum.school_year}`} key={index}>
+                    <Link to={`curriculum?school_year=${curriculum.school_year_start}-${curriculum.school_year_end}`} key={index}>
                         <div className="bg-white shadow-md p-4 rounded-lg">
                             <h2 className="text-xl font-semibold text-secondaryColor"># {index + 1}</h2>
-                            <p className="text-gray-500">School Year: {curriculum.school_year}</p>
+                            <p className="text-gray-500">School Year: {curriculum.school_year_start} - {curriculum.school_year_end}</p>
                         </div>
                     </Link>
                 ))}
             </div>
 
-            {
-                isModalOpen && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-                        <div className="bg-white p-6 rounded-md w-2/4">
-                            <h2 className="text-lg font-bold mb-4">Add New Curriculum</h2>
-                            <form onSubmit={handleAddCurriculum}>
-                                <div className="mb-4">
-                                    <label className="block text-sm font-medium mb-1">School Year</label>
-                                    <select
-                                        value={schoolYearId}
-                                        name="school_year_id"
-                                        onChange={(e) => { setSchoolYearId(e.target.value) }}
-                                        className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400
-                                        ${noSchoolYearId && 'border-red-300'}`
-                                        }>
-                                        {!schoolYearId &&
-                                            <option value={""} disabled>select shool year...</option>
-                                        }
-                                        {schoolYears.map((schoolYear, index) => (
-                                            schoolYear.semester_name === 'First' &&
-                                            <option key={schoolYear.id} value={schoolYear.id}>
-                                                {schoolYear.school_year} {schoolYear.semester_name}-Semester
-                                            </option>
-                                        ))}
-                                    </select>
-                                    {curriCulumExist &&
-                                        <p className="text-sm text-red-500">Curriculum Already Exist</p>
-                                    }
-                                </div>
-                                <div className="flex justify-end">
-                                    <button
-                                        type="button"
-                                        className="bg-gray-500 text-white py-1 px-3 rounded-md mr-2"
-                                        onClick={() => {
-                                            setSchoolYearId('');
-                                            setIsModalOpen(false);
-                                            setCurriCulumExist(false);
-                                        }}
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        disabled={isLoading}
-                                        type="submit"
-                                        className="bg-primaryColor text-white py-1 px-3 rounded-md"
-                                    >
-                                        Save
-                                    </button>
-                                </div>
-                            </form>
+            {isModalOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center transition-opacity ease-in-out duration-300">
+                    <div className="bg-white p-6 rounded-lg w-96 max-w-md shadow-lg relative transition-transform transform scale-95 hover:scale-100">
+                        <div className="bg-gray-100 px-4 py-2 rounded-t-lg shadow-sm mb-4">
+                            <h2 className="text-center font-bold text-xl text-gray-800">Add New Curriculum</h2>
                         </div>
+
+                        <form onSubmit={handleAddCurriculum}>
+                            {/* School Year */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">School Year:</label>
+                                <div className="flex justify-between gap-1 items-center">
+                                    <button
+                                        disabled={(currentYear - 5) === parseInt(form.school_year_start, 10)}
+                                        type="button"
+                                        onClick={() => handleYearChange('decrease')}
+                                        className={`w-12 h-12 text-2xl font-semibold bg-gray-200 rounded-md text-gray-600 hover:bg-gray-300 transition duration-200 ${((currentYear - 5) === parseInt(form.school_year_start, 10)) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    >
+                                        -
+                                    </button>
+                                    <p className="flex-1 text-center font-bold text-3xl text-gray-800">
+                                        {`${form.school_year_start} - ${form.school_year_end}`}
+                                    </p>
+                                    <button
+                                        disabled={(currentYear + 5) === parseInt(form.school_year_start, 10)}
+                                        type="button"
+                                        onClick={() => handleYearChange('increase')}
+                                        className={`w-12 h-12 text-2xl font-semibold bg-gray-200 rounded-md text-gray-600 hover:bg-gray-300 transition duration-200 ${((currentYear + 5) === parseInt(form.school_year_start, 10)) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    >
+                                        +
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Error Message */}
+                            {curriCulumExist && (
+                                <p className="text-sm text-red-500 mb-4">Curriculum Already Exists</p>
+                            )}
+
+                            {/* Buttons */}
+                            <div className="flex justify-end space-x-3 mt-6">
+                                <button
+                                    type="button"
+                                    className="bg-gray-500 text-white py-2 px-4 rounded-md shadow hover:bg-gray-600 transition duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400"
+                                    onClick={() => {
+                                        setSchoolYearId('');
+                                        setIsModalOpen(false);
+                                        setCurriCulumExist(false);
+                                    }}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    disabled={isLoading}
+                                    type="submit"
+                                    className="bg-blue-600 text-white py-2 px-4 rounded-md shadow hover:bg-blue-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {isLoading ? 'Saving...' : 'Save'}
+                                </button>
+                            </div>
+                        </form>
                     </div>
-                )
-            }
+                </div>
+            )}
+
+
+
             <Toast />
         </ >
     );

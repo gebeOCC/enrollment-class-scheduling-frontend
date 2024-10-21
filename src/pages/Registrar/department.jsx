@@ -178,7 +178,7 @@ function Department() {
                 {departmentsCourses.map((department, index) => (
                     <div
                         key={index}
-                        className="shadow-custom-heavy rounded-md mb-4 p-4 bg-white"
+                        className="shadow-heavy rounded-md mb-4 p-4 bg-white"
                     >
                         <div className="flex justify-between">
                             <h2 className="text-secondaryColor font-semibold text-xl mb-2">

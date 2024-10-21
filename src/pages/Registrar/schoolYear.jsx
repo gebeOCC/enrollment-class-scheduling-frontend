@@ -23,7 +23,7 @@ function SchoolYear() {
             .then(response => {
                 setSchoolYears(response.data.school_years)
 
-                console.log(response.data.school_years)
+                console.table(response.data.school_years)
                 setSemesters(response.data.semesters)
                 const lastSchoolYear = response.data.school_years[0];
                 if (lastSchoolYear) {
@@ -173,8 +173,12 @@ function SchoolYear() {
                                         <span className="bg-green-500 text-white text-xs font-bold rounded-full px-2 py-1 mr-1">Current</span>
                                     )}
                                     {sy.enrollment_ongoing === 1 && (
-                                        <span className="bg-yellow-500 text-white text-xs font-bold rounded-full px-2 py-1">Ongoing</span>
+                                        <span className="bg-blue-500 text-white text-xs font-bold rounded-full px-2 py-1">Ongoing</span>
                                     )}
+                                    {(!sy.enrollment_ongoing && !!sy.preparation) && (
+                                        <span className="bg-yellow-500 text-white text-xs font-bold rounded-full px-2 py-1">Preparing</span>
+                                    )}
+
                                 </div>
                             </div>
                         </Link>

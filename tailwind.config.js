@@ -12,8 +12,8 @@ export default {
                 thirdColor: '#587D8B',
             },
             boxShadow: {
-                'custom-light': '0 0 10px 2px rgba(100, 100, 100, 0.1)',
-                'custom-heavy': '0 0 10px 2px rgba(100, 100, 100, 0.2)',
+                'light': '0 0 10px 2px rgba(100, 100, 100, 0.1)',
+                'heavy': '0 0 10px 2px rgba(100, 100, 100, 0.2)',
             }
         },
         screens: {

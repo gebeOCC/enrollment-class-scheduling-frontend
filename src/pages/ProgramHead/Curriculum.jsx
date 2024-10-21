@@ -19,6 +19,7 @@ function Curriculum() {
     const [yearLevels, setYearLevels] = useState([]);
     const [semesters, setSemesters] = useState([]);
     const [subjects, setSubjects] = useState([]);
+    const [preRequisites, setPreRequisites] = useState([]);
 
     const [addSemester, setAddSemester] = useState({
         id: '',
@@ -232,25 +233,39 @@ function Curriculum() {
 
     return (
         <>
-            <div className="bg-white p-4 rounded-lg shadow overflow-hidden mb-6 text-center flex justify-between items-center">
+            <div className="bg-white p-4 rounded-lg shadow-light overflow-hidden mb-6 text-center flex justify-between items-center">
                 {course.course_name &&
                     <>
                         <h1 className="text-4xl font-bold text-blue-600">
-                            {course.course_name} ({schoolYear})
+                        {course.course_name} <span className='text-lg sm:text-xl md:text-2xl text-gray-500'> ({schoolYear})</span>
                         </h1>
-                        <button
-                            onClick={toggleEditing}
-                            className={`px-4 py-2 rounded ${editing ? 'bg-red-500' : 'bg-blue-500'} text-white hover:bg-opacity-90 transition`}
-                        >
-                            {editing ? 'Stop Editing' : 'Edit'}
-                        </button>
+                        <div className="flex items-center shadow-light p-2 rounded-2xl">
+                            <label htmlFor="edit-toggle" className="mr-2 font-semibold text-gray-700">
+                                Edit mode
+                            </label>
+                            <input
+                                type="checkbox"
+                                id="edit-toggle"
+                                checked={editing}
+                                onChange={toggleEditing}
+                                aria-label="Toggle edit mode"
+                                className="appearance-none w-12 h-6 bg-gray-400 rounded-full cursor-pointer transition duration-300 ease-in-out flex justify-start items-center
+                                            checked:bg-blue-600 
+                                            after:content-[''] 
+                                            after:block after:w-5 after:h-5 after:bg-white 
+                                            after:rounded-full after:shadow-md 
+                                            after:transition-all after:duration-300 
+                                            after:translate-x-1 checked:after:translate-x-6   
+                                            hover:shadow-lg focus:outline-none"
+                            />
+                        </div>
                     </>
                 }
             </div>
 
             <div className="space-y-6">
                 {yearLevels.map((yearLevel, yearIndex) => (
-                    <div key={yearIndex} className="bg-white shadow-lg p-6 rounded-xl border border-gray-200">
+                    <div key={yearIndex} className="bg-white shadow-light p-6 rounded-xl border border-gray-200">
                         <div className="flex justify-between items-center mb-2">
                             <h2 className="text-2xl font-bold text-blue-600">
                                 {yearLevel.year_level_name}

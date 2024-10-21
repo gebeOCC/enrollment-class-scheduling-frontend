@@ -1,7 +1,9 @@
 import { useParams, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axiosInstance from "../../../axios/axiosInstance";
+import { useAuth } from "../../context/AuthContext";
 function EnrollmentCourse() {
+    const { enrollmentOngoing, preparation } = useAuth();
     const { courseid } = useParams();
     const [course, setCourse] = useState([]);
 
@@ -67,7 +69,6 @@ function EnrollmentCourse() {
             });
     };
 
-
     const createNewSection = (year_level_id) => {
         setYearSectionForm(prev => ({
             ...prev,
@@ -89,7 +90,6 @@ function EnrollmentCourse() {
             }
         });
     };
-
     return (
         <>
             <div className="bg-white p-4 rounded-lg shadow overflow-hidden mb-6 text-center">
@@ -101,7 +101,6 @@ function EnrollmentCourse() {
                     </>
                 }
             </div>
-
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
                 {yearLevels.map((yearLevel, index) => (
                     <div key={index} className="bg-white p-4 rounded-lg shadow overflow-hidden">

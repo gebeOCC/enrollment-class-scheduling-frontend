@@ -60,8 +60,11 @@ function SchoolYearDetails() {
                         </button>
                     )}
 
-                    {schoolYeardetails.enrollment_ongoing !== 0 && (
-                        <span className="bg-yellow-500 text-white text-xs font-bold rounded-full px-2 py-1">Enrollment Ongoing</span>
+                    {!!schoolYeardetails.enrollment_ongoing && (
+                        <span className="bg-blue-500 text-white text-xs font-bold rounded-full px-2 py-1">Enrollment Ongoing</span>
+                    )}
+                    {(!schoolYeardetails.enrollment_ongoing && !!schoolYeardetails.preparation) && (
+                        <span className="bg-yellow-500 text-white text-xs font-bold rounded-full px-2 py-1">Enrollment Preparing</span>
                     )}
                 </div>
             </div>

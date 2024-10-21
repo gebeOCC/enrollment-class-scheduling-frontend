@@ -80,7 +80,7 @@ function Rooms() {
     return (
         <>
             <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 md:h-full">
-                <div className="w-full md:w-full bg-white shadow-custom-light p-4 rounded-md flex flex-col min-h-min max-h-full">
+                <div className="w-full md:w-full bg-white shadow-light p-4 rounded-md flex flex-col min-h-min max-h-full">
                     <div className="flex flex-col h-full">
                         <h2 className="text-black font-bold text-2xl mb-2">Rooms</h2>
                         <div className="flex-grow overflow-y-auto space-y-2">
@@ -128,7 +128,7 @@ function Rooms() {
                 {departmentRooms.map((departmentRoom, index) => (
                     <div
                         key={index}
-                        className={`w-full md:w-full bg-white p-4 rounded-md shadow-custom-light ${departmentRoom.id == deptId ? 'border border-[#00ff1a]' : ''}`}>
+                        className={`w-full md:w-full bg-white p-4 rounded-md shadow-light ${departmentRoom.id == deptId ? 'border border-[#00ff1a]' : ''}`}>
                         <div className="flex justify-between mb-4">
                             <h3
                                 className="text-black font-bold text-lgcursor-pointer inline-block self-center text-2xl">

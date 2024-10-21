@@ -66,6 +66,24 @@ function App() {
         </>
     );
 
+    const evaluatorRoutes = (
+        <>
+            <Route path="/courses/:courseid" element={<CourseInfo />} />
+            <Route path="/courses/:courseid/curriculum" element={<Curriculum />} />
+            {(enrollmentOngoing || preparation) &&
+                <>
+                    <Route path="/enrollment/:courseid" element={<EnrollmentCourse />} />
+                    <Route path="/enrollment/:courseid/:yearlevel" element={<YearLevelSectionSubejcts />} />
+                    <Route path="/dashboard" element={<EnrollmentDashboardProgramHead />} />
+                <Route path="/" element={<Navigate to="/dashboard" />} />
+                </>
+            }
+            <Route path="/" element={<Navigate to="/classes" />} />
+            <Route path="/classes" element={<FacultyClasses />} />
+            <Route path="/classes/:classId" element={<CLassStudents />} />
+        </>
+    );
+
     const FacultyRoutes = (
         <>
             <Route path="/classes" element={<FacultyClasses />} />
@@ -94,6 +112,7 @@ function App() {
                         <Route path="/" element={<SideBar />}>
                             {userRole === "registrar" && registrarRoutes}
                             {userRole === "program_head" && programHeadRoutes}
+                            {userRole === "evaluator" && evaluatorRoutes}
                             {userRole === "faculty" && FacultyRoutes}
                             {userRole === "student" && studentRoutes}
                         </Route>

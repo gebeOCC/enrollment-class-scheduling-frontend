@@ -139,10 +139,10 @@ function PhFacultyList() {
                                             {formatFullName(faculty.user.user_information)}
                                         </td>
                                         <td className="py-3 px-4 hidden sm:table-cell text-gray-700">{faculty.user.user_information.email_address}</td>
-                                        <td className="py-3 px-4 hidden sm:table-cell text-gray-700 overflow-hidden transition-transform">
+                                        <td className="py-3 px-4 hidden sm:table-cell text-gray-700 transition-transform">
                                             <span
                                                 onClick={() => { setActive(faculty.faculty_id) }}
-                                                className={`duration-200 hover:scale-105 cursor-pointer px-2 py-1 rounded-full text-xs font-medium ${faculty.active ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+                                                className={`duration-200 hover:scale-105 cursor-pointer px-2 py-1 rounded-full text-xs font-medium  inline-block ${faculty.active ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
                                                 {faculty.active ? 'Active' : 'Inactive'}
                                             </span>
                                         </td>

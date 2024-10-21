@@ -19,7 +19,7 @@ function Studentlist() {
         axiosInstance.get(`get-student-list`)
             .then(response => {
                 setStudents(response.data)
-                console.log(response.data)
+                console.table(response.data)
             })
     }, [])
 
@@ -260,8 +260,6 @@ function Studentlist() {
                 <div className="flex justify-between items-center mb-4">
                     <div className="flex gap-3">
                         <h2 className="text-2xl font-bold">Student List</h2>
-
-                        {/* Dropdown for selecting the number of students to display */}
                         <select
                             value={showCount}
                             onChange={(e) => setShowCount(parseInt(e.target.value))}
@@ -291,7 +289,6 @@ function Studentlist() {
                                 onChange={handleFileChange}
                             />
                         </label>
-
                         <button
                             onClick={() => { setIsStudentModalOpen(true) }}
                             className="bg-primaryColor text-white px-4 py-2 rounded-md hover:bg-blue-700"

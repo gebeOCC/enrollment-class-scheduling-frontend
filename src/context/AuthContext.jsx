@@ -9,6 +9,7 @@ export const AuthProvider = ({ children }) => {
     const [enrollmentOngoing, setEnrollmentOngoing] = useState(false);
     const [preparation, setPreparation] = useState(false);
     const [courses, setCourses] = useState([]);
+    const [enrollmentData, setEnrollmentData] = useState([]);
 
     useEffect(() => {
         const fetchUserRole = async () => {
@@ -17,19 +18,18 @@ export const AuthProvider = ({ children }) => {
                 if (response.data.user_role) {
                     setUserRole(response.data.user_role);
                     setEnrollmentOngoing(response.data.enrollmentOngoing);
-                    setPreparation(response.data.preparation)
+                    setPreparation(response.data.preparation);
+                    setEnrollmentData(response.data.schoolYear);
                     if (response.data.courses.length > 0) {
-                        setCourses(response.data.courses)
+                        setCourses(response.data.courses);
                     }
                 }
-                // console.log(response.data);
             } catch (error) {
                 console.error('Error fetching user role:', error);
             } finally {
                 setFetching(false);
             }
         };
-
         fetchUserRole();
     }, []);
 
@@ -38,7 +38,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     return (
-        <AuthContext.Provider value={{ userRole, fetching, enrollmentOngoing, preparation, courses }}>
+        <AuthContext.Provider value={{ userRole, fetching, enrollmentOngoing, preparation, courses, enrollmentData }}>
             {children}
         </AuthContext.Provider>
     );

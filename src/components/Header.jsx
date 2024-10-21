@@ -30,7 +30,8 @@ function Header({ sidebarOpen, toggleSidebar }) {
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className={`size-6 cursor-pointer transition-transform duration-300 ease-in-out transform`}
+                className={`size-6 cursor-pointer transition-transform duration-300 ease-in-out transform
+                hover:scale-110 active:scale-90`}
             >
                 <path
                     strokeLinecap="round"
@@ -38,7 +39,6 @@ function Header({ sidebarOpen, toggleSidebar }) {
                     d={`M3.75 6.75h16.5M3.75 12h16.5m-16.5 ${sidebarOpen ? '5.25H12' : '5.25h16.5'}`}
                 />
             </svg>
-
 
             {/* Profile Picture and Dropdown */}
             <div className="relative">

@@ -3,10 +3,10 @@ import OCC_LOGO from '../images/OCC_LOGO.png';
 import Header from "./Header";
 import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
+import { formatDate } from "../utilities/utils";
 
 function SideBar() {
-    const { userRole, fetching, enrollmentOngoing, preparation, courses } = useAuth();
-    // console.log(userRole);
+    const { userRole, fetching, enrollmentOngoing, preparation, courses, enrollmentData } = useAuth();
     const [sidebarOpen, setSidebarOpen] = useState(true); // Sidebar is visible by default
 
     const toggleSidebar = () => {
@@ -26,7 +26,7 @@ function SideBar() {
                         <h2 className="text-4xl font-bold">OCC</h2>
                     </div>
 
-                    <ul className="space-y-2 flex-grow overflow-y-auto">
+                    <ul className="space-y-1 flex-grow overflow-x-hidden">
                         {(() => {
                             if (userRole === "registrar") {
                                 return (
@@ -152,72 +152,160 @@ function SideBar() {
                                     <>
                                         {(enrollmentOngoing || preparation) &&
                                             <>
-                                                <li className="px-4">
-                                                    <NavLink
-                                                        to="dashboard"
-                                                        className={({ isActive }) =>
-                                                            isActive
-                                                                ? "bg-[#3d7cb1] p-2 rounded-md flex items-center space-x-2 py-2"
-                                                                : "p-2 flex items-center space-x-2 py-2"
-                                                        }
-                                                    >
-                                                        <i className="fas fa-calendar-alt"></i>
-                                                        <span>Dashboard</span>
-                                                    </NavLink>
-                                                </li>
+                                                <div className="px-2">
+                                                    <div className="py-4 rounded-lg bg-cyan-700 shadow-md">
+                                                        {/* Enrollment Status */}
+                                                        <p className="px-4 text-sm font-bold text-white">
+                                                            ENROLLMENT{' '}
+                                                            <span className="text-gray-200 font-thin">
+                                                                {(!enrollmentOngoing && preparation) ? 'preparation' : 'started'}
+                                                            </span>
+                                                        </p>
+
+                                                        {/* Enrollment Date Range */}
+                                                        <p className="px-4 text-xs italic text-gray-300 mb-3">
+                                                            {formatDate(enrollmentData.start_date)} - {formatDate(enrollmentData.end_date)}
+                                                        </p>
+
+                                                        {/* Course List */}
+                                                        <div className="space-y-1">
+                                                            {courses.map((course, index) => (
+                                                                <li key={index} className="px-4">
+                                                                    <NavLink
+                                                                        to={`enrollment/${course.hashed_course_id}`}
+                                                                        className={({ isActive }) =>
+                                                                            isActive
+                                                                                ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
+                                                                                : "p-2 flex items-center rounded-md  space-x-2 py-2 duration-100 focus:bg-[#4e90ca]  hover:bg-[#3d7cb1]"  // Added hover state
+                                                                        }
+                                                                    >
+                                                                        <i className="fas fa-calendar-alt text-white"></i>
+                                                                        <span className="text-white">{course.course_name_abbreviation}</span>
+                                                                    </NavLink>
+                                                                </li>
+                                                            ))}
+                                                            <li className="px-4">
+                                                                <NavLink
+                                                                    to="dashboard"
+                                                                    className={({ isActive }) =>
+                                                                        isActive
+                                                                            ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
+                                                                            : "p-2 flex items-center space-x-2 py-2 rounded-md duration-100 focus:bg-[#4e90ca] hover:bg-[#3d7cb1]"
+                                                                    }
+                                                                >
+                                                                    <i className="fas fa-calendar-alt"></i>
+                                                                    <span>Dashboard</span>
+                                                                </NavLink>
+                                                            </li>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </>
                                         }
-                                        <li className="px-4">
+                                        
+                                        <div className="px-2">
                                             <NavLink
                                                 to="/courses"
                                                 className={({ isActive }) =>
-                                                    isActive ? "bg-[#3d7cb1] p-2 rounded-md flex items-center space-x-2 py-2"
-                                                        : "p-2 flex items-center space-x-2 py-2"
+                                                    isActive
+                                                        ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
+                                                        : "p-2 flex items-center rounded-md  space-x-2 py-2 duration-100 focus:bg-[#4e90ca]  hover:bg-[#3d7cb1]"
                                                 }
                                             >
                                                 <i className="fas fa-book"></i>
                                                 <span>Courses</span>
                                             </NavLink>
-                                        </li>
-                                        <li className="px-4">
+                                        </div>
+                                        <li className="px-2">
                                             <NavLink
                                                 to="/faculty-list"
                                                 className={({ isActive }) =>
-                                                    isActive ? "bg-[#3d7cb1] p-2 rounded-md flex items-center space-x-2 py-2"
-                                                        : "p-2 flex items-center space-x-2 py-2"
+                                                    isActive
+                                                        ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
+                                                        : "p-2 flex items-center rounded-md  space-x-2 py-2 duration-100 focus:bg-[#4e90ca]  hover:bg-[#3d7cb1]"
                                                 }
                                             >
                                                 <i className="fas fa-user-tie"></i>
                                                 <span>Faculty</span>
                                             </NavLink>
                                         </li>
-                                        {(enrollmentOngoing || preparation) &&
-                                            <>
-                                                <p className="px-4 text-sm text-gray-400">ENROLLMENT</p>
-                                                {courses.map((course, index) => (
-                                                    <li key={index} className="px-4">
-                                                        <NavLink
-                                                            to={`enrollment/${course.hashed_course_id}`}
-                                                            className={({ isActive }) =>
-                                                                isActive
-                                                                    ? "bg-[#3d7cb1] p-2 rounded-md flex items-center space-x-2 py-2"
-                                                                    : "p-2 flex items-center space-x-2 py-2"
-                                                            }
-                                                        >
-                                                            <i className="fas fa-calendar-alt"></i>
-                                                            <span>{course.course_name_abbreviation}</span>
-                                                        </NavLink>
-                                                    </li >
-                                                ))
-                                                }
-                                            </>
-                                        }
-                                        <li className="px-4">
+                                        <li className="px-2">
                                             <NavLink
                                                 to="/classes"
                                                 className={({ isActive }) =>
-                                                    isActive ? "bg-[#3d7cb1] p-2 rounded-md flex items-center space-x-2 py-2"
-                                                        : "p-2 flex items-center space-x-2 py-2"
+                                                    isActive
+                                                        ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
+                                                        : "p-2 flex items-center rounded-md  space-x-2 py-2 duration-100 focus:bg-[#4e90ca]  hover:bg-[#3d7cb1]"
+                                                }
+                                            >
+                                                <i className="fas fa-book"></i>
+                                                <span>Classes</span>
+                                            </NavLink>
+                                        </li>
+                                    </>
+                                )
+                            } else if (userRole === "evaluator") {
+                                return (
+                                    <>
+                                        {(enrollmentOngoing || preparation) &&
+                                            <>
+                                                <div className="px-2">
+                                                    <div className="py-4 rounded-lg bg-cyan-700 shadow-md">
+                                                        {/* Enrollment Status */}
+                                                        <p className="px-4 text-sm font-bold text-white">
+                                                            ENROLLMENT{' '}
+                                                            <span className="text-gray-200 font-thin">
+                                                                {(!enrollmentOngoing && preparation) ? 'preparation' : 'started'}
+                                                            </span>
+                                                        </p>
+
+                                                        {/* Enrollment Date Range */}
+                                                        <p className="px-4 text-xs italic text-gray-300 mb-3">
+                                                            {formatDate(enrollmentData.start_date)} - {formatDate(enrollmentData.end_date)}
+                                                        </p>
+
+                                                        {/* Course List */}
+                                                        <div className="space-y-1">
+                                                            {courses.map((course, index) => (
+                                                                <li key={index} className="px-4">
+                                                                    <NavLink
+                                                                        to={`enrollment/${course.hashed_course_id}`}
+                                                                        className={({ isActive }) =>
+                                                                            isActive
+                                                                                ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
+                                                                                : "p-2 flex items-center rounded-md  space-x-2 py-2 duration-100 focus:bg-[#4e90ca]  hover:bg-[#3d7cb1]"  // Added hover state
+                                                                        }
+                                                                    >
+                                                                        <i className="fas fa-calendar-alt text-white"></i>
+                                                                        <span className="text-white">{course.course_name_abbreviation}</span>
+                                                                    </NavLink>
+                                                                </li>
+                                                            ))}
+                                                            <li className="px-4">
+                                                                <NavLink
+                                                                    to="dashboard"
+                                                                    className={({ isActive }) =>
+                                                                        isActive
+                                                                            ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
+                                                                            : "p-2 flex items-center space-x-2 py-2 rounded-md duration-100 focus:bg-[#4e90ca] hover:bg-[#3d7cb1]"
+                                                                    }
+                                                                >
+                                                                    <i className="fas fa-calendar-alt"></i>
+                                                                    <span>Dashboard</span>
+                                                                </NavLink>
+                                                            </li>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </>
+                                        }
+                                        <li className="px-2">
+                                            <NavLink
+                                                to="/classes"
+                                                className={({ isActive }) =>
+                                                    isActive
+                                                        ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
+                                                        : "p-2 flex items-center rounded-md  space-x-2 py-2 duration-100 focus:bg-[#4e90ca]  hover:bg-[#3d7cb1]"
                                                 }
                                             >
                                                 <i className="fas fa-book"></i>
@@ -409,7 +497,7 @@ function SideBar() {
                             } else if (userRole === "program_head") {
                                 return (
                                     <>
-                                        {enrollmentOngoing &&
+                                        {(enrollmentOngoing || preparation) &&
                                             <>
                                                 <li className="px-4">
                                                     <NavLink
@@ -438,13 +526,25 @@ function SideBar() {
                                                 <span>Courses</span>
                                             </NavLink>
                                         </li>
-                                        {enrollmentOngoing &&
+                                        <li className="px-4">
+                                            <NavLink
+                                                to="/faculty-list"
+                                                className={({ isActive }) =>
+                                                    isActive ? "bg-[#3d7cb1] p-2 rounded-md flex items-center space-x-2 py-2"
+                                                        : "p-2 flex items-center space-x-2 py-2"
+                                                }
+                                            >
+                                                <i className="fas fa-user-tie"></i>
+                                                <span>Faculty</span>
+                                            </NavLink>
+                                        </li>
+                                        {(enrollmentOngoing || preparation) &&
                                             <>
                                                 <p className="px-4 text-sm text-gray-400">ENROLLMENT</p>
                                                 {courses.map((course, index) => (
                                                     <li key={index} className="px-4">
                                                         <NavLink
-                                                            to={`enrollment /${course.hashed_course_id}`}
+                                                            to={`enrollment/${course.hashed_course_id}`}
                                                             className={({ isActive }) =>
                                                                 isActive
                                                                     ? "bg-[#3d7cb1] p-2 rounded-md flex items-center space-x-2 py-2"
