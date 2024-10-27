@@ -7,7 +7,7 @@ import { showToast } from '../../components/Toast';
 function Curriculum() {
     const { courseid } = useParams();
     const [searchParams] = useSearchParams();
-    const schoolYear = searchParams.get('school_year');
+    const schoolYear = searchParams.get('school-year');
 
     const [submitting, setSubmitting] = useState(false);
     const [editing, setEditing] = useState(false);

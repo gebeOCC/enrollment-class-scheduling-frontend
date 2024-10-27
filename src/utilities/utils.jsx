@@ -8,14 +8,14 @@ export const formatDate = (dateString) => {
 // convert 24 hours to am pm
 export function convertToAMPM(time) {
     const [hour, minute] = time.split(':').map(Number);
-    
+
     const ampm = hour >= 12 ? 'PM' : 'AM';
-    
+
     const convertedHour = hour % 12 || 12;
-    
+
     return `${convertedHour}:${minute.toString().padStart(2, '0')} ${ampm}`;
-  }
-  
+}
+
 
 // convert minutes to 24 hours
 export function convertMinutesTo24HourTime(minutes) {
@@ -100,7 +100,26 @@ export function formatDateShort(dateString) {
     return date.toLocaleString('en-US', options);
 }
 
-export function formatFullName (userInfo) {
+export function formatFullName(userInfo) {
     const { last_name, first_name, middle_name } = userInfo;
     return `${capitalizeFirstLetter(last_name)}, ${capitalizeFirstLetter(first_name)}${middle_name ? ' ' + getFirstLetter(capitalizeFirstLetter(middle_name)) + '.' : ''}`;
 };
+
+
+export function formatBirthday(birthday) {
+    if (!birthday) return '';
+
+    let date;
+
+    if (/^\d{4}-\d{2}-\d{2}$/.test(birthday)) {
+        date = new Date(birthday);
+    } else {
+        date = new Date(birthday);
+    }
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+}

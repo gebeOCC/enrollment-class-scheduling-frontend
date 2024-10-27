@@ -187,11 +187,15 @@ function YearLevelSectionSubjects() {
         }
     }
 
+    // api to fetch all the classes of this year level & section
     const getClasses = async () => {
+        console.log(courseid);
+        console.log(formattedYearLevel);
+        console.log(section);
         await axiosInstance.get(`get-classes/${courseid}/${formattedYearLevel}/${section}`)
             .then(response => {
                 setClasses(response.data.classes);
-                console.log(response.data.classes);
+                console.table(response.data.classes)
                 setYearLevelSectionId(response.data.yearSectionId);
             })
     }
@@ -222,7 +226,7 @@ function YearLevelSectionSubjects() {
         const getInstructors = async () => {
             await axiosInstance.get(`get-instructors`)
                 .then(response => {
-                    setInstructors(response.data)
+                    setInstructors(response.data);
                 })
         }
 
@@ -268,7 +272,6 @@ function YearLevelSectionSubjects() {
         ]
     }, [classForm.faculty_id, instructorInFocus])
 
-
     const [classInvalidFields, setClassInvalidFields] = useState([""]);
     const submitClass = async () => {
         setSubmitting(true)
@@ -288,6 +291,8 @@ function YearLevelSectionSubjects() {
             setSubmitting(false);
             return;
         }
+
+        console.log(yearLevelSectionId)
         await axiosInstance.post(`add-class/${yearLevelSectionId}`, classForm)
             .then(response => {
                 if (response.data.message === 'success') {

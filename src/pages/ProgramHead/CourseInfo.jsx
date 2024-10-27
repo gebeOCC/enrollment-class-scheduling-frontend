@@ -97,7 +97,7 @@ function CourseInfo() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {curriculums.map((curriculum, index) => (
-                    <Link to={`curriculum?school_year=${curriculum.school_year_start}-${curriculum.school_year_end}`} key={index}>
+                    <Link to={`curriculum?school-year=${curriculum.school_year_start}-${curriculum.school_year_end}`} key={index}>
                         <div className="bg-white shadow-md p-4 rounded-lg">
                             <h2 className="text-xl font-semibold text-secondaryColor"># {index + 1}</h2>
                             <p className="text-gray-500">School Year: {curriculum.school_year_start} - {curriculum.school_year_end}</p>

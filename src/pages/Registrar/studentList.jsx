@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import axiosInstance from "../../../axios/axiosInstance"
-import { capitalizeFirstLetter, formatPhoneNumber, getFirstLetter, isValidEmail, removeHyphens } from "../../utilities/utils";
+import { capitalizeFirstLetter, formatBirthday, formatPhoneNumber, getFirstLetter, isValidEmail, removeHyphens } from "../../utilities/utils";
 import * as XLSX from 'xlsx';
 
 function Studentlist() {
@@ -19,7 +19,6 @@ function Studentlist() {
         axiosInstance.get(`get-student-list`)
             .then(response => {
                 setStudents(response.data)
-                console.table(response.data)
             })
     }, [])
 
@@ -161,18 +160,20 @@ function Studentlist() {
                     }
                 });
 
+                // console.log(student)
                 return axiosInstance.post(`import-students/`, {
                     user_id_no: student['STUDENT ID NO'] || '',
                     first_name: student['FIRST NAME'] || '',
                     last_name: student['LAST NAME'] || '',
                     middle_name: student['MIDDLE NAME'] || '',
                     gender: student['GENDER'] || '',
-                    birthday: student['BIRTH DATE (mm/dd/yy)'] || '',
+                    birthday: formatBirthday(student['BIRTH DATE (mm/dd/yy)']) || '',
                     contact_number: student['Contact No.'] || '',
                     email_address: student['Email Address'] || '',
                     present_address: student['Present Address'] || '',
                     zip_code: student['ZIP CODE'] || '',
                 }).then(response => {
+                    console.log(response.data.message)
                     if (response.data.message === "success") {
                         setUploadExcelStudentList(prevList =>
                             prevList.map(existingStudent =>
@@ -181,13 +182,13 @@ function Studentlist() {
                                     : existingStudent
                             )
                         );
-                        setTotalUpload(prevNum => prevNum + 1);
                         const newStudent = {
                             id_number: student['STUDENT ID NO'],
                             first_name: student['FIRST NAME'],
                             last_name: student['LAST NAME'],
                             uploading_status: false,
                         };
+                        setTotalUpload(prevNum => prevNum + 1);
 
                         setUploadExcelStudentList(prevList => [...prevList, newStudent]);
                     }

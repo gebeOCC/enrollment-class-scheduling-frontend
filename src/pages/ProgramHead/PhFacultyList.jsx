@@ -33,60 +33,68 @@ function PhFacultyList() {
     }
 
     const handleActiveConfirm = async () => {
-        setSubmitting(true);
+        // setSubmitting(true);
+        setActiveModal(false);
+
         const action = editFaculty.active ? 'set-faculty-inactive' : 'set-faculty-active';
         const newActiveStatus = editFaculty.active ? 0 : 1;
 
-        try {
-            await axiosInstance.post(`${action}/${editFaculty.faculty_id}`)
-                .then(response => {
-                    if (response.data.message === 'success') {
-                        const updatedFaculties = faculties.map(faculty =>
-                            faculty.faculty_id === editFaculty.faculty_id
-                                ? { ...faculty, active: newActiveStatus }
-                                : faculty
-                        );
-                        setFaculties(updatedFaculties);
-                    }
-                });
-        } catch (error) {
-            console.error("Error updating faculty:", error);
-        } finally {
-            setActiveModal();
-            setSubmitting(false);
-        }
+        const oldFacList = faculties;
+
+        const updatedFaculties = faculties.map(faculty =>
+            faculty.faculty_id === editFaculty.faculty_id
+                ? {
+                    ...faculty,
+                    active: newActiveStatus
+                }
+                : faculty
+        );
+        setFaculties(updatedFaculties);
+
+        await axiosInstance.post(`${action}/${editFaculty.faculty_id}`)
+            .then(response => {
+                if (response.data.message !== 'success') {
+                    setFaculties(oldFacList);
+                }
+            })
+            .finally(() => {
+                setSubmitting(false);
+            });
     };
 
     const handleEvaluatorConfirm = async () => {
-        setSubmitting(true);
+        setEvaluatorModal(false);
+
         const action = editFaculty.user.user_role == "faculty" ? 'set-faculty-evaluator' : 'set-faculty-faculty';
         const evaluator = editFaculty.user.user_role == "faculty" ? 'evaluator' : 'faculty';
 
-        try {
-            await axiosInstance.post(`${action}/${editFaculty.faculty_id}`)
-                .then(response => {
-                    if (response.data.message === 'success') {
-                        const updatedFaculties = faculties.map(faculty =>
-                            faculty.faculty_id === editFaculty.faculty_id
-                                ? {
-                                    ...faculty,
-                                    user: {
-                                        ...faculty.user,
-                                        user_role: evaluator
-                                    }
-                                }
-                                : faculty
-                        );
-                        setFaculties(updatedFaculties);
+        const oldFacList = faculties;
+
+        const updatedFaculties = faculties.map(faculty =>
+            faculty.faculty_id === editFaculty.faculty_id
+                ? {
+                    ...faculty,
+                    user: {
+                        ...faculty.user,
+                        user_role: evaluator
                     }
-                })
-                .finally(() => {
-                    setEvaluatorModal(false);
-                });
+                }
+                : faculty
+        );
+        setFaculties(updatedFaculties);
+
+        try {
+            const response = await axiosInstance.post(`${action}/${editFaculty.faculty_id}`);
+
+            if (response.data.message !== 'success') {
+                setFaculties(oldFacList);  // Revert changes if not successful
+            } else {
+                setEvaluatorModal(false);  // Only close the modal on success
+            }
         } catch (error) {
-            console.error("Error updating faculty:", error);
+            setFaculties(oldFacList);  // Handle network or other errors
+            console.error("Error updating evaluator:", error);
         } finally {
-            setActiveModal();
             setSubmitting(false);
         }
     }
@@ -102,13 +110,8 @@ function PhFacultyList() {
                             onChange={(e) => { setSearchBar(e.target.value) }}
                             type="text"
                             placeholder="Search faculty..."
-                            className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 mb-2 md:mb-0"
+                            className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 mb-2 md:mb-0 w-72"
                         />
-                        <button
-                            onClick={() => { setIsFacultyModalOpen(true) }}
-                            className="bg-primaryColor text-white px-4 py-2 rounded-md hover:bg-blue-700 mb-2 md:mb-0 hidden sm:block">
-                            Add Faculty
-                        </button>
                     </div>
                 </div>
 

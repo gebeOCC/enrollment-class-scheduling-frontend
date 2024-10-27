@@ -20,6 +20,7 @@ import EnrollmentDashboardRegistrar from "./pages/Registrar/EnrollmentDashboardR
 import EnrollmentDashboardProgramHead from "./pages/ProgramHead/EnrollmentDashboardProgramHead";
 import StudentClasses from "./pages/Student/StudentClasses";
 import PhFacultyList from "./pages/ProgramHead/PhFacultyList";
+import EnrollStudent from "./pages/enrollment/EnrollStudent";
 
 function App() {
     const { userRole, enrollmentOngoing, preparation } = useAuth();
@@ -55,7 +56,8 @@ function App() {
             {(enrollmentOngoing || preparation) &&
                 <>
                     <Route path="/enrollment/:courseid" element={<EnrollmentCourse />} />
-                    <Route path="/enrollment/:courseid/:yearlevel" element={<YearLevelSectionSubejcts />} />
+                    <Route path="/enrollment/:courseid/class/:yearlevel" element={<YearLevelSectionSubejcts />} />
+                    <Route path="/enrollment/:courseid/enroll-student/:yearlevel" element={<EnrollStudent />} />
                     <Route path="/dashboard" element={<EnrollmentDashboardProgramHead />} />
                     <Route path="*" element={<Navigate to="/dashboard" />} />
                 </>
@@ -68,19 +70,22 @@ function App() {
 
     const evaluatorRoutes = (
         <>
+            <Route path="/" element={<Navigate to="/classes" />} />
             <Route path="/courses/:courseid" element={<CourseInfo />} />
             <Route path="/courses/:courseid/curriculum" element={<Curriculum />} />
             {(enrollmentOngoing || preparation) &&
                 <>
                     <Route path="/enrollment/:courseid" element={<EnrollmentCourse />} />
-                    <Route path="/enrollment/:courseid/:yearlevel" element={<YearLevelSectionSubejcts />} />
+                    <Route path="/enrollment/:courseid/class/:yearlevel" element={<YearLevelSectionSubejcts />} />
+                    <Route path="/enrollment/:courseid/enroll-student/:yearlevel" element={<EnrollStudent />} />
                     <Route path="/dashboard" element={<EnrollmentDashboardProgramHead />} />
-                <Route path="/" element={<Navigate to="/dashboard" />} />
+                    <Route path="*" element={<Navigate to="/dashboard" />} />
                 </>
             }
             <Route path="/" element={<Navigate to="/classes" />} />
             <Route path="/classes" element={<FacultyClasses />} />
             <Route path="/classes/:classId" element={<CLassStudents />} />
+            <Route path="*" element={<Navigate to="/classes" />} />
         </>
     );
 

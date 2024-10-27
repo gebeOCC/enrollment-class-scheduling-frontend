@@ -2,8 +2,9 @@ import { useParams, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axiosInstance from "../../../axios/axiosInstance";
 import { useAuth } from "../../context/AuthContext";
+import SkeletonEnrollmentCourse from "../../components/skeletons/SkeletonEnrollmentCourse";
 function EnrollmentCourse() {
-    const { enrollmentOngoing, preparation } = useAuth();
+    const { userRole, enrollmentOngoing, preparation, } = useAuth();
     const { courseid } = useParams();
     const [course, setCourse] = useState([]);
 
@@ -90,53 +91,71 @@ function EnrollmentCourse() {
             }
         });
     };
+
+    if (yearLevels.length < 1) return <SkeletonEnrollmentCourse />;
+
     return (
         <>
             <div className="bg-white p-4 rounded-lg shadow overflow-hidden mb-6 text-center">
-                {course.course_name &&
-                    <>
-                        <h1 className="text-4xl font-bold text-blue-600">
-                            {course.course_name}
-                        </h1>
-                    </>
-                }
+                <>
+                    <h1 className=" md:text-4xl h-10 font-bold text-blue-600">
+                        {course.course_name}
+                    </h1>
+                </>
             </div>
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                 {yearLevels.map((yearLevel, index) => (
-                    <div key={index} className="bg-white p-4 rounded-lg shadow overflow-hidden">
-                        <div className="mb-4 flex justify-between">
-                            <h2 className="text-xl font-bold inline-block self-center">{yearLevel.year_level_name}</h2>
+                    <div key={index} className="bg-white p-6 rounded-lg shadow-light hover:shadow-xl transition-shadow duration-300 overflow-hidden">
+                        <div className="mb-4 flex justify-between items-center">
+                            <h2 className="text-2xl font-semibold text-gray-800">{yearLevel.year_level_name}</h2>
                             <button
                                 onClick={() => { createNewSection(yearLevel.id) }}
-                                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-transform transform hover:scale-105">
                                 Add Section
                             </button>
                         </div>
-                        <table className="w-full">
+                        <table className="w-full border-collapse">
                             <thead>
-                                <tr className="bg-[#2980b9] text-white">
-                                    <th className="text-left p-2">Section</th>
-                                    <th className="text-left p-2">Students</th>
-                                    <th className="text-left p-2">Actions</th>
+                                <tr className="bg-blue-700 text-white text-left">
+                                    <th className="p-2">Section</th>
+                                    <th className="p-2">Students</th>
+                                    <th className="p-2">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {yearLevel.year_section && yearLevel.year_section.map((section, index) => (
-                                    <tr key={index}
-                                        className={`border-b ${index % 2 === 0 ? "bg-white" : "bg-[#e1e6ea]"}`}>
-                                        <td className="p-2">{section.section}</td>
-                                        <td className="p-2">{section.student_count}/{section.max_students}</td>
-                                        <td className="p-2 space-x-2">
-                                            <Link to={`${yearLevel.year_level_name.replace(/\s+/g, '-')}?section=${section.section}`}>
-                                                <button
-                                                    className="text-white px-2 py-1 rounded bg-primaryColor hover:opacity-80 active:opacity-90 active:bg-blue-700">
-                                                    Subjects
-                                                </button>
-                                            </Link>
-                                            <button
-                                                className="bg-green-400 text-white px-2 py-1 rounded hover:bg-green-500">
+                                    <tr key={index} className={`border-b ${index % 2 === 0 ? "bg-gray-100" : "bg-gray-50"}`}>
+                                        <td className="p-2 text-gray-700">{section.section}</td>
+                                        <td className="p-2 text-gray-700">{section.student_count}/{section.max_students}</td>
+                                        <td className="p-2 space-x-2 flex items-center">
+                                            {userRole === 'program_head' &&
+                                                <Link to={`class/${yearLevel.year_level_name.replace(/\s+/g, '-')}?section=${section.section}`}>
+                                                    <button className="text-white bg-indigo-500 px-2 py-1 rounded hover:bg-indigo-600 hover:shadow-md transition-50 active:bg-blue-600">
+                                                        Class
+                                                    </button>
+                                                </Link>
+                                            }
+                                            <button className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 hover:shadow-md transition-all transition-150 active:bg-emerald-500">
                                                 Students
                                             </button>
+                                            {enrollmentOngoing ? (
+                                                <Link to={`enroll-student/${yearLevel.year_level_name.replace(/\s+/g, '-')}?section=${section.section}`}>
+                                                    <button className="flex items-center bg-purple-600 text-white px-2 py-1 rounded-lg transition-transform transform hover:scale-105 hover:shadow-md active:scale-95">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
+                                                        </svg>
+                                                        Enroll Student
+                                                    </button>
+                                                </Link>
+                                            ) : (
+                                                <button className="flex items-center bg-gray-400 text-white px-2 py-1 rounded-lg cursor-not-allowed">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
+                                                    </svg>
+                                                    Enroll Student
+                                                </button>
+                                            )}
                                         </td>
                                     </tr>
                                 ))}
@@ -145,6 +164,7 @@ function EnrollmentCourse() {
                     </div>
                 ))}
             </div>
+
 
             {yearSectionForm.year_level_id != 0 &&
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
