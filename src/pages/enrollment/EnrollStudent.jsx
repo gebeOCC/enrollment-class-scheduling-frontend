@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import axiosInstance from "../../../axios/axiosInstance";
 import { useLocation, useParams } from "react-router-dom";
-import { capitalizeFirstLetter, convertToAMPM, getFirstLetter } from "../../utilities/utils";
-import axios from "axios";
-
+import { capitalizeFirstLetter, convert24HourTimeToMinutes, convertToAMPM, getFirstLetter, hasTimeConflict } from "../../utilities/utils";
+import { showToast } from "../../components/Toast";
+import Toast from "../../components/Toast";
+import { FiSearch } from "react-icons/fi";
+import { FaCirclePlus } from "react-icons/fa6";
 function EnrollStudent() {
     // page start
     const { courseid, yearlevel } = useParams();
@@ -16,16 +18,26 @@ function EnrollStudent() {
     const [defaultClasses, setDefaultClasses] = useState([]);
     const [studentType, setStudentType] = useState([]);
     const [selesctedStudentType, setSelesctedStudentType] = useState("");
+    const [yearSectionId, setYearSectionId] = useState(0);
     const [regularStudent, setRegularStudent] = useState(true);
 
-
     useEffect(() => {
-        if (classes == defaultClasses) {
+        if (classes.length === 0) {
+            setRegularStudent(false);
+            return;
+        }
+
+        const allIdsPresent = classes.every(cls =>
+            defaultClasses.some(defaultCls => defaultCls.id === cls.id)
+        );
+
+        if (allIdsPresent && classes.length === defaultClasses.length) {
             setRegularStudent(true);
         } else {
             setRegularStudent(false);
         }
-    }, [classes])
+    }, [classes]);
+
 
     useEffect(() => {
         const getCourseName = async () => {
@@ -47,31 +59,33 @@ function EnrollStudent() {
                 .then(response => {
                     if (response.data.message === 'success') {
                         setClasses(response.data.classes);
+                        console.log(response.data.classes);
                         setDefaultClasses(response.data.classes);
                         setStudentType(response.data.studentType);
+                        setYearSectionId(response.data.yearSectionId);
                     }
                 })
         }
-
-        // axios.get('https://api.api-ninjas.com/v1/quotes?category=happiness', {
-        //     headers: { 'X-Api-Key': 'sxMO2mycQG5pA80izJIrTA==h4sI6d6YQztZwvLU' }
-        // })
-        //     .then(response => {
-        //         console.log(response.data);
-        //     })
-        //     .catch(error => {
-        //         console.error('Error fetching data:', error);
-        //     });
 
         getCourseName();
         getYearLevelSectionSectionSubjects();
     }, [])
 
-    // user control
-    const [studentId, setStudentIdSearch] = useState('');
+
+    // USER CONTROL
+
+    const [studentIdSearch, setStudentIdSearch] = useState('');
+    const [subjectCode, setSubjectCode] = useState('');
+
+    const [submitting, setSubmitting] = useState(false);
     const [searchingStudent, setSearchingStudent] = useState(false);
+    const [searchingClasses, setSearchingClasses] = useState(false);
     const [studentFound, setStudentFound] = useState(true);
+    const [classesFound, setClassesFound] = useState(true);
+    const [studentAlreadyEnrrolled, setStudentAlreadyEnrrolled] = useState(false);
+
     const [studentInfo, setStudentInfo] = useState([]);
+    const [subjectSearch, setSubjectSearch] = useState([]);
 
     // handle student search using id when 
     const [typingTimeout, setTypingTimeout] = useState(null);
@@ -113,20 +127,101 @@ function EnrollStudent() {
         setTypingTimeout(newTimeout);
     }
 
-    const [selectedClass, setSelectedClass] = useState({
-        class_code: "",
-        credit_units: 0,
-        day: "",
-        descriptive_title: "",
-        end_time: "",
-        faculty_id: 0,
-        id: 0,
-        room_id: 0,
-        start_time: "10:30",
-        subject_code: "13:30",
-        subject_id: 0,
-        year_section_id: 0,
-    });
+    // Handle search classes after 1secs on change
+    const [typingTimeoutSubjectCode, setTypingTimeoutSubjectCode] = useState(null);
+    const handleSubjectCodeChange = (e) => {
+
+        if (e.target.value.includes(' ')) return;
+        setSubjectCode(e.target.value);
+        if (!e.target.value) return setSubjectSearch([]);
+
+        if (typingTimeoutSubjectCode) {
+            clearTimeout(typingTimeoutSubjectCode);
+        }
+
+        const newTimeout = setTimeout(() => {
+            setSubjectSearch([])
+
+            const getClasses = async () => {
+                setSearchingClasses(true)
+                setClassesFound(true);
+                await axiosInstance.get(`get-classes/${e.target.value}`)
+                    .then(response => {
+                        console.log(response.data)
+                        if (response.data.message === 'subject not found') {
+                            setClassesFound(false)
+                        } else if (response.data.message === 'success') {
+                            setClassesFound(true)
+                            setSubjectSearch(response.data.classes)
+                        }
+                    })
+                    .finally(() => {
+                        setSearchingClasses(false)
+                    })
+            }
+            if (e.target.value === '') return;
+            getClasses();
+        }, 1000);
+
+        setTypingTimeoutSubjectCode(newTimeout);
+    }
+
+    const detectConflict = (classDetails) => {
+        const conflictExists = classes.find(classSchedule => hasTimeConflict(
+            convert24HourTimeToMinutes(classSchedule.start_time),
+            convert24HourTimeToMinutes(classSchedule.end_time),
+            convert24HourTimeToMinutes(classDetails.start_time),
+            convert24HourTimeToMinutes(classDetails.end_time)
+        ) && classSchedule.day == classDetails.day);
+
+        return !!conflictExists;
+    };
+
+    const [invalidFields, setInvalidFields] = useState([""]);
+
+    const submitStudentClasses = async (e) => {
+        setSubmitting(true);
+        const invalidFields = [];
+
+        if (!selesctedStudentType) invalidFields.push('student_type');
+        if (!studentInfo.user_id) invalidFields.push('student_id');
+        setInvalidFields(invalidFields);
+
+        if (invalidFields.length > 0) {
+            setSubmitting(false);
+            return;
+        }
+
+        const data = JSON.stringify({ classes: classes });
+        try {
+            await axiosInstance.post(
+                `enroll-student/${studentInfo.user_id}/${selesctedStudentType}/${yearSectionId}`,
+                data,
+                {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }
+            )
+                .then(response => {
+                    if (response.data.message === 'success') {
+                        showToast('Enrrolled successfully!', 'success');
+                        setClasses(defaultClasses);
+                        setStudentInfo([]);
+                        setStudentIdSearch("");
+                        setSubjectSearch([]);
+                        setStudentAlreadyEnrrolled(false);
+                    } else if (response.data.message === 'student already enrolled') {
+                        setStudentAlreadyEnrrolled(true);
+                    };
+                })
+                .finally(() => {
+                    setSubmitting(false);
+                })
+        } catch (error) {
+            console.error(error.response ? error.response.data : error.message);
+        }
+    }
 
     return (
         <div className="space-y-4">
@@ -144,7 +239,7 @@ function EnrollStudent() {
 
             <div className="flex flex-col gap-2 space-y-4 h-auto p-4 bg-white rounded-lg shadow-light">
                 <h1 className="text-2xl font-semibold text-gray-800">Student Info <span className="text-sm text-black italic font-thin">(Add student details if freshman or transferee to create ID)</span></h1>
-                <div className="flex gap-2 items-center">
+                <div className="flex gap-4 items-center">
                     <div className="relative">
                         <label
                             htmlFor="student_type_id"
@@ -152,11 +247,17 @@ function EnrollStudent() {
                         >
                             Student Type:
                         </label>
+                        <p
+                            htmlFor="student_type_id"
+                            className="text-lg font-semibold text-red-500 mb-1 absolute -right-3 -top-3 px-1"
+                        >
+                            *
+                        </p>
                         <select
                             value={selesctedStudentType}
                             onChange={(e) => { setSelesctedStudentType(e.target.value); }}
                             name="student_type_id"
-                            className={`h-11 w-40 block pl-3 pr-3 cursor-pointer text-lg border border-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-lg rounded-md transition duration-200 ease-in-out ${!selesctedStudentType && 'text-gray-400'}`}
+                            className={`h-11 w-40 block pl-3 pr-3 cursor-pointer text-lg border ${invalidFields.includes('student_type') ? 'border-red-500' : 'border-black'} focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-lg rounded-md transition duration-200 ease-in-out ${!selesctedStudentType && 'text-gray-400'}`}
                         >
                             {!selesctedStudentType && <option value="" disabled className="text-gray-400">Select...</option>}
                             {studentType.map((type, index) => (
@@ -178,7 +279,7 @@ function EnrollStudent() {
 
                 {/* Search Student ID no AND Student info */}
                 <div className="flex flex-col">
-                    <div className="flex gap-2 items-center">
+                    <div className="flex gap-4 items-center">
                         <div className="relative">
                             <label
                                 htmlFor="student_id"
@@ -186,12 +287,18 @@ function EnrollStudent() {
                             >
                                 Student ID No.
                             </label>
+                            <p
+                                htmlFor="student_type_id"
+                                className="text-lg font-semibold text-red-500 mb-1 absolute -right-3 -top-3 px-1"
+                            >
+                                *
+                            </p>
                             <input
                                 type="text"
-                                value={studentId}
+                                value={studentIdSearch}
                                 name="student_id"
                                 onChange={handleStudentIdChange}
-                                className="text-lg w-40 px-3 py-2 border border-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out"
+                                className={`text-lg w-40 px-3 py-2 border ${invalidFields.includes('student_id') ? 'border-red-500' : 'border-black'} hover:border-blue-500 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out`}
                                 placeholder="Student ID no."
                                 aria-label="Search for faculty members"
                             />
@@ -205,8 +312,8 @@ function EnrollStudent() {
                             <p className="text-gray-800 text-2xl">
                                 <span className="font-semibold">Student: </span>
                                 <span className=" underline">{capitalizeFirstLetter(studentInfo.last_name)}, {capitalizeFirstLetter(studentInfo.first_name)}{' '}
-                                    {studentInfo.middle_name && getFirstLetter(studentInfo.middle_name) + '.'}</span>
-
+                                    {studentInfo.middle_name && getFirstLetter(studentInfo.middle_name) + '.'}</span> {' '}
+                                <span className="text-red-500">{studentAlreadyEnrrolled && 'is enrolled already!'}</span>
                             </p>
                         ) : !studentFound && <p className="text-red-500 text-2xl">Student not found!</p>}
                     </div>
@@ -217,7 +324,10 @@ function EnrollStudent() {
             <div className="flex flex-col space-y-4 h-auto p-4 bg-white rounded-lg shadow-lg">
                 <div className="col-span-3 space-y-2">
                     <div className="flex justify-between">
-                        <h1 className="text-2xl font-semibold text-gray-800">Student Classes <span className="text-sm text-black italic font-thin">(Student class turns red means there's conflict with another class you selected)</span></h1>
+                        <h1 className="text-2xl font-semibold text-gray-800">Student Classes {' '}
+                            <span className="text-sm text-black italic font-thin">(Student class turns red means there's conflict with another class you selected)
+                            </span>
+                        </h1>
                         <div className="flex items-center space-x-2">
                             <span className="font-normal text-lg text-gray-700">Regular Student</span>
                             <input
@@ -238,7 +348,10 @@ function EnrollStudent() {
                     </div>
                     <div className="space-y-1">
                         <div
-                            className={`font-bold grid grid-cols-[100px_1fr_120px_180px_auto] gap-4 items-center bg-white px-2 transition duration-200 ease-in-out`}>
+                            className={`font-bold grid grid-cols-[100px_100px_1fr_120px_180px_90px_auto] gap-4 items-center bg-white px-2 transition duration-200 ease-in-out`}>
+                            <div className="font-bold text-gray-700">
+                                Class code
+                            </div>
                             <div className="font-bold text-gray-700">
                                 Subject code
                             </div>
@@ -250,6 +363,9 @@ function EnrollStudent() {
                             </div>
                             <div className="text-gray-600">
                                 Time
+                            </div>
+                            <div className="text-gray-600">
+                                Credit units
                             </div>
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -264,56 +380,57 @@ function EnrollStudent() {
                                 />
                             </svg>
                         </div>
-                        {classes.map((classSubject, index) => {
-                            const hasConflict = selectedClass.subject_id &&
-                                hasTimeConflict(
-                                    convert24HourTimeToMinutes(classSubject.start_time),
-                                    convert24HourTimeToMinutes(classSubject.end_time),
-                                    convert24HourTimeToMinutes(selectedClass.start_time),
-                                    convert24HourTimeToMinutes(selectedClass.end_time)
-                                ) &&
-                                selectedClass.day.toUpperCase() === classSubject.day.toUpperCase();
-
-                            return (
-                                <div
-                                    key={index}
-                                    className={`border grid grid-cols-[100px_1fr_120px_180px_auto] gap-4 items-center bg-white p-2 rounded-lg transition duration-200 ease-in-out ${hasConflict ? 'bg-red-500 text-white' : 'hover:bg-gray-100'}`}
-                                >
-                                    <div className="font-semibold text-gray-700">
-                                        {classSubject.subject_code}
-                                    </div>
-                                    <div className="text-gray-600">
-                                        {classSubject.descriptive_title}
-                                    </div>
-                                    <div className="text-gray-600">
-                                        {classSubject.day}
-                                    </div>
-                                    <div className="text-gray-600">
-                                        {convertToAMPM(classSubject.start_time)} - {convertToAMPM(classSubject.end_time)}
-                                    </div>
-                                    <svg
-                                        onClick={() => setClasses(prevSubjects => prevSubjects.filter((_, i) => i !== index))}
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        viewBox="0 0 24 24"
-                                        fill="currentColor"
-                                        className="w-6 h-6 cursor-pointer text-red-500 hover:text-red-400 transition duration-200 ease-in-out"
-                                    >
-                                        <path
-                                            fillRule="evenodd"
-                                            d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z"
-                                            clipRule="evenodd"
-                                        />
-                                    </svg>
+                        {classes.length < 1 &&
+                            <div className={`border grid grid-cols-[100px_100px_1fr_120px_180px_90px_auto] gap-4 items-center bg-white p-2 transition duration-200 ease-in-out`}>Empty</div>
+                        }
+                        {classes.map((classSubject, index) => (
+                            <div
+                                key={index}
+                                className={`border grid grid-cols-[100px_100px_1fr_120px_180px_90px_auto] gap-4 items-center bg-white p-2 rounded-lg transition duration-200 ease-in-out hover:bg-gray-100`}
+                            >
+                                <div className="text-gray-700">
+                                    {classSubject.class_code}
                                 </div>
-                            );
-                        })}
-                        <button
-                            disabled={classes.length < 1}
-                            className={`mt-4 w-full bg-blue-500 text-white py-2 px-4 rounded-lg transition duration-200 ease-in-out ${classes.length < 1 ? 'bg-gray-300 cursor-not-allowed' : 'hover:bg-blue-400'}`}
-                        // onClick={submitStudentClasses}
-                        >
-                            Enroll Student
-                        </button>
+                                <div className="text-gray-700">
+                                    {classSubject.subject_code}
+                                </div>
+                                <div className="text-gray-600">
+                                    {classSubject.descriptive_title}
+                                </div>
+                                <div className="text-gray-600">
+                                    {classSubject.day}
+                                </div>
+                                <div className="text-gray-600">
+                                    {convertToAMPM(classSubject.start_time)} - {convertToAMPM(classSubject.end_time)}
+                                </div>
+                                <div className="text-gray-600 text-center">
+                                    {classSubject.credit_units}
+                                </div>
+                                <svg
+                                    onClick={() => setClasses(prevSubjects => prevSubjects.filter(subject => subject.id !== classSubject.id))}
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24"
+                                    fill="currentColor"
+                                    className="w-6 h-6 cursor-pointer text-red-500 hover:text-red-400 transition duration-200 ease-in-out"
+                                >
+                                    <path
+                                        fillRule="evenodd"
+                                        d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z"
+                                        clipRule="evenodd"
+                                    />
+                                </svg>
+                            </div>
+                        ))}
+                        <div className={`grid grid-cols-[100px_100px_1fr_120px_180px_90px_auto] gap-4 items-center`}>
+                            <button
+                                disabled={classes.length < 1}
+                                className={`w-full col-span-2 bg-blue-500 text-white py-2 px-4 rounded-lg transition duration-200 ease-in-out ${classes.length < 1 ? 'bg-gray-300 cursor-not-allowed' : 'hover:bg-blue-400'}`}
+                                onClick={submitStudentClasses}
+                            >
+                                Enroll Student
+                            </button>
+                            <h1 className="text-lg">Total units: {classes.reduce((total, subject) => total + subject.credit_units, 0)}</h1>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -323,32 +440,79 @@ function EnrollStudent() {
                     <div className="flex justify-between">
                         <h1 className="text-2xl font-semibold text-gray-800">Search Classes {' '}
                             <span className="text-sm text-black italic font-thin">
-                                (Input subject code to search classes)
+                                (A red background indicates a conflict of day and time with the added classes.)
                             </span>
                         </h1>
                     </div>
                 </div>
-                <div className="relative">
-                    <label
-                        htmlFor="student_id"
-                        className="text-xs font-semibold text-gray-700 mb-1 absolute left-1 -top-2.5 bg-white px-1"
-                    >
-                        Student ID No.
-                    </label>
-                    <input
-                        type="text"
-                        value={studentId}
-                        name="student_id"
-                        onChange={handleStudentIdChange}
-                        className="text-lg w-40 px-3 py-2 border border-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out"
-                        placeholder="Student ID no."
-                        aria-label="Search for faculty members"
-                    />
+                <div className="space-y-1">
+                    <div className="flex gap-2 items-center">
+                        <div className="relative w-min">
+                            <label
+                                htmlFor="student_id"
+                                className="text-xs font-semibold text-gray-700 mb-1 absolute left-1 -top-2.5 bg-white px-1"
+                            >
+                                Subject Code
+                            </label>
+                            <input
+                                type="text"
+                                value={subjectCode}
+                                name="student_id"
+                                onChange={handleSubjectCodeChange}
+                                className="pr-8 text-lg w-44 px-3 py-2 border border-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out"
+                                placeholder=""
+                                aria-label="Search for faculty members"
+                            />
+                            <FiSearch className="absolute right-1 top-2" size={30} color="black" />
+
+                        </div>
+
+                        {/* When Searching Student */}
+                        {searchingClasses && <p className="text-blue-400 text-2xl">Searching Classes 🔍</p>}
+
+                        {!classesFound && <p className="text-red-500 text-2xl">No classes found!</p>}
+
+                    </div>
+                    {subjectSearch.map((classSubject, index) => (
+                        <div
+                            key={index}
+                            className={`border grid grid-cols-[100px_100px_1fr_120px_180px_90px_auto] gap-4 items-center ${detectConflict(classSubject) ? 'bg-red-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100'}  p-2 rounded-lg transition duration-200 ease-in-out`}
+                        >
+                            <div className="">
+                                {classSubject.class_code}
+                            </div>
+                            <div className="">
+                                {classSubject.subject_code}
+                            </div>
+                            <div className="">
+                                {classSubject.descriptive_title}
+                            </div>
+                            <div className="">
+                                {classSubject.day}
+                            </div>
+                            <div className="">
+                                {convertToAMPM(classSubject.start_time)} - {convertToAMPM(classSubject.end_time)}
+                            </div>
+                            <div className="text-center">
+                                {classSubject.credit_units}
+                            </div>
+                            <FaCirclePlus
+                                onClick={() => {
+                                    if ((detectConflict(classSubject)) || classes.find(classItem => classItem.subject_id === classSubject.subject_id)) {
+                                        return;
+                                    }
+                                    setClasses(prevClasses => [...prevClasses, classSubject]);
+                                }}
+                                size={18}
+                                className={`transition duration-200 ease-in-out ${(detectConflict(classSubject)) || (classes.find(classItem => classItem.subject_id === classSubject.subject_id)) ? 'text-gray-700 cursor-not-allowed' : 'text-green-500 hover:text-green-400 cursor-pointer'}`}
+                            />
+                        </div>
+                    ))}
                 </div>
             </div>
+            <Toast />
         </div>
     );
-
 }
 
 export default EnrollStudent;

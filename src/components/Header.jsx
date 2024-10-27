@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 import { useState } from "react";
 import ProfilePic from '../images/OCC_LOGO.png';
 import axiosInstance from "../../axios/axiosInstance";
-
+import { HiBars3 } from "react-icons/hi2";
 function Header({ sidebarOpen, toggleSidebar }) {
     const [dropdownOpen, setDropdownOpen] = useState(false);
 
@@ -23,22 +23,8 @@ function Header({ sidebarOpen, toggleSidebar }) {
     return (
         <>
             {/* Header */}
-            <svg
-                onClick={toggleSidebar}
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className={`size-6 cursor-pointer transition-transform duration-300 ease-in-out transform
-                hover:scale-110 active:scale-90`}
-            >
-                <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d={`M3.75 6.75h16.5M3.75 12h16.5m-16.5 ${sidebarOpen ? '5.25H12' : '5.25h16.5'}`}
-                />
-            </svg>
+            <HiBars3 onClick={toggleSidebar} className="cursor-pointer transition-transform duration-300 ease-in-out transform
+                hover:scale-110 active:scale-90" size={30} />
 
             {/* Profile Picture and Dropdown */}
             <div className="relative">

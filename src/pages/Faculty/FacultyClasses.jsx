@@ -15,6 +15,7 @@ const daysOrder = {
 
 function FacultyClasses() {
     const [classes, setClasses] = useState([]);
+    const [schoolYear, setSchoolYear] = useState([]);
 
     const sortClassesByDay = (data) => {
         return data.sort((a, b) => daysOrder[a.day] - daysOrder[b.day]);
@@ -24,18 +25,24 @@ function FacultyClasses() {
         const getClasses = async () => {
             await axiosInstance.get(`get-faculty-classes`)
                 .then(response => {
-                    const sortedClasses = sortClassesByDay(response.data);
+                    const sortedClasses = sortClassesByDay(response.data.classes);
                     setClasses(sortedClasses);
+                    setSchoolYear(response.data.schoolYear);
                     console.log(response.data);
                 })
         }
-        
+
         getClasses();
     }, [])
     return (
-        <>
+        <div className="space-y-4">
+            <div className="bg-white p-4 rounded-lg shadow-light overflow-hidden text-center flex justify-center items-center">
+                <h1 className="text-4xl font-bold text-blue-600">
+                    ({schoolYear.start_year}-{schoolYear.end_year} {schoolYear.semester_name} Semester)
+                </h1>
+            </div>
             <div className='bg-white p-4 rounded-lg shadow-lg overflow-hidden'>
-                <h1 className="text-2xl font-bold mb-4">Classes</h1>
+                <h1 className="text-2xl font-bold mb-4">Classes <span className="text-sm"></span></h1>
                 <table className="w-full bg-white">
                     <thead>
                         <tr className="bg-[#2980b9] text-white">
@@ -64,7 +71,7 @@ function FacultyClasses() {
                     </tbody>
                 </table>
             </div>
-        </>
+        </div>
     )
 }
 export default FacultyClasses;

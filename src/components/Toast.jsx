@@ -28,7 +28,7 @@ const Toast = () => {
     return (
         <CSSTransition
             in={toast.show}
-            timeout={300}
+            timeout={500}
             classNames="toast"
             unmountOnExit
             nodeRef={toastRef} // Pass the ref to CSSTransition
