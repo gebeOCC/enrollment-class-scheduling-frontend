@@ -21,6 +21,8 @@ import EnrollmentDashboardProgramHead from "./pages/ProgramHead/EnrollmentDashbo
 import StudentClasses from "./pages/Student/StudentClasses";
 import PhFacultyList from "./pages/ProgramHead/PhFacultyList";
 import EnrollStudent from "./pages/enrollment/EnrollStudent";
+import StudentDetails from "./pages/Registrar/StudentDetails";
+import EnrollmentRecord from "./pages/Student/EnrollmentRecord";
 
 function App() {
     const { userRole, enrollmentOngoing, preparation } = useAuth();
@@ -32,6 +34,7 @@ function App() {
             <Route path="/rooms" element={<Rooms />} />
             <Route path="/faculty-list" element={<FacultyList />} />
             <Route path="/student-list" element={<StudentList />} />
+            <Route path="/student-list/student-details" element={<StudentDetails />} />
             <Route path="/school-year" element={<SchoolYear />} />
             <Route path="/school-year/:schoolYear/:semester" element={<SchoolYearDetails />} />
             <Route path="/classes" element={<FacultyClasses />} />
@@ -100,6 +103,7 @@ function App() {
     const studentRoutes = (
         <>
             <Route path="/classes" element={<StudentClasses />} />
+            <Route path="/enrollment-record" element={<EnrollmentRecord />} />
             <Route path="*" element={<Navigate to="/classes" />} />
         </>
     );

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import axiosInstance from "../../../axios/axiosInstance";
-import { capitalizeFirstLetter, formatPhoneNumber, getFirstLetter, isValidEmail, removeHyphens } from "../../utilities/utils";
+import { capitalizeFirstLetter, formatFullName, formatPhoneNumber, getFirstLetter, isValidEmail, removeHyphens } from "../../utilities/utils";
 import Toast from "../../components/Toast";
 import { showToast } from "../../components/Toast";
 
@@ -238,7 +238,7 @@ function FacultyList() {
                                         <td className="py-2 px-2 md:px-4 hidden sm:table-cell">{index + 1}.</td>
                                         <td className="py-2 px-2 md:px-4">{faculty.user_id_no}</td>
                                         <td className="py-2 px-2 md:px-4">
-                                            {capitalizeFirstLetter(faculty.last_name)}, {capitalizeFirstLetter(faculty.first_name)} {faculty.middle_name && getFirstLetter(capitalizeFirstLetter(faculty.middle_name)) + '.'}
+                                            {formatFullName(faculty)}
                                         </td>
                                         <td className="py-2 px-2 md:px-4 hidden sm:table-cell">{faculty.email_address}</td>
                                         <td className="py-2 px-2 md:px-4 hidden sm:table-cell">{faculty.department_name_abbreviation}</td>

@@ -341,12 +341,23 @@ function SideBar() {
                                             <NavLink
                                                 to="/classes"
                                                 className={({ isActive }) =>
-                                                    isActive ? "bg-[#3d7cb1] p-2 rounded-md flex items-center space-x-2 py-2"
-                                                        : "p-2 flex items-center space-x-2 py-2"
+                                                    isActive ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
+                                                        : "p-2 flex items-center rounded-md  space-x-2 py-2 duration-100 focus:bg-[#4e90ca]  hover:bg-[#3d7cb1]"
                                                 }
                                             >
                                                 <i className="fas fa-book"></i>
                                                 <span>Classes</span>
+                                            </NavLink>
+                                        </li>
+                                        <li className="px-4">
+                                            <NavLink
+                                                to="/enrollment-record"
+                                                className={({ isActive }) =>
+                                                    isActive ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
+                                                        : "p-2 flex items-center rounded-md  space-x-2 py-2 duration-100 focus:bg-[#4e90ca]  hover:bg-[#3d7cb1]"
+                                                }
+                                            >
+                                                <span>Enrollment Record</span>
                                             </NavLink>
                                         </li>
                                     </>

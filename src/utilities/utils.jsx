@@ -1,4 +1,4 @@
-// nalimot ko asa ni ge naapil ra ni og copy sa daan na codes
+// turns date format to long date
 export const formatDate = (dateString) => {
     const options = { month: 'long', day: 'numeric', year: 'numeric' };
     const date = new Date(dateString);
@@ -122,4 +122,33 @@ export function formatBirthday(birthday) {
     const day = String(date.getDate()).padStart(2, '0');
 
     return `${year}-${month}-${day}`;
+}
+
+export function checkPasswordComplexity(password) {
+    const requirements = {
+        length: false,
+        uppercase: false,
+        lowercase: false,
+        number: false,
+        special: false,
+    };
+
+    if (password.length >= 8) requirements.length = true; // Minimum length of 8
+    if (/[A-Z]/.test(password)) requirements.uppercase = true; // At least one uppercase letter
+    if (/[a-z]/.test(password)) requirements.lowercase = true; // At least one lowercase letter
+    if (/\d/.test(password)) requirements.number = true; // At least one number
+    if (/[^A-Za-z0-9]/.test(password)) requirements.special = true; // At least one special character
+
+    const isValid = Object.values(requirements).every(Boolean); // Check if all requirements are met
+
+    return {
+        isValid,
+        requirements: {
+            length: requirements.length,
+            uppercase: requirements.uppercase,
+            lowercase: requirements.lowercase,
+            number: requirements.number,
+            special: requirements.special,
+        },
+    };
 }
