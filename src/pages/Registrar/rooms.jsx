@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import axiosInstance from "../../../axios/axiosInstance";
+import Loading from "../../components/Loading";
 
 function Rooms() {
     const [rooms, setRooms] = useState([]);
@@ -10,6 +11,7 @@ function Rooms() {
     const [deptId, setDeptId] = useState("")
     const [roomNameInputEmpty, setRoomNameInputEmpty] = useState(false)
     const [roomExist, setRoomExist] = useState(false)
+    const [fetching, setFetching] = useState(true);
 
     useEffect(() => {
         axiosInstance.get(`get-rooms/`)
@@ -17,6 +19,9 @@ function Rooms() {
                 setRooms(response.data.rooms);
                 setDepartmentsRooms(response.data.department)
                 console.log(response.data);
+            })
+            .finally(() => {
+                setFetching(false);
             });
     }, [])
 
@@ -77,6 +82,7 @@ function Rooms() {
         }
     }
 
+    if (fetching) return <Loading />
     return (
         <>
             <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 md:h-full">

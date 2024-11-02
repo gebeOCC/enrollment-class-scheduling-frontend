@@ -2,29 +2,63 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import axiosInstance from '../../../axios/axiosInstance';
 import { checkPasswordComplexity } from '../../utilities/utils';
+import { PiSpinnerBold } from 'react-icons/pi';
+import { FaExclamation } from 'react-icons/fa6';
+import Loading from '../../components/Loading';
 
 function StudentDetails() {
     const [searchParams] = useSearchParams();
     const studentId = searchParams.get('student-id');
     const [studentDetails, setStudentDetails] = useState(null);
+    const [fetching, setFetching] = useState(true);
+    const [found, setFound] = useState(true);
 
     const [password, setPassword] = useState("");
     const [passwordRequirements, setPasswordRequirements] = useState("");
 
-    useEffect(() => {
-        const getStudentDetails = async () => {
-            try {
-                const response = await axiosInstance.get(`get-student-details/${studentId}`);
-                setStudentDetails(response.data);
-            } catch (error) {
-                console.error('Error fetching student details:', error);
-            }
-        };
+    const getStudentDetails = async () => {
+        await axiosInstance.get(`get-student-details/${studentId}`)
+            .then(response => {
+                if (response.data.message == 'success') {
+                    setStudentDetails(response.data.studentDetails);
+                } else if (response.data.message == 'student not found') {
+                    setFound(false);
+                }
+            })
+            .finally(() => {
+                setFetching(false);
+            });
+    };
 
+    useEffect(() => {
         getStudentDetails();
     }, [studentId]);
 
-    if (!studentDetails) return <p className="text-gray-600">Loading...</p>;
+    const onRetry = () => {
+        setFetching(true);
+        setFound(true);
+
+        getStudentDetails();
+    };
+
+
+    if (fetching) return <Loading />
+    if (!found) {
+        return (
+            <div className="flex flex-col justify-center items-center h-full p-4 bg-transparent rounded-lg text-center">
+                <h1 className="text-4xl font-bold text-blue-600 mb-4 flex items-center">
+                    <FaExclamation className="text-5xl mr-2" /> Student not found!
+                </h1>
+                <button
+                    className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    onClick={onRetry}
+                >
+                    Try Again
+                </button>
+            </div>
+        );
+    }
+    
 
     const {
         user_id_no,
@@ -55,6 +89,7 @@ function StudentDetails() {
                 console.log(response.data);
             })
     };
+
 
     return (
         <div className='space-y-4'>

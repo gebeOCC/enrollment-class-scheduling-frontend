@@ -23,6 +23,7 @@ import PhFacultyList from "./pages/ProgramHead/PhFacultyList";
 import EnrollStudent from "./pages/enrollment/EnrollStudent";
 import StudentDetails from "./pages/Registrar/StudentDetails";
 import EnrollmentRecord from "./pages/Student/EnrollmentRecord";
+import FacultyDetails from "./pages/Registrar/FacultyDetails";
 
 function App() {
     const { userRole, enrollmentOngoing, preparation } = useAuth();
@@ -35,6 +36,7 @@ function App() {
             <Route path="/faculty-list" element={<FacultyList />} />
             <Route path="/student-list" element={<StudentList />} />
             <Route path="/student-list/student-details" element={<StudentDetails />} />
+            <Route path="/faculty-list/faculty-details" element={<FacultyDetails />} />
             <Route path="/school-year" element={<SchoolYear />} />
             <Route path="/school-year/:schoolYear/:semester" element={<SchoolYearDetails />} />
             <Route path="/classes" element={<FacultyClasses />} />

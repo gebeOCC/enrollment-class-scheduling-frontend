@@ -10,26 +10,30 @@ export const AuthProvider = ({ children }) => {
     const [preparation, setPreparation] = useState(false);
     const [courses, setCourses] = useState([]);
     const [enrollmentData, setEnrollmentData] = useState([]);
+    const [firstName, setFirstName] = useState('');
 
     useEffect(() => {
         const fetchUserRole = async () => {
-            try {
-                const response = await axiosInstance.get('/user');
-                if (response.data.user_role) {
-                    setUserRole(response.data.user_role);
-                    setEnrollmentOngoing(response.data.enrollmentOngoing);
-                    setPreparation(response.data.preparation);
-                    setEnrollmentData(response.data.schoolYear);
-                    if (response.data.courses.length > 0) {
-                        setCourses(response.data.courses);
+            await axiosInstance.get('/user')
+                .then(response => {
+                    if (response.data.user_role) {
+                        setUserRole(response.data.user_role);
+                        setEnrollmentOngoing(response.data.enrollmentOngoing);
+                        setPreparation(response.data.preparation);
+                        setEnrollmentData(response.data.schoolYear);
+                        if (response.data.courses.length > 0) {
+                            setCourses(response.data.courses);
+                        }
+                        setFirstName(response.data.firstName)
                     }
-                }
-            } catch (error) {
-                console.error('Error fetching user role:', error);
-            } finally {
-                setFetching(false);
-            }
-        };
+                })
+                .catch(error => {
+                    console.error('Error fetching user role:', error);
+                })
+                .finally(() => {
+                    setFetching(false);
+                });
+        }
         fetchUserRole();
     }, []);
 
@@ -38,7 +42,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     return (
-        <AuthContext.Provider value={{ userRole, fetching, enrollmentOngoing, preparation, courses, enrollmentData }}>
+        <AuthContext.Provider value={{ userRole, fetching, enrollmentOngoing, preparation, courses, enrollmentData, firstName }}>
             {children}
         </AuthContext.Provider>
     );

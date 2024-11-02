@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
 import axiosInstance from "../../../axios/axiosInstance";
 import { useEffect, useState } from "react";
+import Loading from "../../components/Loading";
 function SchoolYearDetails() {
     const { schoolYear } = useParams();
     const { semester } = useParams();
@@ -24,7 +25,20 @@ function SchoolYearDetails() {
     }, [])
 
     if (fetching) {
-        return <div></div>;
+        return <Loading />;
+    }
+
+    if (!schoolYeardetails) {
+        return (
+            <div className="space-y-4">
+                <div className="bg-white p-4 rounded-lg shadow-light overflow-hidden text-center items-center">
+                    <h1 className="text-4xl font-bold text-blue-600">
+                        {schoolYear} {semester} Semester{" "}
+                    </h1>
+                    <h2 className="text-red-600 text-3xl"> didn’t exist!</h2>
+                </div>
+            </div>
+        )
     }
 
     const setAsDefault = async () => {
@@ -41,9 +55,9 @@ function SchoolYearDetails() {
     }
 
     return (
-        <>
-            <div className="flex flex-col sm:flex-row sm:justify-between items-center mb-4">
-                <h1 className="text-2xl font-bold w-max text-center sm:text-left">
+        <div className="space-y-4">
+            <div className="bg-white p-4 rounded-lg shadow-light overflow-hidden text-center flex justify-between items-center">
+                <h1 className="text-4xl font-bold text-blue-600">
                     {schoolYeardetails.start_year}-{schoolYeardetails.end_year} {schoolYeardetails.semester_name} Semester
                 </h1>
                 <div className="mt-2 sm:mt-0 flex sm:flex-row items-center gap-2">
@@ -126,7 +140,7 @@ function SchoolYearDetails() {
                     </div>
                 </div>
             </div>
-        </>
+        </div>
     );
 }
 

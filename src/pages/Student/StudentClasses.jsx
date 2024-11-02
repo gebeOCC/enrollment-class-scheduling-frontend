@@ -43,7 +43,7 @@ function StudentClasses() {
                     ({schoolYear.start_year}-{schoolYear.end_year} {schoolYear.semester_name} Semester)
                 </h1>
             </div>
-            <div className='bg-white p-4 rounded-lg shadow-lg overflow-hidden'>
+            <div className='bg-white p-4 rounded-lg shadow-light overflow-hidden'>
                 {enrolled ?
                     (
                         <>

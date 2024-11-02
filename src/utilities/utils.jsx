@@ -16,7 +16,6 @@ export function convertToAMPM(time) {
     return `${convertedHour}:${minute.toString().padStart(2, '0')} ${ampm}`;
 }
 
-
 // convert minutes to 24 hours
 export function convertMinutesTo24HourTime(minutes) {
     const hours = Math.floor(minutes / 60);
@@ -100,12 +99,13 @@ export function formatDateShort(dateString) {
     return date.toLocaleString('en-US', options);
 }
 
+// format full name into this format "Lastname, Firstname M."
 export function formatFullName(userInfo) {
     const { last_name, first_name, middle_name } = userInfo;
     return `${capitalizeFirstLetter(last_name)}, ${capitalizeFirstLetter(first_name)}${middle_name ? ' ' + getFirstLetter(capitalizeFirstLetter(middle_name)) + '.' : ''}`;
 };
 
-
+// format date into valid yyyy/mm/dd
 export function formatBirthday(birthday) {
     if (!birthday) return '';
 
@@ -124,6 +124,7 @@ export function formatBirthday(birthday) {
     return `${year}-${month}-${day}`;
 }
 
+// check password complexity
 export function checkPasswordComplexity(password) {
     const requirements = {
         length: false,

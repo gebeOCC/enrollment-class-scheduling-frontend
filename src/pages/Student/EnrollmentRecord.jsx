@@ -48,7 +48,7 @@ function EnrollmentRecord() {
             {data ?
                 (
                     classes.map((classes, index) => (
-                        <div key={index} className='bg-white p-4 rounded-lg shadow-lg overflow-hidden'>
+                        <div key={index} className='bg-white p-4 rounded-lg shadow-light overflow-hidden'>
                             <>
                                 <h1 className="text-2xl font-bold mb-4">
                                     {classes.year_section.school_year.start_year}-{classes.year_section.school_year.end_year} {classes.year_section.school_year.semester.semester_name} Semester <span className="font-normal">{classes?.year_section?.course?.course_name_abbreviation} - {classes?.year_section?.year_level?.year_level}{classes?.year_section?.section} </span>
@@ -88,7 +88,7 @@ function EnrollmentRecord() {
                     ))
                 ) : (
 
-                    <div className='bg-white p-4 rounded-lg shadow-lg overflow-hidden'>
+                    <div className='bg-white p-4 rounded-lg shadow-light overflow-hidden'>
                         <h1 className="text-2xl font-bold"> No data</h1>
                     </div>
                 )

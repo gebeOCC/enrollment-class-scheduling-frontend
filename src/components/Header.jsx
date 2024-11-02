@@ -3,7 +3,9 @@ import { useState } from "react";
 import ProfilePic from '../images/OCC_LOGO.png';
 import axiosInstance from "../../axios/axiosInstance";
 import { HiBars3 } from "react-icons/hi2";
-function Header({ sidebarOpen, toggleSidebar }) {
+import { useAuth } from "../context/AuthContext";
+function Header({ toggleSidebar }) {
+    const { firstName } = useAuth();
     const [dropdownOpen, setDropdownOpen] = useState(false);
 
     const toggleDropdown = () => {
@@ -28,29 +30,35 @@ function Header({ sidebarOpen, toggleSidebar }) {
 
             {/* Profile Picture and Dropdown */}
             <div className="relative">
-                <img
-                    src={ProfilePic}
-                    alt="Profile"
-                    className="w-10 h-10 rounded-full cursor-pointer"
+                {/* Profile Picture */}
+                <div
+                    className="w-10 h-10 bg-white rounded-full flex items-center justify-center border-2 border-blue-600 cursor-pointer"
                     onClick={toggleDropdown}
-                />
+                >
+                    <span className="text-2xl font-semibold text-blue-600">
+                        {firstName[0].toUpperCase()}
+                    </span>
+                </div>
+
+                {/* Dropdown Menu */}
                 {dropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1">
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20">
                         <NavLink
                             to="/profile"
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition duration-150"
                         >
                             Profile
                         </NavLink>
                         <div
                             onClick={logout}
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition duration-150 cursor-pointer"
                         >
                             Logout
                         </div>
                     </div>
                 )}
             </div>
+
         </>
     )
 }

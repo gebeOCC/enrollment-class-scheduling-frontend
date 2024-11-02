@@ -2,9 +2,12 @@ import { useEffect, useState } from "react";
 import axiosInstance from "../../../axios/axiosInstance";
 import Toast from "../../components/Toast";
 import { showToast } from "../../components/Toast";
+import Loading from "../../components/Loading";
+import { ImSpinner5 } from "react-icons/im";
 
 function Department() {
     const [submitting, setSubmitting] = useState(false);
+    const [fetching, setFetching] = useState(true);
 
     const [deptForm, setDeptForm] = useState({
         department_name: '',
@@ -69,6 +72,9 @@ function Department() {
             .then(response => {
                 setDepartmentsCourses(response.data);
                 console.log(response.data);
+            })
+            .finally(() => {
+                setFetching(false);
             });
     }, []);
 
@@ -143,10 +149,12 @@ function Department() {
 
     const [isAssignNewModalOpen, setIsAssignNewModalOpen] = useState(false);
     const [searchFaculty, setSearchFaculty] = useState("");
+    const [facultyIdToAssign, setFacultyIdToAssign] = useState(0);
 
 
     const submitAssign = async (id) => {
-        console.log(id)
+        setFacultyIdToAssign(id);
+        setSubmitting(true);
         await axiosInstance.post(`assign-program-head`, { department_id: facultyAssign.department_id, faculty_id: id })
             .then(response => {
                 if (response.data.message === "success") {
@@ -159,9 +167,17 @@ function Department() {
                     showToast(`Assigning success`, 'success');
                 }
             })
+            .finally(() => {
+                setSubmitting(false);
+                setFacultyIdToAssign(0);
+                setFacultyAssign({ department_id: '' });
+                setSearchFaculty('');
+            })
     }
 
     const submitAssignNew = async (id) => {
+        setSubmitting(true);
+        setFacultyIdToAssign(id);
         await axiosInstance.post(`assign-new-program-head`, { department_id: facultyAssign.department_id, faculty_id: id })
             .then(response => {
                 if (response.data.message === "success") {
@@ -170,121 +186,144 @@ function Department() {
                     showToast(`Assigning success`, 'success');
                 }
             })
+            .then(() => {
+                setSubmitting(false);
+                setFacultyIdToAssign(0);
+                setFacultyAssign({ department_id: '' })
+                setSearchFaculty('');
+            });
     }
+
+    if (fetching) return <Loading />
 
     return (
         <>
-            <div className="container mx-auto p-4">
-                {departmentsCourses.map((department, index) => (
-                    <div
-                        key={index}
-                        className="shadow-heavy rounded-md mb-4 p-4 bg-white"
-                    >
-                        <div className="flex justify-between">
-                            <h2 className="text-secondaryColor font-semibold text-xl mb-2">
-                                {department.department_name} ({department.department_name_abbreviation})
-                            </h2>
-                            <h1>
-                                {department.full_name}
-                            </h1>
-
-                            {department.full_name == null ? (
-                                <button
-                                    className="bg-secondaryColor text-white px-2 rounded-md hover:bg-blue-600 transition duration-200 ease-in-out mb-2"
-                                    onClick={() => {
-                                        setIsAssignModalOpen(!isAssignNewModalOpen),
-                                            setFacultyAssign({
-                                                department_id: department.id
-                                            });
-                                    }}
-                                >Assign Department Head</button>
-                            ) : (
-                                <button
-                                    className="bg-secondaryColor text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-200 ease-in-out mb-2"
-                                    onClick={() => {
-                                        setIsAssignNewModalOpen(!isAssignModalOpen),
-                                            setFacultyAssign({
-                                                department_id: department.id
-                                            });
-                                    }}
-                                >Assign New Department Head</button>
-                            )
-                            }
-                        </div>
-                        <div className="grid grid-cols-2 gap-4 mb-4">
-                            {department.course.map((program, i) => (
-                                <div
-                                    key={i}
-                                    className="bg-gray-200 p-4 text-center"
-                                >
-                                    {program.course_name} ({program.course_name_abbreviation})
-                                </div>
-                            ))}
-                        </div>
-                        <button
-                            onClick={() => {
-                                setCourseForm(prev => ({
-                                    ...prev,
-                                    id: department.id,
-                                }));
-                            }}
-                            className="bg-thirdColor text-white py-1 px-4 rounded-md"
+            <div className="container mx-auto px-4 space-y-6">
+                {departmentsCourses.length > 0 ? (
+                    departmentsCourses.map((department, index) => (
+                        <div
+                            key={index}
+                            className="shadow-light rounded-lg p-6 bg-white"
                         >
-                            Add Program
-                        </button>
-                    </div>
-                ))}
-                <button
-                    className="bg-primaryColor text-white py-2 px-4 rounded-md mt-4"
-                    onClick={addDepartment}
-                >
-                    Add Department
-                </button>
+                            {/* Department Header */}
+                            <div className="flex justify-between items-center mb-4">
+                                <div>
+                                    <h2 className="text-secondaryColor font-semibold text-xl">
+                                        {department.department_name} ({department.department_name_abbreviation})
+                                    </h2>
+                                    <p className="text-gray-600 text-sm">Head: {department.full_name || 'No Department Head Assigned'}</p>
+                                </div>
+                                <button
+                                    className="bg-secondaryColor text-white py-2 px-4 rounded-md hover:bg-blue-600 transition"
+                                    onClick={() => {
+                                        if (department.full_name == null) {
+                                            setIsAssignModalOpen(!isAssignNewModalOpen);
+                                        } else {
+                                            setIsAssignNewModalOpen(!isAssignModalOpen);
+                                        }
+                                        setFacultyAssign({ department_id: department.id });
+                                    }}
+                                >
+                                    {department.full_name == null ? 'Assign Department Head' : 'Assign New Department Head'}
+                                </button>
+                            </div>
+
+                            {/* Programs Grid */}
+                            <div className="grid grid-cols-2 gap-4 mb-6">
+                                {department.course.map((program, i) => (
+                                    <div
+                                        key={i}
+                                        className="bg-gray-100 p-4 rounded-md shadow-sm text-center"
+                                    >
+                                        <p className="font-medium text-gray-700">{program.course_name}</p>
+                                        <p className="text-sm text-gray-500">({program.course_name_abbreviation})</p>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Add Program Button */}
+                            <div className="text-right">
+                                <button
+                                    onClick={() => setCourseForm(prev => ({ ...prev, id: department.id }))}
+                                    className="bg-thirdColor text-white py-2 px-4 rounded-md hover:bg-thirdColor-dark transition"
+                                >
+                                    Add Program
+                                </button>
+                            </div>
+                        </div>
+                    ))
+                ) : (
+                    <p className="text-center text-gray-500">No departments available.</p>
+                )}
+
+                {/* Add Department Button */}
+                <div className="text-center">
+                    <button
+                        className="bg-primaryColor text-white py-2 px-6 rounded-md hover:bg-primaryColor-dark transition"
+                        onClick={addDepartment}
+                    >
+                        Add Department
+                    </button>
+                </div>
             </div>
 
-            {/* Department */}
             {isDeptModalOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-                    <div className="bg-white p-6 rounded-md w-2/4">
-                        <h2 className="text-lg font-bold mb-4">Add Department</h2>
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                    <div className="bg-white p-8 rounded-lg w-full max-w-lg mx-4 shadow-lg">
+                        <h2 className="text-xl font-semibold text-gray-800 mb-6">Add Department</h2>
+
                         <form>
-                            <div className="mb-4">
-                                <label className={` text-gray-700`}>Department Name:</label>
+                            {/* Department Name Input */}
+                            <div className="mb-5">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Department Name:
+                                </label>
                                 <input
                                     type="text"
                                     value={deptForm.department_name}
                                     name="department_name"
                                     onChange={handleDeptChange}
-                                    className={`w-full px-3 py-2 border rounded-md ${deptInvalidFields.includes('department_name') && 'border-red-300'}`}
+                                    className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 ${deptInvalidFields.includes('department_name') ? 'border-red-300' : 'border-gray-300'
+                                        }`}
                                     placeholder="Enter Department Name"
+                                    aria-invalid={deptInvalidFields.includes('department_name')}
                                 />
                             </div>
-                            <div className="mb-4">
-                                <label className="block text-gray-700">Name Abbreviation:</label>
+
+                            {/* Name Abbreviation Input */}
+                            <div className="mb-5">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Name Abbreviation:
+                                </label>
                                 <input
                                     type="text"
                                     value={deptForm.department_name_abbreviation}
                                     name="department_name_abbreviation"
                                     onChange={handleDeptChange}
-                                    className={`w-full px-3 py-2 border rounded-md ${deptInvalidFields.includes('department_name_abbreviation') && 'border-red-300'}`}
+                                    className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 ${deptInvalidFields.includes('department_name_abbreviation') ? 'border-red-300' : 'border-gray-300'
+                                        }`}
                                     placeholder="Enter Abbreviation"
+                                    aria-invalid={deptInvalidFields.includes('department_name_abbreviation')}
                                 />
                             </div>
-                            <div className="flex justify-end">
+
+                            {/* Action Buttons */}
+                            <div className="flex justify-end space-x-3 mt-4">
                                 <button
                                     type="button"
-                                    className="bg-thirdColor text-white py-1 px-3 rounded-md mr-2"
+                                    className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 transition"
                                     onClick={closeModal}
                                 >
                                     Cancel
                                 </button>
                                 <button
-                                    disabled={submitting}
                                     type="submit"
-                                    className="bg-primaryColor text-white py-1 px-3 rounded-md"
+                                    disabled={submitting}
+                                    className={`py-2 px-4 rounded-md text-white ${submitting ? 'bg-primaryColor-light cursor-not-allowed' : 'bg-primaryColor hover:bg-primaryColor-dark transition'
+                                        }`}
                                     onClick={saveDepartment}
                                 >
-                                    Save
+                                    {submitting ? 'Saving...' : 'Save'}
                                 </button>
                             </div>
                         </form>
@@ -292,57 +331,67 @@ function Department() {
                 </div>
             )}
 
-            {/* Course */}
+            {/* Course Modal */}
             {courseForm.id && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-                    <div className="bg-white p-6 rounded-md w-2/4">
-                        <h2 className="text-lg font-bold">Add Program</h2>
-                        <h2 className="text-secondaryColor font-semibold text-xl mb-4">
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                    <div className="bg-white p-8 rounded-lg w-full max-w-lg mx-4 shadow-lg">
+                        <h2 className="text-xl font-semibold text-gray-800">Add Program</h2>
+                        <h3 className="text-secondaryColor font-semibold text-lg mb-6">
                             {courseDept.department_name} ({courseDept.department_name_abbreviation})
-                        </h2>
+                        </h3>
+
                         <form>
-                            <div className="mb-4">
-                                <label className="block text-gray-700">Program Name:</label>
+                            {/* Program Name Input */}
+                            <div className="mb-5">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Program Name:
+                                </label>
                                 <input
                                     type="text"
                                     value={courseForm.course_name}
                                     name="course_name"
                                     onChange={handleCourseChange}
-                                    className={`w-full px-3 py-2 border rounded-md ${courseInvalidFields.includes('course_name') && 'border-red-300'}`}
+                                    className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 ${courseInvalidFields.includes('course_name') ? 'border-red-300' : 'border-gray-300'
+                                        }`}
                                     placeholder="Enter Program Name"
+                                    aria-invalid={courseInvalidFields.includes('course_name')}
                                 />
                             </div>
-                            <div className="mb-4">
-                                <label className="block text-gray-700">Name Abbreviation:</label>
+
+                            {/* Name Abbreviation Input */}
+                            <div className="mb-5">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Name Abbreviation:
+                                </label>
                                 <input
                                     type="text"
                                     value={courseForm.course_name_abbreviation}
                                     name="course_name_abbreviation"
                                     onChange={handleCourseChange}
-                                    className={`w-full px-3 py-2 border rounded-md ${courseInvalidFields.includes('course_name_abbreviation') && 'border-red-300'}`}
+                                    className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 ${courseInvalidFields.includes('course_name_abbreviation') ? 'border-red-300' : 'border-gray-300'
+                                        }`}
                                     placeholder="Enter Abbreviation"
+                                    aria-invalid={courseInvalidFields.includes('course_name_abbreviation')}
                                 />
                             </div>
-                            <div className="flex justify-end">
+
+                            {/* Action Buttons */}
+                            <div className="flex justify-end space-x-3 mt-6">
                                 <button
                                     type="button"
-                                    onClick={() => {
-                                        setCourseForm(prev => ({
-                                            ...prev,
-                                            id: '',
-                                        }));
-                                    }}
-                                    className="bg-gray-500 text-white py-1 px-3 rounded-md mr-2"
+                                    onClick={() => setCourseForm(prev => ({ ...prev, id: '' }))}
+                                    className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 transition"
                                 >
                                     Cancel
                                 </button>
                                 <button
-                                    disabled={submitting}
                                     type="submit"
-                                    className="bg-primaryColor text-white py-1 px-3 rounded-md"
+                                    disabled={submitting}
                                     onClick={submitCourse}
+                                    className={`py-2 px-4 rounded-md text-white ${submitting ? 'bg-primaryColor-light cursor-not-allowed' : 'bg-primaryColor hover:bg-primaryColor-dark transition'
+                                        }`}
                                 >
-                                    Save
+                                    {submitting ? 'Saving...' : 'Save'}
                                 </button>
                             </div>
                         </form>
@@ -350,153 +399,194 @@ function Department() {
                 </div>
             )}
 
-            {isAssignModalOpen &&
-                (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-                        <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg">
-                            <h2 id="modal-title" className="text-lg font-bold mb-4 text-gray-900">Assign Program Head</h2>
-                            <form onSubmit={submitAssign}>
-                                {/* Search Input */}
-                                <div className="mb-4">
-                                    <label htmlFor="faculty-search" className="block text-gray-700 font-medium mb-2">
-                                        Search Faculty:
-                                    </label>
-                                    <input
-                                        id="faculty-search"
-                                        type="text"
-                                        value={searchFaculty}
-                                        name="faculty_id"
-                                        onChange={(e) => setSearchFaculty(e.target.value)}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primaryColor focus:border-transparent"
-                                        placeholder="Enter faculty name or ID"
-                                        aria-label="Search for faculty members"
-                                    />
-                                </div>
+            {isAssignModalOpen && (
+                <div
+                    className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="modal-title"
+                >
+                    <div className="bg-white p-8 rounded-lg w-full max-w-md shadow-xl relative">
+                        <h2 id="modal-title" className="text-xl font-semibold text-gray-800 mb-6">
+                            Assign Program Head
+                        </h2>
 
-                                {/* Faculty List */}
-                                <div className="mb-4 max-h-60 overflow-y-auto">
-                                    {searchFaculty ? (
-                                        <ul className="divide-y divide-gray-200">
-                                            {deptFaculties
-                                                .filter(deptFaculty =>
-                                                    deptFaculty.full_name.toLowerCase().includes(searchFaculty.toLowerCase()) ||
-                                                    deptFaculty.user_id_no.toLowerCase().includes(searchFaculty.toLowerCase())
-                                                )
-                                                .map((deptFaculty, index) => (
-                                                    <li key={index} className="p-2 flex justify-between items-center hover:bg-gray-50 transition-colors">
-                                                        <div>
-                                                            <span className="font-medium text-gray-900">{deptFaculty.user_id_no}</span> -
-                                                            <span className="ml-2 text-gray-700">{deptFaculty.full_name}</span>
-                                                        </div>
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => { submitAssign(deptFaculty.id) }}
-                                                            className={`bg-primaryColor text-white py-2 px-4 rounded-md hover:bg-primaryColor-dark transition ${submitting ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                                        >
-                                                            {submitting ? 'Assigning...' : 'Assign'}
-                                                        </button>
-                                                    </li>
-                                                ))}
-                                        </ul>
-                                    ) : (
-                                        <p className="text-gray-500">Start typing to search for faculty members.</p>
-                                    )}
-                                </div>
+                        <form onSubmit={submitAssign}>
+                            {/* Search Input */}
+                            <div className="mb-5">
+                                <label
+                                    htmlFor="faculty-search"
+                                    className="block text-sm font-medium text-gray-600 mb-2"
+                                >
+                                    Search Faculty:
+                                </label>
+                                <input
+                                    id="faculty-search"
+                                    type="text"
+                                    value={searchFaculty}
+                                    onChange={(e) => setSearchFaculty(e.target.value)}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryColor focus:border-transparent placeholder-gray-400"
+                                    placeholder="Enter faculty name or ID"
+                                    aria-label="Search for faculty members"
+                                />
+                            </div>
 
-                                {/* Action Buttons */}
-                                <div className="flex justify-start space-x-2 mt-4">
-                                    <button
-                                        type="button"
-                                        className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 transition"
-                                        onClick={() => {
-                                            setIsAssignModalOpen(false)
-                                            setSearchFaculty("");
-                                        }}
-                                    >
-                                        Close
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
+                            {/* Faculty List */}
+                            <div className="mb-6 max-h-64 overflow-y-auto border border-gray-200 rounded-lg">
+                                {searchFaculty ? (
+                                    <ul className="divide-y divide-gray-200">
+                                        {deptFaculties
+                                            .filter(deptFaculty =>
+                                                deptFaculty.full_name.toLowerCase().includes(searchFaculty.toLowerCase()) ||
+                                                deptFaculty.user_id_no.toLowerCase().includes(searchFaculty.toLowerCase())
+                                            )
+                                            .map((deptFaculty, index) => (
+                                                <li
+                                                    key={index}
+                                                    className="p-3 flex justify-between items-center hover:bg-gray-100 transition-colors"
+                                                >
+                                                    <div className="flex items-center space-x-2">
+                                                        <span className="font-medium text-gray-700">
+                                                            {deptFaculty.user_id_no}
+                                                        </span>
+                                                        <span className="text-gray-500">-</span>
+                                                        <span className="text-gray-700">{deptFaculty.full_name}</span>
+                                                    </div>
+                                                    <button
+                                                        disabled={deptFaculty.user_role === 'program_head'}
+                                                        type="button"
+                                                        onClick={() => { submitAssign(deptFaculty.id); }}
+                                                        className={`${deptFaculty.user_role === 'program_head' || submitting ? 'bg-gray-300 cursor-not-allowed' : 'bg-primaryColor hover:bg-primaryColor-dark'
+                                                            } text-white py-2 px-3 rounded-lg transition ${submitting ? 'opacity-50' : ''
+                                                            }`}
+                                                    >
+                                                        {submitting && deptFaculty.id === facultyIdToAssign ? (
+                                                            <>
+                                                                Assigning... <ImSpinner5 className="inline-block animate-spin ml-1" />
+                                                            </>
+                                                        ) : (
+                                                            'Assign'
+                                                        )}
+                                                    </button>
+                                                </li>
+                                            ))}
+                                    </ul>
+                                ) : (
+                                    <p className="text-center text-gray-500 py-6">
+                                        Start typing to search for faculty members.
+                                    </p>
+                                )}
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="flex justify-end space-x-3">
+                                <button
+                                    type="button"
+                                    className="bg-gray-400 text-white py-2 px-4 rounded-lg hover:bg-gray-500 transition"
+                                    onClick={() => {
+                                        setIsAssignModalOpen(false);
+                                        setSearchFaculty("");
+                                    }}
+                                >
+                                    Close
+                                </button>
+                            </div>
+                        </form>
                     </div>
-                )
-            }
+                </div>
+            )}
 
-            {isAssignNewModalOpen &&
-                (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-                        <div className="bg-white p-6 rounded-md w-1/1">
-                            <h2 className="text-lg font-bold mb-4">Assign New Program Head</h2>
-                            <form>
-                                {/* Search Input */}
-                                <div className="mb-4">
-                                    <label htmlFor="faculty-search" className="block text-gray-700 font-medium mb-2">
-                                        Search Faculty:
-                                    </label>
-                                    <input
-                                        id="faculty-search"
-                                        type="text"
-                                        value={searchFaculty}
-                                        name="faculty_id"
-                                        onChange={(e) => setSearchFaculty(e.target.value)}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primaryColor focus:border-transparent"
-                                        placeholder="Enter faculty name or ID"
-                                        aria-label="Search for faculty members"
-                                    />
-                                </div>
+            {isAssignNewModalOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                    <div className="bg-white p-8 rounded-lg w-full max-w-lg shadow-lg relative">
+                        <h2 className="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
+                            <span>Assign New Program Head</span>
+                        </h2>
 
-                                {/* Faculty List */}
-                                <div className="mb-4 max-h-60 overflow-y-auto">
-                                    {searchFaculty ? (
-                                        <ul className="divide-y divide-gray-200">
-                                            {deptFaculties
-                                                .filter(deptFaculty =>
-                                                    deptFaculty.full_name.toLowerCase().includes(searchFaculty.toLowerCase()) ||
-                                                    deptFaculty.user_id_no.toLowerCase().includes(searchFaculty.toLowerCase())
-                                                )
-                                                .map((deptFaculty, index) => (
-                                                    <li key={index} className="p-2 flex justify-between items-center hover:bg-gray-50 transition-colors">
-                                                        <div>
-                                                            <span className="font-medium text-gray-900">{deptFaculty.user_id_no}</span> -
-                                                            <span className="ml-2 text-gray-700">{deptFaculty.full_name}</span>
-                                                        </div>
-                                                        <button
-                                                            disabled={deptFaculty.user_role == 'program_head'}
-                                                            type="button"
-                                                            onClick={() => { submitAssignNew(deptFaculty.id) }}
-                                                            className={`${deptFaculty.user_role == 'program_head' || submitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-primaryColor hover:bg-primaryColor-dark'
-                                                                } text-white py-2 px-4 rounded-md transition ${submitting ? 'opacity-50' : ''
-                                                                }`}
-                                                        >
-                                                            {submitting ? 'Assigning...' : 'Assign'}
-                                                        </button>
+                        <form>
+                            {/* Search Input */}
+                            <div className="mb-5">
+                                <label
+                                    htmlFor="faculty-search"
+                                    className="block text-sm font-medium text-gray-600 mb-2"
+                                >
+                                    Search Faculty:
+                                </label>
+                                <input
+                                    id="faculty-search"
+                                    type="text"
+                                    value={searchFaculty}
+                                    onChange={(e) => setSearchFaculty(e.target.value)}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryColor focus:border-transparent placeholder-gray-400"
+                                    placeholder="Enter faculty name or ID"
+                                    aria-label="Search for faculty members"
+                                />
+                            </div>
 
-                                                    </li>
-                                                ))}
-                                        </ul>
-                                    ) : (
-                                        <p className="text-gray-500">Start typing to search for faculty members.</p>
-                                    )}
-                                </div>
+                            {/* Faculty List */}
+                            <div className="mb-6 max-h-64 overflow-y-auto border border-gray-200 rounded-lg">
+                                {searchFaculty ? (
+                                    <ul className="divide-y divide-gray-200">
+                                        {deptFaculties
+                                            .filter(deptFaculty =>
+                                                deptFaculty.full_name.toLowerCase().includes(searchFaculty.toLowerCase()) ||
+                                                deptFaculty.user_id_no.toLowerCase().includes(searchFaculty.toLowerCase())
+                                            )
+                                            .map((deptFaculty, index) => (
+                                                <li
+                                                    key={index}
+                                                    className="p-3 flex justify-between items-center hover:bg-gray-100 transition-colors"
+                                                >
+                                                    <div className="flex items-center space-x-2 text-md">
+                                                        <span className="font-medium text-gray-700">
+                                                            {deptFaculty.user_id_no}
+                                                        </span>
+                                                        <span className="text-gray-500">-</span>
+                                                        <span className="text-gray-700">{deptFaculty.full_name}</span>
+                                                    </div>
+                                                    <button
+                                                        disabled={deptFaculty.user_role === 'program_head'}
+                                                        type="button"
+                                                        onClick={() => { submitAssignNew(deptFaculty.id); }}
+                                                        className={`${deptFaculty.user_role === 'program_head' || submitting ? 'bg-gray-300 cursor-not-allowed' : 'bg-primaryColor hover:bg-primaryColor-dark'
+                                                            } text-white py-2 px-3 rounded-lg transition ${submitting ? 'opacity-50' : ''
+                                                            }`}
+                                                    >
+                                                        {submitting && deptFaculty.id === facultyIdToAssign ? (
+                                                            <>
+                                                                Assigning... <ImSpinner5 className="inline-block animate-spin ml-1" />
+                                                            </>
+                                                        ) : (
+                                                            'Assign'
+                                                        )}
+                                                    </button>
+                                                </li>
+                                            ))}
+                                    </ul>
+                                ) : (
+                                    <p className="text-center text-gray-500 py-6">
+                                        Start typing to search for faculty members.
+                                    </p>
+                                )}
+                            </div>
 
-                                {/* Action Buttons */}
-                                <div className="flex justify-start space-x-2 mt-4">
-                                    <button
-                                        type="button"
-                                        className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 transition"
-                                        onClick={() => {
-                                            setIsAssignNewModalOpen(!isAssignNewModalOpen);
-                                            setSearchFaculty("");
-                                        }}
-                                    >
-                                        Close
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
+                            {/* Action Buttons */}
+                            <div className="flex justify-end space-x-3">
+                                <button
+                                    type="button"
+                                    className="bg-gray-400 text-white py-2 px-4 rounded-lg hover:bg-gray-500 transition"
+                                    onClick={() => {
+                                        setIsAssignNewModalOpen(!isAssignNewModalOpen);
+                                        setSearchFaculty("");
+                                    }}
+                                >
+                                    Close
+                                </button>
+                            </div>
+                        </form>
                     </div>
-                )
-            }
+                </div>
+            )}
             <Toast />
         </>
     );

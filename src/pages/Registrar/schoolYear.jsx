@@ -2,12 +2,14 @@ import { useState, useEffect } from "react";
 import axiosInstance from "../../../axios/axiosInstance";
 import { Link } from "react-router-dom";
 import { formatDateShort } from "../../utilities/utils";
+import Loading from "../../components/Loading";
 function SchoolYear() {
     const [submitting, setSubmitting] = useState(false);
     const [enrollmentConflict, setEnrollmentConflict] = useState(false);
     const [semesters, setSemesters] = useState([]);
     const [schoolYears, setSchoolYears] = useState([]);
     const [showAll, setShowAll] = useState(false);
+    const [fetching, setFetching] = useState(true);
 
     const [isSchoolYearModalOpen, setIsSchoolYearModalOpen] = useState(false)
     const [form, setForm] = useState({
@@ -44,6 +46,9 @@ function SchoolYear() {
                         }));
                     }
                 }
+            })
+            .finally(() => {
+                setFetching(false);
             })
     }
 
@@ -128,6 +133,8 @@ function SchoolYear() {
         result.setDate(result.getDate() + days);
         return result.toISOString().split('T')[0];
     };
+
+    if (fetching) return <Loading />
 
     return (
         <>
@@ -257,6 +264,7 @@ function SchoolYear() {
                                         onChange={handleFormChange}
                                         name="start_date"
                                         type="date"
+                                        min={`${form.start_year}-01-01`}  // Set the minimum year based on form.start_year
                                         className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 ${shoolYearInvalidFields.includes('start_date') && 'border-red-300'}`}
                                     />
                                 </div>
