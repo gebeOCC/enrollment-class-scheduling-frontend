@@ -7,14 +7,17 @@ export const formatDate = (dateString) => {
 
 // convert 24 hours to am pm
 export function convertToAMPM(time) {
+    if (!time || typeof time !== 'string' || !time.includes(':')) {
+        return ''; // or return a default value like 'N/A'
+    }
+
     const [hour, minute] = time.split(':').map(Number);
-
     const ampm = hour >= 12 ? 'PM' : 'AM';
-
     const convertedHour = hour % 12 || 12;
 
     return `${convertedHour}:${minute.toString().padStart(2, '0')} ${ampm}`;
 }
+
 
 // convert minutes to 24 hours
 export function convertMinutesTo24HourTime(minutes) {

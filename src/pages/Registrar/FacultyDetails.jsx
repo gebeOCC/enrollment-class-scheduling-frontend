@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import axiosInstance from '../../../axios/axiosInstance';
 import { checkPasswordComplexity } from '../../utilities/utils';
 import { PiSpinnerBold } from 'react-icons/pi';
-import { FaExclamation } from 'react-icons/fa6';
+import { FaCheck, FaExclamation, FaRegCopy } from 'react-icons/fa6';
 import Loading from '../../components/Loading';
 import { MdEdit } from "react-icons/md";
 import { IoMdCloseCircle } from 'react-icons/io';
@@ -16,6 +16,7 @@ function FacultyDetails() {
     const [found, setFound] = useState(true);
     const [editingDepartment, setEditingDepartment] = useState(false);
     const [departments, setDepartments] = useState([]);
+    const [copied, setCopied] = useState(false);
 
     const [password, setPassword] = useState("");
     const [passwordRequirements, setPasswordRequirements] = useState("");
@@ -104,6 +105,14 @@ function FacultyDetails() {
             })
     };
 
+    const handleCopy = () => {
+        navigator.clipboard.writeText(facultyDetails.user_id_no);
+        setCopied(true);
+
+        // Reset after 3 seconds
+        setTimeout(() => setCopied(false), 3000);
+    };
+
     return (
         <div className='space-y-4'>
             <div className="w-full mx-auto shadow-sm bg-white rounded-xl p-8 text-gray-800">
@@ -115,7 +124,14 @@ function FacultyDetails() {
                     </div>
                     <div>
                         <h2 className="text-2xl font-bold">{facultyDetails.user_information.first_name} {facultyDetails.user_information.middle_name} {facultyDetails.user_information.last_name}</h2>
-                        <p className="text-sm text-gray-500">ID Number: {facultyDetails.user_id_no}</p>
+                        <div className="flex gap-1 text-gray-500 items-center">
+                            <p className="text-md flex">ID Number: {facultyDetails.user_id_no}</p>
+                            {copied ? (
+                                <FaCheck className="cursor-pointer" />
+                            ) : (
+                                <FaRegCopy className="cursor-pointer" onClick={handleCopy} />
+                            )}
+                        </div>
                     </div>
                 </div>
                 <div className="grid grid-cols-1 gap-y-4">
@@ -147,7 +163,10 @@ function FacultyDetails() {
             </div>
 
             <div className="w-full bg-white rounded-lg shadow-lg p-6 text-gray-800">
-                <h3 className="text-2xl font-bold text-blue-600 mb-4"> Department</h3>
+                <h3 className="text-2xl font-bold text-blue-600"> Department</h3>
+                {facultyDetails.user_role == 'program_head' &&
+                    <h5>Program Head</h5>
+                }
 
                 <div className="bg-gray-100 rounded-md p-4">
                     {facultyDetails.faculty.department ? (
@@ -156,10 +175,10 @@ function FacultyDetails() {
                                 <p className="text-lg font-semibold text-gray-900 mt-1 flex items-center">
                                     <select
                                         onChange={setDepartment}
-                                        className='cursor-pointer'
+                                        className='cursor-pointer text-blue'
                                         name=""
                                         id=""
-                                        value={facultyDetails.faculty.department.department_id}>
+                                        value={facultyDetails.faculty.department_id}>
                                         {departments.map((department, index) => (
                                             <option key={index} value={department.id}>{department.department_name}</option>
                                         ))}
@@ -171,9 +190,11 @@ function FacultyDetails() {
                             ) : (
                                 <p className="text-lg font-semibold text-gray-900 mt-1 flex items-center">
                                     {facultyDetails.faculty.department.department_name}
-                                    <span className="text-blue-600 ml-2">
-                                        <MdEdit onClick={editDepartment} className='cursor-pointer' />
-                                    </span>
+                                    {facultyDetails.user_role != 'program_head' &&
+                                        <span className="text-blue-600 ml-2">
+                                            <MdEdit onClick={editDepartment} className='cursor-pointer' />
+                                        </span>
+                                    }
                                 </p>
                             )
                             }

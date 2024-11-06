@@ -38,14 +38,14 @@ function SideBar() {
         <div className="flex h-screen overflow-hidden">
             <div className={`h-full fixed top-0 left-0 z-50 md:h-auto md:static bg-[#3e5c76] text-white flex-shrink-0 flex-col justify-between lg:block transition-all duration-300 ease-in-out ${sidebarOpen ? 'w-64' : 'w-20 hidden md:block'}`}>
                 <div className="flex flex-col h-full">
-                    <div className="p-4 flex items-center h-14 mb-4">
+                    <div className="p-4 flex items-center h-14">
                         <HiBars3 onClick={toggleSidebar} className="md:hidden cursor-pointer  transition-transform duration-300 ease-in-out transform
                 hover:scale-110 active:scale-90" size={30} />
                         <img src={OCC_LOGO} alt="Logo" className="w-8 h-8 mr-2" />
                         {sidebarOpen && <h2 className="text-3xl font-bold">OCC</h2>}
                     </div>
 
-                    <ul className="space-y-1 flex-grow overflow-x-hidden">
+                    <ul className="space-y-1 flex-grow overflow-x-hidden py-4">
                         {(() => {
                             if (userRole === "registrar") {
                                 return (
@@ -70,7 +70,7 @@ function SideBar() {
 
                                                         {/* Course List */}
                                                         <div className="space-y-1">
-                                                            {/* {courses.map((course, index) => (
+                                                            {courses.map((course, index) => (
                                                                 <li key={index} className="px-4">
                                                                     <NavLink
                                                                         to={`enrollment/${course.hashed_course_id}`}
@@ -84,7 +84,7 @@ function SideBar() {
                                                                         <span className="text-white">{course.course_name_abbreviation}</span>
                                                                     </NavLink>
                                                                 </li>
-                                                            ))} */}
+                                                            ))}
                                                             <li className="px-4">
                                                                 <NavLink
                                                                     to="dashboard"
@@ -103,6 +103,7 @@ function SideBar() {
                                                 </div>
                                             </>
                                         }
+
                                         <li className="px-4 py">
                                             <NavLink
                                                 to="/department"
@@ -116,8 +117,6 @@ function SideBar() {
                                             </NavLink>
                                         </li>
 
-                                        {/* Enrollment Section */}
-                                        <p className="px-4 text-sm text-gray-400">ENROLLMENT</p>
                                         <li className="px-4">
                                             <NavLink
                                                 to="/school-year"
@@ -397,7 +396,6 @@ function SideBar() {
                                                         : "p-2 flex items-center rounded-md  space-x-2 py-2 duration-100 focus:bg-[#4e90ca]  hover:bg-[#3d7cb1]"
                                                 }
                                             >
-                                                <i className="fas fa-book"></i>
                                                 <span>Classes</span>
                                             </NavLink>
                                         </li>

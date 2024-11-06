@@ -3,15 +3,18 @@ import axiosInstance from "../../../axios/axiosInstance"
 import { capitalizeFirstLetter, formatBirthday, formatPhoneNumber, getFirstLetter, isValidEmail, removeHyphens } from "../../utilities/utils";
 import * as XLSX from 'xlsx';
 import { FcViewDetails } from "react-icons/fc";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import AddNewStudentModal from "../GlobalFunction/AddNewStudentModal";
 import { CiImport } from "react-icons/ci";
 import Loading from "../../components/Loading";
 
 function Studentlist() {
+    const navigate = useNavigate();
     const [searchBar, setSearchBar] = useState('')
     const [students, setStudents] = useState([])
     const [showCount, setShowCount] = useState(10);
+    const [message, setMessage] = useState('');
+    const [data, setData] = useState([]);
 
     const [uploadingStudents, setUploadingStudents] = useState(false);
     const [fetching, setFetching] = useState(true);
@@ -19,7 +22,7 @@ function Studentlist() {
     const [totalStudentsInExcel, setTotalStudentsInExcel] = useState(0);
     const progressPercentage = ((totalUpload / totalStudentsInExcel) * 100).toFixed(2);
 
-    useEffect(() => {
+    const getStudentList = async () => {
         axiosInstance.get(`get-student-list`)
             .then(response => {
                 setStudents(response.data)
@@ -27,10 +30,13 @@ function Studentlist() {
             .finally(() => {
                 setFetching(false);
             })
+    }
+
+    useEffect(() => {
+        getStudentList();
     }, [])
 
     const [isStudentModalOpen, setIsStudentModalOpen] = useState(false)
-
 
     const [uploadExcelStudentList, setUploadExcelStudentList] = useState([]);
 
@@ -61,6 +67,8 @@ function Studentlist() {
             setTotalStudentsInExcel(totalStudents);
             setUploadingStudents(true);
 
+            let totalStudentUpload = 0;
+
             const uploadPromises = jsonData.slice(1).map(row => {
                 const student = {};
                 headers.forEach((header, index) => {
@@ -75,7 +83,6 @@ function Studentlist() {
                     }
                 });
 
-                // console.log(student)
                 return axiosInstance.post(`import-students/`, {
                     user_id_no: student['STUDENT ID NO'] || '',
                     first_name: student['FIRST NAME'] || '',
@@ -87,29 +94,38 @@ function Studentlist() {
                     email_address: student['Email Address'] || '',
                     present_address: student['Present Address'] || '',
                     zip_code: student['ZIP CODE'] || '',
-                }).then(response => {
-                    console.log(response.data.message)
-                    if (response.data.message === "success") {
-                        setUploadExcelStudentList(prevList =>
-                            prevList.map(existingStudent =>
-                                existingStudent.id_number === newStudent.id_number
-                                    ? { ...existingStudent, uploading_status: true }
-                                    : existingStudent
-                            )
-                        );
-                        const newStudent = {
-                            id_number: student['STUDENT ID NO'],
-                            first_name: student['FIRST NAME'],
-                            last_name: student['LAST NAME'],
-                            uploading_status: false,
-                        };
-                        setTotalUpload(prevNum => prevNum + 1);
+                })
+                    .then(response => {
+                        if (response.data.message === "success") {
+                            setUploadExcelStudentList(prevList =>
+                                prevList.map(existingStudent =>
+                                    existingStudent.id_number === newStudent.id_number
+                                        ? { ...existingStudent, uploading_status: true }
+                                        : existingStudent
+                                )
+                            );
+                            const newStudent = {
+                                id_number: student['STUDENT ID NO'],
+                                first_name: student['FIRST NAME'],
+                                last_name: student['LAST NAME'],
+                                uploading_status: false,
+                            };
 
-                        setUploadExcelStudentList(prevList => [...prevList, newStudent]);
-                    }
-                }).catch(error => {
-                    console.error("Error uploading student:", error);
-                });
+                            setUploadExcelStudentList(prevList => [...prevList, newStudent]);
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error uploading student:", error);
+                    })
+                    .finally(() => {
+                        setTotalUpload(prevNum => prevNum + 1);
+                        totalStudentUpload++;
+                        if (totalStudentUpload == totalStudents) {
+                            getStudentList();
+                        }
+                        console.log(totalStudentUpload);
+                        console.log(totalStudents);
+                    })
             });
 
             await Promise.all(uploadPromises);
@@ -143,8 +159,7 @@ function Studentlist() {
                             onChange={(e) => { setSearchBar(e.target.value) }}
                             type="text"
                             placeholder="Search student..."
-                            className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        />
+                            className="px-4 py-2 border focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-lg rounded-md transition-all duration-200 ease-in-out"/>
 
                         <label className="flex border border-green-500 text-green-500 px-6 py-2 rounded-md hover:bg-green-500 hover:text-white transition duration-300 cursor-pointer">
                             Import Excel
@@ -169,12 +184,10 @@ function Studentlist() {
                 <table className="min-w-full bg-white">
                     <thead>
                         <tr className="w-full bg-[#00b6cf] text-white text-left">
-                            <th className="py-2 px-4">#</th>
                             <th className="py-2 px-4">Student ID no.</th>
                             <th className="py-2 px-4">Name</th>
                             <th className="py-2 px-4">Email</th>
                             <th className="py-2 px-4">Contact no.</th>
-                            <th className="py-2 px-4">Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -186,25 +199,20 @@ function Studentlist() {
                                     (String(student.last_name) + String(student.first_name) + getFirstLetter(String(student.middle_name)))
                                         .toLowerCase().includes(searchBar.toLowerCase())
                                 ))
-                                .slice(0, showCount) // Show only the selected number of students
+                                .slice(0, showCount)
                                 .map((student, index) => (
                                     <tr
                                         key={index}
-                                        className={`border-b ${index % 2 === 0 ? "bg-white" : "bg-[#deeced]"}`}
+                                        className={`border-b hover:bg-[#deeced] cursor-pointer`}
+                                        onClick={() => navigate(`student-details?student-id=${student.user_id_no}`)}
                                     >
-                                        <td className="py-1 px-4">{index + 1}.</td>
-                                        <td className="py-1 px-4">{student.user_id_no}</td>
-                                        <td className="py-1 px-4">
+                                        <td className="py-2 px-4 transition duration-200 hover:py-3">{student.user_id_no}</td>
+                                        <td className="py-2 px-4 transition duration-200 hover:py-3">
                                             {capitalizeFirstLetter(student.last_name)}, {capitalizeFirstLetter(student.first_name)}{" "}
                                             {student.middle_name && getFirstLetter(student.middle_name) + '.'}
                                         </td>
-                                        <td className="py-1 px-4">{student.email_address}</td>
-                                        <td className="py-1 px-4">{student.contact_number}</td>
-                                        <td className="py-1 px-4 flex justify-center cursor-pointer">
-                                            <NavLink to={`student-details?student-id=${student.user_id_no}`}>
-                                                <FcViewDetails size={30} />
-                                            </NavLink>
-                                        </td>
+                                        <td className="py-2 px-4 transition duration-200 hover:py-3">{student.email_address}</td>
+                                        <td className="py-2 px-4 transition duration-200 hover:py-3">{student.contact_number}</td>
                                     </tr>
                                 ))
                         ) : (
@@ -216,7 +224,7 @@ function Studentlist() {
                         )}
                     </tbody>
                 </table>
-            </div>
+            </div >
 
             {
                 uploadExcelStudentList.map((student, index) => (
@@ -226,57 +234,60 @@ function Studentlist() {
                 ))
             }
 
-            {uploadingStudents && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-                    <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md flex flex-col justify-between">
-                        {/* Modal Header */}
-                        <h1 className="text-3xl font-semibold text-center mb-4">
-                            Uploading Students
-                        </h1>
+            {
+                uploadingStudents && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+                        <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md flex flex-col justify-between">
+                            {/* Modal Header */}
+                            <h1 className="text-3xl font-semibold text-center mb-4">
+                                Uploading Students
+                            </h1>
 
-                        {/* Warning Message */}
-                        <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-md mb-4">
-                            <p className="text-center font-medium">
-                                Please do not close or refresh the browser while students are being uploaded.
-                            </p>
-                        </div>
-
-                        {/* Progress Percentage */}
-                        <div className="flex flex-col items-center">
-                            <span className="text-lg font-medium mb-2">
-                                {progressPercentage}% Complete
-                            </span>
-
-                            {/* Progress Bar */}
-                            <div className="w-full bg-gray-200 rounded-full h-4 mb-4">
-                                <div
-                                    className="bg-blue-600 h-4 rounded-full transition-all"
-                                    style={{ width: `${progressPercentage}%` }}>
-                                </div>
+                            {/* Warning Message */}
+                            <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-md mb-4">
+                                <p className="text-center font-medium">
+                                    Please do not close or refresh the browser while students are being uploaded.
+                                </p>
                             </div>
 
-                            {/* Progress Details */}
-                            <p className="text-gray-600">
-                                {totalUpload} out of {totalStudentsInExcel} students uploaded
-                            </p>
-                        </div>
+                            {/* Progress Percentage */}
+                            <div className="flex flex-col items-center">
+                                <span className="text-lg font-medium mb-2">
+                                    {progressPercentage}% Complete
+                                </span>
 
-                        {/* Footer - Close Button */}
-                        <div className="flex justify-center mt-6">
-                            <button
-                                onClick={() => setUploadingStudents(false)}
-                                disabled={progressPercentage !== "100.00"}
-                                className={`px-4 py-2 rounded-md shadow-md transition ${progressPercentage === "100.00"
-                                    ? "bg-blue-500 text-white hover:bg-blue-600"
-                                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                    }`}>
-                                Close
-                            </button>
+                                {/* Progress Bar */}
+                                <div className="w-full bg-gray-200 rounded-full h-4 mb-4">
+                                    <div
+                                        className="bg-blue-600 h-4 rounded-full transition-all"
+                                        style={{ width: `${progressPercentage}%` }}>
+                                    </div>
+                                </div>
+
+                                {/* Progress Details */}
+                                <p className="text-gray-600">
+                                    {totalUpload} out of {totalStudentsInExcel} students uploaded
+                                </p>
+                            </div>
+
+                            {/* Footer - Close Button */}
+                            <div className="flex justify-center mt-6">
+                                <button
+                                    onClick={() => setUploadingStudents(false)}
+                                    disabled={progressPercentage !== "100.00"}
+                                    className={`px-4 py-2 rounded-md shadow-md transition ${progressPercentage === "100.00"
+                                        ? "bg-blue-500 text-white hover:bg-blue-600"
+                                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                        }`}>
+                                    Close
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
-            <AddNewStudentModal open={isStudentModalOpen} setOpen={setIsStudentModalOpen} />
+                )
+            }
+
+            <AddNewStudentModal open={isStudentModalOpen} setOpen={setIsStudentModalOpen} setMessage={setMessage} setData={setData} />
         </>
     )
 }

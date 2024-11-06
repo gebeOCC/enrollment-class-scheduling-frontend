@@ -1,18 +1,16 @@
 import { useEffect, useState } from "react";
 import { formatPhoneNumber, isValidEmail, removeHyphens } from "../../utilities/utils";
 import axiosInstance from "../../../axios/axiosInstance";
+import { ImSpinner5 } from "react-icons/im";
 
-function AddNewStudentModal({ open, setOpen }) {
+function AddNewStudentModal({ setStudentIdSearch, open, setOpen, setStudentInfo }) {
     const [submitting, setSubmitting] = useState(false);
     const [userIdExist, setUserIdExist] = useState(false);
     const [isDefaultChecked, setIsDefaultChecked] = useState(true);
-    const [showPassword, setShowPassword] = useState(false);
 
     const [step, setStep] = useState(1);
 
     const [warnings, setWarnings] = useState({});
-
-    const [isStudentModalOpen, setIsStudentModalOpen] = useState(false)
 
     const [form, setForm] = useState({
         user_id_no: '',
@@ -74,11 +72,17 @@ function AddNewStudentModal({ open, setOpen }) {
                 return;
             }
 
-            if (!formattedNumber.startsWith('09')) {
+            if (!formattedNumber) {
+                setForm(prev => ({
+                    ...prev,
+                    [name]: '09'
+                }));
                 return;
             }
 
-            value = formattedNumber;
+            if (!formattedNumber.startsWith('09')) {
+                return;
+            }
         } else if (
             name === 'first_name' ||
             name === 'last_name' ||
@@ -144,8 +148,8 @@ function AddNewStudentModal({ open, setOpen }) {
                 } else if (response.data.message === "User ID already exists") {
                     setUserIdExist(true);
                 }
-
-                console.log(response.data.message)
+                setStudentIdSearch(response.data.userIdNo);
+                setStudentInfo(response.data.student);
             }).finally(() => {
                 setSubmitting(false);
             })
@@ -163,7 +167,7 @@ function AddNewStudentModal({ open, setOpen }) {
                                     <div>
                                         {/* First Name */}
                                         <div className="mb-2">
-                                            <label className="block text-sm font-medium">First Name:</label>
+                                            <label className="block text-sm font-medium">First Name</label>
                                             <input
                                                 value={form.first_name}
                                                 name="first_name"
@@ -254,7 +258,7 @@ function AddNewStudentModal({ open, setOpen }) {
                                     </div>
 
                                     <div className="mb-2">
-                                        <label className="block text-sm font-medium">Zip code</label>
+                                        <label className="block text-sm font-medium">Zip Code</label>
                                         <input
                                             value={form.zip_code}
                                             name="zip_code"
@@ -264,7 +268,7 @@ function AddNewStudentModal({ open, setOpen }) {
                                     </div>
 
                                     <div className="mb-2">
-                                        <label className="block text-sm font-medium">Contact no.</label>
+                                        <label className="block text-sm font-medium">Contact Number</label>
                                         <input
                                             value={formatPhoneNumber(form.contact_number)}
                                             name="contact_number"
@@ -290,9 +294,9 @@ function AddNewStudentModal({ open, setOpen }) {
                             <div className="flex justify-between mt-2">
                                 <button
                                     disabled={step === 1}
-                                    type="button"
-                                    onClick={() => { setStep(step - 1) }}
-                                    className={`bg-gray-200 ${step === 1 ? 'opacity-50 cursor-not-allowed ' : 'hover:bg-gray-300'}py-2 px-4 rounded-md `}>
+                                    onClick={() => setStep(step - 1)}
+                                    className={`py-2 px-4 rounded-md ${step === 1 ? 'bg-gray-200 cursor-not-allowed' : 'bg-gray-300 hover:bg-gray-400'} transition`}
+                                >
                                     Previous
                                 </button>
 
@@ -310,7 +314,14 @@ function AddNewStudentModal({ open, setOpen }) {
                                         type="button"
                                         onClick={submitUserInfo}
                                         className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">
-                                        Submit
+                                        {submitting ? (
+                                            <>
+                                                Submitting
+                                                <ImSpinner5 className="inline-block animate-spin ml-1" />
+                                            </>
+                                        ) : (
+                                            "Submit"
+                                        )}
                                     </button>
                                 )}
                             </div>

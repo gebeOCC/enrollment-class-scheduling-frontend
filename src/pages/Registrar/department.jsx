@@ -132,6 +132,8 @@ function Department() {
         department_id: '',
     });
 
+    const courseDeptAssignHead = departmentsCourses.find(department => department.id === facultyAssign.department_id);
+
     const [deptFaculties, setDeptFaculties] = useState([]);
 
     useEffect(() => {
@@ -407,9 +409,12 @@ function Department() {
                     aria-labelledby="modal-title"
                 >
                     <div className="bg-white p-8 rounded-lg w-full max-w-md shadow-xl relative">
-                        <h2 id="modal-title" className="text-xl font-semibold text-gray-800 mb-6">
+                        <h2 id="modal-title" className="text-xl font-semibold text-gray-800">
                             Assign Program Head
                         </h2>
+                        <h3 className="text-secondaryColor font-semibold text-lg mb-6">
+                            {courseDeptAssignHead.department_name} ({courseDeptAssignHead.department_name_abbreviation})
+                        </h3>
 
                         <form onSubmit={submitAssign}>
                             {/* Search Input */}
@@ -499,9 +504,12 @@ function Department() {
             {isAssignNewModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                     <div className="bg-white p-8 rounded-lg w-full max-w-lg shadow-lg relative">
-                        <h2 className="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
+                        <h2 className="text-2xl font-semibold text-gray-800 flex items-center">
                             <span>Assign New Program Head</span>
                         </h2>
+                        <h3 className="text-secondaryColor font-semibold text-lg mb-6">
+                            {courseDeptAssignHead.department_name} ({courseDeptAssignHead.department_name_abbreviation})
+                        </h3>
 
                         <form>
                             {/* Search Input */}

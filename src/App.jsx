@@ -24,6 +24,8 @@ import EnrollStudent from "./pages/enrollment/EnrollStudent";
 import StudentDetails from "./pages/Registrar/StudentDetails";
 import EnrollmentRecord from "./pages/Student/EnrollmentRecord";
 import FacultyDetails from "./pages/Registrar/FacultyDetails";
+import RegistrarEnrollmentCourse from "./pages/Registrar/RegistrarEnrollmentCourse";
+import Profile from "./pages/All/Profile";
 
 function App() {
     const { userRole, enrollmentOngoing, preparation } = useAuth();
@@ -43,6 +45,8 @@ function App() {
             <Route path="/classes/:classId" element={<CLassStudents />} />
             {(enrollmentOngoing || preparation) &&
                 <>
+                    <Route path="/enrollment/:courseid" element={<RegistrarEnrollmentCourse />} />
+                    <Route path="/enrollment/:courseid/enroll-student/:yearlevel" element={<EnrollStudent />} />
                     <Route path="/dashboard" element={<EnrollmentDashboardRegistrar />} />
                     <Route path="*" element={<Navigate to="/dashboard" />} />
                 </>
@@ -121,6 +125,7 @@ function App() {
                 ) : (
                     <>
                         <Route path="/" element={<SideBar />}>
+                            <Route path="/profile" element={<Profile />} />
                             {userRole === "registrar" && registrarRoutes}
                             {userRole === "program_head" && programHeadRoutes}
                             {userRole === "evaluator" && evaluatorRoutes}

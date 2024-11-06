@@ -1,32 +1,39 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import axiosInstance from "../../../axios/axiosInstance";
 import { convertToAMPM, formatFullName } from "../../utilities/utils";
 import { PiSpinnerBold } from "react-icons/pi";
+import { useReactToPrint } from 'react-to-print';
 
 function StudentClasses() {
     const [classes, setClasses] = useState([]);
     const [schoolYear, setSchoolYear] = useState({});
     const [enrolled, setEnrolled] = useState(true);
     const [fetching, setFetching] = useState(true);
+    const componentRef = useRef(null); // Create a reference for the content to print
 
     const getStudentClasses = async () => {
         await axiosInstance.get(`get-student-classes`)
             .then(response => {
-                if (response.data.message == 'success') {
+                if (response.data.message === 'success') {
                     setClasses(response.data.studentClasses);
                     setSchoolYear(response.data.schoolYear);
-                } else if (response.data.message == 'not enrorlled') {
+                } else if (response.data.message === 'not enrolled') {
                     setSchoolYear(response.data.schoolYear);
                     setEnrolled(false);
                 }
             })
             .finally(() => {
                 setFetching(false);
-            })
-    }
+            });
+    };
+
     useEffect(() => {
         getStudentClasses();
-    }, [])
+    }, []);
+
+    const handlePrint = useReactToPrint({
+        contentRef: componentRef,
+    });
 
     if (fetching) {
         return (
@@ -37,15 +44,18 @@ function StudentClasses() {
     }
 
     return (
-        <div className="space-y-4">
-            <div className="bg-white p-4 rounded-lg shadow-light overflow-hidden text-center flex justify-center items-center">
-                <h1 className="text-4xl font-bold text-blue-600">
-                    ({schoolYear.start_year}-{schoolYear.end_year} {schoolYear.semester_name} Semester)
-                </h1>
-            </div>
-            <div className='bg-white p-4 rounded-lg shadow-light overflow-hidden'>
-                {enrolled ?
-                    (
+        <>
+            <button onClick={handlePrint} className="bg-blue-500 text-white py-2 px-4 rounded mb-4">
+                Print Table
+            </button>
+            <div ref={componentRef} className="space-y-4">
+                <div className="bg-white p-4 rounded-lg shadow-light overflow-hidden text-center flex justify-center items-center">
+                    <h1 className="text-4xl font-bold text-blue-600">
+                        ({schoolYear.start_year}-{schoolYear.end_year} {schoolYear.semester_name} Semester)
+                    </h1>
+                </div>
+                <div className='bg-white p-4 rounded-lg shadow-light overflow-hidden'>
+                    {enrolled ? (
                         <>
                             <h1 className="text-2xl font-bold mb-4">
                                 {classes?.year_section?.course?.course_name_abbreviation} - {classes?.year_section?.year_level?.year_level}{classes?.year_section?.section}
@@ -73,20 +83,20 @@ function StudentClasses() {
                                             </tr>
                                         ))
                                     ) : (
-                                        <>
-                                            No class
-                                        </>
-                                    )
-                                    }
+                                        <tr>
+                                            <td colSpan="8" className="text-center p-2">No class</td>
+                                        </tr>
+                                    )}
                                 </tbody>
                             </table>
-                        </>) : (
+                        </>
+                    ) : (
                         <h1 className="text-2xl font-bold"> Not enrolled</h1>
-                    )
-                }
+                    )}
+                </div>
             </div>
-        </div >
-    )
+        </>
+    );
 }
 
 export default StudentClasses;

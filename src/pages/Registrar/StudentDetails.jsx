@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import axiosInstance from '../../../axios/axiosInstance';
 import { checkPasswordComplexity } from '../../utilities/utils';
 import { PiSpinnerBold } from 'react-icons/pi';
-import { FaExclamation } from 'react-icons/fa6';
+import { FaCheck, FaExclamation, FaRegCopy } from 'react-icons/fa6';
 import Loading from '../../components/Loading';
 
 function StudentDetails() {
@@ -12,6 +12,7 @@ function StudentDetails() {
     const [studentDetails, setStudentDetails] = useState(null);
     const [fetching, setFetching] = useState(true);
     const [found, setFound] = useState(true);
+    const [copied, setCopied] = useState(false);
 
     const [password, setPassword] = useState("");
     const [passwordRequirements, setPasswordRequirements] = useState("");
@@ -58,7 +59,7 @@ function StudentDetails() {
             </div>
         );
     }
-    
+
 
     const {
         user_id_no,
@@ -90,6 +91,12 @@ function StudentDetails() {
             })
     };
 
+    const handleCopy = () => {
+        navigator.clipboard.writeText(user_id_no);
+        setCopied(true);
+
+        setTimeout(() => setCopied(false), 3000);
+    };
 
     return (
         <div className='space-y-4'>
@@ -102,7 +109,14 @@ function StudentDetails() {
                     </div>
                     <div>
                         <h2 className="text-2xl font-bold">{first_name} {middle_name} {last_name}</h2>
-                        <p className="text-sm text-gray-500">ID Number: {user_id_no}</p>
+                        <div className="flex gap-1 text-gray-500 items-center">
+                            <p className="text-md flex">ID Number: {user_id_no}</p>
+                            {copied ? (
+                                <FaCheck className="cursor-pointer" />
+                            ) : (
+                                <FaRegCopy className="cursor-pointer" onClick={handleCopy} />
+                            )}
+                        </div>
                     </div>
                 </div>
                 <div className="grid grid-cols-1 gap-y-4">

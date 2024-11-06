@@ -108,9 +108,9 @@ function CourseInfo() {
 
             {isModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center transition-opacity ease-in-out duration-300">
-                    <div className="bg-white p-6 rounded-lg w-96 max-w-md shadow-lg relative transition-transform transform scale-95 hover:scale-100">
+                    <div className="bg-white p-6 rounded-lg w-96 max-w-md shadow-lg relative transition-transform transform scale-95">
                         <div className="bg-gray-100 px-4 py-2 rounded-t-lg shadow-sm mb-4">
-                            <h2 className="text-center font-bold text-xl text-gray-800">Add New Curriculum</h2>
+                            <h2 className="text-center font-bold text-xl text-gray-800">Curriculum School Year</h2>
                         </div>
 
                         <form onSubmit={handleAddCurriculum}>

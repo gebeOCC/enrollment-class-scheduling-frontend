@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import axiosInstance from "../../../axios/axiosInstance";
 import { useAuth } from "../../context/AuthContext";
 import SkeletonEnrollmentCourse from "../../components/skeletons/SkeletonEnrollmentCourse";
-function EnrollmentCourse() {
+function RegistrarEnrollmentCourse() {
     const { userRole, enrollmentOngoing, preparation, } = useAuth();
     const { courseid } = useParams();
     const [course, setCourse] = useState([]);
@@ -33,14 +33,13 @@ function EnrollmentCourse() {
             await axiosInstance.get(`enrollment/${courseid}`)
                 .then(response => {
                     setYearLevels(response.data);
-                    console.log(response.data);
                 });
         };
 
         getYearLevels();
         getCourseName()
     }, [courseid]);
-    
+
     const submitNewSection = async (e) => {
         e.preventDefault();
         setSubmitting(true);
@@ -110,11 +109,6 @@ function EnrollmentCourse() {
                     <div key={index} className="bg-white p-6 rounded-lg shadow-light hover:shadow-xl transition-shadow duration-300 overflow-hidden">
                         <div className="mb-4 flex justify-between items-center">
                             <h2 className="text-2xl font-semibold text-gray-800">{yearLevel.year_level_name}</h2>
-                            <button
-                                onClick={() => { createNewSection(yearLevel.id) }}
-                                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-transform transform hover:scale-105">
-                                Add Section
-                            </button>
                         </div>
                         <table className="w-full border-collapse">
                             <thead>
@@ -130,13 +124,6 @@ function EnrollmentCourse() {
                                         <td className="p-2 text-gray-700">{section.section}</td>
                                         <td className="p-2 text-gray-700">{section.student_count}/{section.max_students}</td>
                                         <td className="p-2 space-x-2 flex items-center">
-                                            {userRole === 'program_head' &&
-                                                <Link to={`class/${yearLevel.year_level_name.replace(/\s+/g, '-')}?section=${section.section}`}>
-                                                    <button className="text-white bg-indigo-500 px-2 py-1 rounded hover:bg-indigo-600 hover:shadow-md transition-50 active:bg-blue-600">
-                                                        Class
-                                                    </button>
-                                                </Link>
-                                            }
                                             <button className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 hover:shadow-md transition-all transition-150 active:bg-emerald-500">
                                                 Students
                                             </button>
@@ -219,4 +206,4 @@ function EnrollmentCourse() {
     )
 }
 
-export default EnrollmentCourse
+export default RegistrarEnrollmentCourse

@@ -5,9 +5,11 @@ import Toast from "../../components/Toast";
 import { showToast } from "../../components/Toast";
 import Loading from "../../components/Loading";
 import { FcViewDetails } from "react-icons/fc";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { ImSpinner5 } from "react-icons/im";
 
 function FacultyList() {
+    const navigate = useNavigate();
     const [submitting, setSubmitting] = useState(false);
     const [searchBar, setSearchBar] = useState('')
     const [faculties, setFaculties] = useState([])
@@ -15,8 +17,8 @@ function FacultyList() {
     const [showPassword, setShowPassword] = useState(false);
     const [fetching, setFetching] = useState(true);
 
-    const getFacultyList = () => {
-        axiosInstance.get(`get-faculty-list`)
+    const getFacultyList = async () => {
+        await axiosInstance.get(`get-faculty-list`)
             .then(response => {
                 setFaculties(response.data)
             })
@@ -234,12 +236,10 @@ function FacultyList() {
                     <table className="min-w-full bg-white">
                         <thead>
                             <tr className="w-full bg-[#00b6cf] text-white text-left">
-                                <th className="py-2 px-2 md:px-4 hidden sm:table-cell">#</th>
                                 <th className="py-2 px-2 md:px-4">Faculty ID no.</th>
                                 <th className="py-2 px-2 md:px-4">Name</th>
                                 <th className="py-2 px-2 md:px-4 hidden sm:table-cell">Email</th>
                                 <th className="py-2 px-2 md:px-4 hidden sm:table-cell">Department</th>
-                                <th className="py-2 px-2 md:px-4">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -249,20 +249,15 @@ function FacultyList() {
                                         (String(faculty.last_name) + String(faculty.first_name) + getFirstLetter(String(faculty.middle_name))).toLowerCase().includes(searchBar.toLowerCase())) &&
                                     <tr
                                         key={index}
-                                        className={`border-b ${faculty.id % 2 === 0 ? "bg-[#deeced]" : "bg-white"}`}
+                                            className={`border-b hover:bg-[#deeced] cursor-pointer`}
+                                        onClick={() => navigate(`faculty-details?faculty-id=${faculty.user_id_no}`)}
                                     >
-                                        <td className="py-2 px-2 md:px-4 hidden sm:table-cell">{index + 1}.</td>
-                                        <td className="py-2 px-2 md:px-4">{faculty.user_id_no}</td>
-                                        <td className="py-2 px-2 md:px-4">
+                                        <td className="py-2 px-2 transition duration-200 hover:py-3 md:px-4">{faculty.user_id_no}</td>
+                                        <td className="py-2 px-2 transition duration-200 hover:py-3 md:px-4">
                                             {formatFullName(faculty)}
                                         </td>
-                                        <td className="py-2 px-2 md:px-4 hidden sm:table-cell">{faculty.email_address}</td>
-                                            <td className="py-2 px-2 md:px-4 hidden sm:table-cell">{faculty.department_name_abbreviation}</td>
-                                            <td className="py-1 px-4 flex justify-center cursor-pointer">
-                                                <NavLink to={`faculty-details?faculty-id=${faculty.user_id_no}`}>
-                                                    <FcViewDetails size={30} />
-                                                </NavLink>
-                                            </td>
+                                        <td className="py-2 px-2 transition duration-200 hover:py-3 md:px-4 hidden sm:table-cell">{faculty.email_address}</td>
+                                        <td className="py-2 px-2 transition duration-200 hover:py-3 md:px-4 hidden sm:table-cell">{faculty.department_name_abbreviation}</td>
                                     </tr>
                                 ))
                             ) : (
@@ -449,8 +444,16 @@ function FacultyList() {
                                         disabled={submitting}
                                         type="button"
                                         onClick={submitUserInfo}
-                                        className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">
-                                        Submit
+                                        className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 flex items-center gap-2"
+                                    >
+                                        {submitting ? (
+                                            <>
+                                                Submitting
+                                                <ImSpinner5 className="inline-block animate-spin ml-1" />
+                                            </>
+                                        ) : (
+                                            "Submit"
+                                        )}
                                     </button>
                                 )}
                             </div>
