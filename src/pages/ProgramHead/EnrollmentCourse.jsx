@@ -40,7 +40,7 @@ function EnrollmentCourse() {
         getYearLevels();
         getCourseName()
     }, [courseid]);
-    
+
     const submitNewSection = async (e) => {
         e.preventDefault();
         setSubmitting(true);
@@ -137,9 +137,11 @@ function EnrollmentCourse() {
                                                     </button>
                                                 </Link>
                                             }
-                                            <button className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 hover:shadow-md transition-all transition-150 active:bg-emerald-500">
-                                                Students
-                                            </button>
+                                            <Link to={`students/${yearLevel.year_level_name.replace(/\s+/g, '-')}?section=${section.section}`}>
+                                                <button className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 hover:shadow-md transition-all transition-150 active:bg-emerald-500">
+                                                    Students
+                                                </button>
+                                            </Link>
                                             {enrollmentOngoing ? (
                                                 <Link to={`enroll-student/${yearLevel.year_level_name.replace(/\s+/g, '-')}?section=${section.section}`}>
                                                     <button className="flex items-center bg-purple-600 text-white px-2 py-1 rounded-lg transition-transform transform hover:scale-105 hover:shadow-md active:scale-95">

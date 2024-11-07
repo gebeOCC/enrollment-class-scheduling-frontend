@@ -124,9 +124,11 @@ function RegistrarEnrollmentCourse() {
                                         <td className="p-2 text-gray-700">{section.section}</td>
                                         <td className="p-2 text-gray-700">{section.student_count}/{section.max_students}</td>
                                         <td className="p-2 space-x-2 flex items-center">
-                                            <button className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 hover:shadow-md transition-all transition-150 active:bg-emerald-500">
-                                                Students
-                                            </button>
+                                            <Link to={`students/${yearLevel.year_level_name.replace(/\s+/g, '-')}?section=${section.section}`}>
+                                                <button className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 hover:shadow-md transition-all transition-150 active:bg-emerald-500">
+                                                    Students
+                                                </button>
+                                            </Link>
                                             {enrollmentOngoing ? (
                                                 <Link to={`enroll-student/${yearLevel.year_level_name.replace(/\s+/g, '-')}?section=${section.section}`}>
                                                     <button className="flex items-center bg-purple-600 text-white px-2 py-1 rounded-lg transition-transform transform hover:scale-105 hover:shadow-md active:scale-95">

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axiosInstance from "../../../axios/axiosInstance";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { capitalizeFirstLetter, convert24HourTimeToMinutes, convertToAMPM, getFirstLetter, hasTimeConflict } from "../../utilities/utils";
 import { showToast } from "../../components/Toast";
 import Toast from "../../components/Toast";
@@ -89,6 +89,8 @@ function EnrollStudent() {
 
     const [studentInfo, setStudentInfo] = useState([]);
     const [subjectSearch, setSubjectSearch] = useState([]);
+
+    const navigate = useNavigate();
 
     // handle student search using id when 
     const [typingTimeout, setTypingTimeout] = useState(null);
@@ -209,16 +211,26 @@ function EnrollStudent() {
             )
                 .then(response => {
                     if (response.data.message === 'success') {
-                        showToast('Enrrolled successfully!', 'success');
+                        showToast('Enrolled successfully!', 'success');
                         setClasses(defaultClasses);
                         setStudentInfo([]);
-                        setStudentIdSearch("");
                         setSubjectSearch([]);
                         setStudentAlreadyEnrrolled(false);
+
+                        // Construct the link
+                        const enrollmentLink = '/enrollment/' + courseid + '/students/' + yearlevel + '/' + section + '/cor?student-id=' + studentIdSearch;
+                        console.log(enrollmentLink);
+
+                        // Navigate to the constructed link using React Router
+                        navigate(enrollmentLink);
+
+                        // Reset state
+                        setStudentIdSearch("");
                     } else if (response.data.message === 'student already enrolled') {
                         setStudentAlreadyEnrrolled(true);
-                    };
+                    }
                 })
+
                 .finally(() => {
                     setSubmitting(false);
                 })

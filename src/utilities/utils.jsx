@@ -18,7 +18,6 @@ export function convertToAMPM(time) {
     return `${convertedHour}:${minute.toString().padStart(2, '0')} ${ampm}`;
 }
 
-
 // convert minutes to 24 hours
 export function convertMinutesTo24HourTime(minutes) {
     const hours = Math.floor(minutes / 60);

@@ -26,6 +26,8 @@ import EnrollmentRecord from "./pages/Student/EnrollmentRecord";
 import FacultyDetails from "./pages/Registrar/FacultyDetails";
 import RegistrarEnrollmentCourse from "./pages/Registrar/RegistrarEnrollmentCourse";
 import Profile from "./pages/All/Profile";
+import SectionsEnrolledStudents from "./pages/ProgramHead/SectionsEnrolledStudents";
+import StudentCor from "./pages/enrollment/StudentCor";
 
 function App() {
     const { userRole, enrollmentOngoing, preparation } = useAuth();
@@ -46,7 +48,9 @@ function App() {
             {(enrollmentOngoing || preparation) &&
                 <>
                     <Route path="/enrollment/:courseid" element={<RegistrarEnrollmentCourse />} />
-                    <Route path="/enrollment/:courseid/enroll-student/:yearlevel" element={<EnrollStudent />} />
+                <Route path="/enrollment/:courseid/enroll-student/:yearlevel" element={<EnrollStudent />} />
+                <Route path="/enrollment/:courseid/students/:yearlevel" element={<SectionsEnrolledStudents />} />
+                <Route path="/enrollment/:courseid/students/:yearlevel/:section/:studentid" element={<StudentCor />} />
                     <Route path="/dashboard" element={<EnrollmentDashboardRegistrar />} />
                     <Route path="*" element={<Navigate to="/dashboard" />} />
                 </>
@@ -67,6 +71,8 @@ function App() {
                     <Route path="/enrollment/:courseid" element={<EnrollmentCourse />} />
                     <Route path="/enrollment/:courseid/class/:yearlevel" element={<YearLevelSectionSubejcts />} />
                     <Route path="/enrollment/:courseid/enroll-student/:yearlevel" element={<EnrollStudent />} />
+                    <Route path="/enrollment/:courseid/students/:yearlevel" element={<SectionsEnrolledStudents />} />
+                    <Route path="/enrollment/:courseid/students/:yearlevel/:section/:studentid" element={<StudentCor />} />
                     <Route path="/dashboard" element={<EnrollmentDashboardProgramHead />} />
                     <Route path="*" element={<Navigate to="/dashboard" />} />
                 </>
@@ -86,7 +92,9 @@ function App() {
                 <>
                     <Route path="/enrollment/:courseid" element={<EnrollmentCourse />} />
                     <Route path="/enrollment/:courseid/class/:yearlevel" element={<YearLevelSectionSubejcts />} />
-                    <Route path="/enrollment/:courseid/enroll-student/:yearlevel" element={<EnrollStudent />} />
+                <Route path="/enrollment/:courseid/enroll-student/:yearlevel" element={<EnrollStudent />} />
+                <Route path="/enrollment/:courseid/students/:yearlevel" element={<SectionsEnrolledStudents />} />
+                <Route path="/enrollment/:courseid/students/:yearlevel/:section/:studentid" element={<StudentCor />} />
                     <Route path="/dashboard" element={<EnrollmentDashboardProgramHead />} />
                     <Route path="*" element={<Navigate to="/dashboard" />} />
                 </>
