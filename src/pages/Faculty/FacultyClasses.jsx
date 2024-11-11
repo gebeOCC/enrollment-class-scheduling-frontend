@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axiosInstance from "../../../axios/axiosInstance";
 import { Link } from "react-router-dom";
 import { convertToAMPM } from "../../utilities/utils";
-import { PiSpinnerBold } from "react-icons/pi";
+import PreLoader from "../../components/preloader/PreLoader";
 
 const daysOrder = {
     "Monday": 1,
@@ -46,11 +46,7 @@ function FacultyClasses() {
     }, [])
 
     if (fetching) {
-        return (
-            <div className="flex justify-center items-center h-full text-blue-600">
-                <PiSpinnerBold className="animate-spin text-4xl" size={45} />
-            </div>
-        );
+        if (fetching) return <PreLoader />
     } else if (noSchoolYear) {
         return (
             <div className="bg-transparent p-4 rounded-lg overflow-hidden text-center flex justify-center items-center h-full">

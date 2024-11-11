@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import axiosInstance from "../../../axios/axiosInstance";
 import { useAuth } from "../../context/AuthContext";
 import SkeletonEnrollmentCourse from "../../components/skeletons/SkeletonEnrollmentCourse";
+import { ImSpinner5 } from "react-icons/im";
 function EnrollmentCourse() {
     const { userRole, enrollmentOngoing, preparation, } = useAuth();
     const { courseid } = useParams();
@@ -201,6 +202,7 @@ function EnrollmentCourse() {
                                 onClick={submitNewSection}
                                 className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 mb-2">
                                 Yes
+                                {submitting && <ImSpinner5 className="inline-block animate-spin ml-1" />}
                             </button>
                             <button
                                 type="button"

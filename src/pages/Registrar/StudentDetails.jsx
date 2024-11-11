@@ -5,6 +5,7 @@ import { checkPasswordComplexity } from '../../utilities/utils';
 import { PiSpinnerBold } from 'react-icons/pi';
 import { FaCheck, FaExclamation, FaRegCopy } from 'react-icons/fa6';
 import Loading from '../../components/Loading';
+import PreLoader from '../../components/preloader/PreLoader';
 
 function StudentDetails() {
     const [searchParams] = useSearchParams();
@@ -43,7 +44,7 @@ function StudentDetails() {
     };
 
 
-    if (fetching) return <Loading />
+    if (fetching) return <PreLoader />
     if (!found) {
         return (
             <div className="flex flex-col justify-center items-center h-full p-4 bg-transparent rounded-lg text-center">

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import axiosInstance from "../../../axios/axiosInstance";
-import Loading from "../../components/Loading";
+import { ImSpinner5 } from "react-icons/im";
+import PreLoader from "../../components/preloader/PreLoader";
 
 function Rooms() {
     const [rooms, setRooms] = useState([]);
@@ -41,17 +42,22 @@ function Rooms() {
             console.log(response.data)
             if (response.data.message === "success") {
                 setRooms(response.data.rooms);
+                setRoomExist(false);
                 setRoomName("");
             } else if (response.data.message === "Room already exists") {
-                setRoomExist(true)
+                setRoomExist(true);
             }
         } finally {
             setSubmitting(false);
         }
     }
 
+    const [assigningRoom, setAssigningRoom] = useState(false);
+    const [roomId, setRoomId] = useState(0);
+
     const assignRoom = async (id) => {
-        console.log(id)
+        setAssigningRoom(true);
+        setRoomId(id);
         setSubmitting(true)
         try {
             const response = await axiosInstance.post(`assign-room/`, { roomId: id, departmentId: deptId });
@@ -63,11 +69,16 @@ function Rooms() {
             }
         } finally {
             setSubmitting(false);
+            setAssigningRoom(false);
+            setRoomId(0);
         }
     }
 
+    const [unAssigningRoom, setUnAssigningRoom] = useState(false);
+
     const unAssignRoom = async (id) => {
-        console.log(id)
+        setUnAssigningRoom(true);
+        setRoomId(id);
         setSubmitting(true)
         try {
             const response = await axiosInstance.post(`unassign-room/${id}`);
@@ -79,10 +90,12 @@ function Rooms() {
             }
         } finally {
             setSubmitting(false);
+            setUnAssigningRoom(false);
+            setRoomId(0);
         }
     }
 
-    if (fetching) return <Loading />
+    if (fetching) return <PreLoader />
     return (
         <>
             <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 md:h-full">
@@ -104,12 +117,15 @@ function Rooms() {
                                         <>
                                             {deptId ? (
                                                 <button
-                                                    disabled={submitting}
                                                     style={{ color: '#00FF1A' }}
                                                     onClick={() => { assignRoom(room.id) }}>
-                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
-                                                        <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z" clipRule="evenodd" />
-                                                    </svg>
+                                                    {(assigningRoom && roomId == room.id) ? (
+                                                        <ImSpinner5 className="size-6 inline-block animate-spin ml-1" />
+                                                    ) : (
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
+                                                            <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z" clipRule="evenodd" />
+                                                        </svg>
+                                                    )}
                                                 </button>
                                             ) : (
                                                 <button style={{ color: '#1ea38d' }} className="cursor-not-allowed">
@@ -161,19 +177,22 @@ function Rooms() {
                                 <div key={index} className="bg-yellow-400 text-black flex justify-between items-center px-3 py-2 rounded-md" style={{ backgroundColor: "#FFC107" }}>
                                     <span style={{ color: "495057" }}>{room.room_name}</span>
                                     <button
-                                        disabled={submitting}
                                         style={{ color: "#C82333" }}
                                         onClick={() => { unAssignRoom(room.id) }}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
-                                            <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z" clipRule="evenodd" />
-                                        </svg>
+                                        {(unAssigningRoom && roomId == room.id) ? (
+                                            <ImSpinner5 className="size-6 inline-block animate-spin ml-1" />
+                                        ) : (
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
+                                                <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z" clipRule="evenodd" />
+                                            </svg>
+                                        )}
                                     </button>
                                 </div>
                             ))}
                         </div>
                     </div>
                 ))}
-            </div>
+            </div >
 
             {isRoomModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
@@ -187,7 +206,7 @@ function Rooms() {
                                     value={roomName}
                                     name="room_name"
                                     onChange={(e) => { if (submitting) return; setRoomName(e.target.value) }}
-                                    className={`w-full px-3 py-2 border rounded-md ${roomNameInputEmpty && 'border-red-300'}`}
+                                    className={`w-full px-3 py-2 border rounded-md border focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out ${roomNameInputEmpty && 'border-red-300'}`}
                                     placeholder="Room Name"
                                 />
                             </div>
@@ -211,13 +230,21 @@ function Rooms() {
                                         submitRoom();
                                     }}
                                 >
-                                    Save
+                                    {submitting ? (
+                                        <>
+                                            Saving
+                                            <ImSpinner5 className="inline-block animate-spin ml-1" />
+                                        </>
+                                    ) : (
+                                        "Save"
+                                    )}
                                 </button>
                             </div>
                         </form>
                     </div>
                 </div>
-            )}
+            )
+            }
         </>
     )
 }

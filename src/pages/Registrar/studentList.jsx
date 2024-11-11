@@ -2,11 +2,10 @@ import { useState, useEffect } from "react"
 import axiosInstance from "../../../axios/axiosInstance"
 import { capitalizeFirstLetter, formatBirthday, formatPhoneNumber, getFirstLetter, isValidEmail, removeHyphens } from "../../utilities/utils";
 import * as XLSX from 'xlsx';
-import { FcViewDetails } from "react-icons/fc";
 import { NavLink, useNavigate } from "react-router-dom";
 import AddNewStudentModal from "../GlobalFunction/AddNewStudentModal";
 import { CiImport } from "react-icons/ci";
-import Loading from "../../components/Loading";
+import PreLoader from "../../components/preloader/PreLoader";
 
 function Studentlist() {
     const navigate = useNavigate();
@@ -113,6 +112,7 @@ function Studentlist() {
 
                             setUploadExcelStudentList(prevList => [...prevList, newStudent]);
                         }
+                        console.log(response.data);
                     })
                     .catch(error => {
                         console.error("Error uploading student:", error);
@@ -134,34 +134,32 @@ function Studentlist() {
         reader.readAsArrayBuffer(file);
     };
 
-    if (fetching) return <Loading />
+    if (fetching) return <PreLoader />
 
     return (
         <>
             <div className="p-6 bg-white shadow-md rounded-lg">
-                <div className="flex justify-between items-center mb-4">
-                    <div className="flex gap-3">
-                        <h2 className="text-2xl font-bold">Student List</h2>
+                <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
+                    <h2 className="text-2xl font-bold mb-2 sm:mb-0">Student List</h2>
+                    <div className="flex flex-col sm:flex-row space-x-0 sm:space-x-2 w-full sm:w-auto">
                         <select
                             value={showCount}
                             onChange={(e) => setShowCount(parseInt(e.target.value))}
-                            className="border px-2 rounded-md"
+                            className="border px-2 rounded-md h-10 text-center bg-white outline-none cursor-pointer w-full mb-2 md:mb-0 md:w-20"
                         >
                             <option value={10}>10</option>
                             <option value={25}>25</option>
                             <option value={50}>50</option>
                             <option value={100}>100</option>
                         </select>
-                    </div>
-                    <div className="flex space-x-2">
                         <input
                             value={searchBar}
                             onChange={(e) => { setSearchBar(e.target.value) }}
                             type="text"
-                            placeholder="Search student..."
-                            className="px-4 py-2 border focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-lg rounded-md transition-all duration-200 ease-in-out"/>
-
-                        <label className="flex border border-green-500 text-green-500 px-6 py-2 rounded-md hover:bg-green-500 hover:text-white transition duration-300 cursor-pointer">
+                            placeholder="Search faculty..."
+                            className="px-4 py-2 rounded-md mb-2 md:mb-0 border focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out"
+                        />
+                        <label className="hidden md:block justify-center items-center border border-green-500 text-green-500 px-6 py-2 rounded-md hover:bg-green-500 hover:text-white transition duration-300 cursor-pointer">
                             Import Excel
                             <input
                                 type="file"
@@ -169,25 +167,17 @@ function Studentlist() {
                                 className="hidden"
                                 onChange={handleFileChange}
                             />
-                            <CiImport size={20} />
                         </label>
-                        <button
-                            onClick={() => { setIsStudentModalOpen(true) }}
-                            className="bg-primaryColor text-white px-4 py-2 rounded-md hover:bg-blue-700"
-                        >
-                            Add Student
-                        </button>
-
                     </div>
                 </div>
 
                 <table className="min-w-full bg-white">
                     <thead>
                         <tr className="w-full bg-[#00b6cf] text-white text-left">
-                            <th className="py-2 px-4">Student ID no.</th>
-                            <th className="py-2 px-4">Name</th>
-                            <th className="py-2 px-4">Email</th>
-                            <th className="py-2 px-4">Contact no.</th>
+                            <th className="py-2 px-2 md:px-4">ID Number</th>
+                            <th className="py-2 px-2 md:px-4">Name</th>
+                            <th className="py-2 px-2 md:px-4 hidden sm:table-cell">Email</th>
+                            <th className="py-2 px-2 md:px-4 hidden sm:table-cell">Contact no.</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -206,13 +196,13 @@ function Studentlist() {
                                         className={`border-b hover:bg-[#deeced] cursor-pointer`}
                                         onClick={() => navigate(`student-details?student-id=${student.user_id_no}`)}
                                     >
-                                        <td className="py-2 px-4 transition duration-200 hover:py-3">{student.user_id_no}</td>
-                                        <td className="py-2 px-4 transition duration-200 hover:py-3">
+                                        <td className="py-2 px-2 transition duration-200 hover:py-3 md:px-4">{student.user_id_no}</td>
+                                        <td className="py-2 px-2 transition duration-200 hover:py-3 md:px-4">
                                             {capitalizeFirstLetter(student.last_name)}, {capitalizeFirstLetter(student.first_name)}{" "}
                                             {student.middle_name && getFirstLetter(student.middle_name) + '.'}
                                         </td>
-                                        <td className="py-2 px-4 transition duration-200 hover:py-3">{student.email_address}</td>
-                                        <td className="py-2 px-4 transition duration-200 hover:py-3">{student.contact_number}</td>
+                                        <td className="py-2 px-2 transition duration-200 hover:py-3 md:px-4 hidden sm:table-cell">{student.email_address}</td>
+                                        <td className="py-2 px-2 transition duration-200 hover:py-3 md:px-4 hidden sm:table-cell">{student.contact_number}</td>
                                     </tr>
                                 ))
                         ) : (

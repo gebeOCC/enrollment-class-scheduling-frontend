@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axiosInstance from "../../../axios/axiosInstance";
 import Toast from "../../components/Toast";
 import { showToast } from "../../components/Toast";
-import Loading from "../../components/Loading";
+import PreLoader from "../../components/preloader/PreLoader";
 import { ImSpinner5 } from "react-icons/im";
 
 function Department() {
@@ -196,19 +196,19 @@ function Department() {
             });
     }
 
-    if (fetching) return <Loading />
+    if (fetching) return <PreLoader />
 
     return (
         <>
-            <div className="container mx-auto px-4 space-y-6">
+            <div className="container space-y-4">
                 {departmentsCourses.length > 0 ? (
                     departmentsCourses.map((department, index) => (
                         <div
                             key={index}
-                            className="shadow-light rounded-lg p-6 bg-white"
+                            className="shadow-light rounded-lg p-6 bg-white w-full"
                         >
                             {/* Department Header */}
-                            <div className="flex justify-between items-center mb-4">
+                            <div className="flex flex-col md:flex-row justify-between items-center mb-4">
                                 <div>
                                     <h2 className="text-secondaryColor font-semibold text-xl">
                                         {department.department_name} ({department.department_name_abbreviation})
@@ -216,7 +216,7 @@ function Department() {
                                     <p className="text-gray-600 text-sm">Head: {department.full_name || 'No Department Head Assigned'}</p>
                                 </div>
                                 <button
-                                    className="bg-secondaryColor text-white py-2 px-4 rounded-md hover:bg-blue-600 transition"
+                                    className="bg-secondaryColor w-full md:w-auto text-white p-2 rounded-md hover:bg-blue-600 transition"
                                     onClick={() => {
                                         if (department.full_name == null) {
                                             setIsAssignModalOpen(!isAssignNewModalOpen);
@@ -231,7 +231,7 @@ function Department() {
                             </div>
 
                             {/* Programs Grid */}
-                            <div className="grid grid-cols-2 gap-4 mb-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                                 {department.course.map((program, i) => (
                                     <div
                                         key={i}
@@ -285,7 +285,7 @@ function Department() {
                                     value={deptForm.department_name}
                                     name="department_name"
                                     onChange={handleDeptChange}
-                                    className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 ${deptInvalidFields.includes('department_name') ? 'border-red-300' : 'border-gray-300'
+                                    className={`w-full px-4 py-2 rounded-md border focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out ${deptInvalidFields.includes('department_name') ? 'border-red-300' : 'border-gray-300'
                                         }`}
                                     placeholder="Enter Department Name"
                                     aria-invalid={deptInvalidFields.includes('department_name')}
@@ -302,7 +302,7 @@ function Department() {
                                     value={deptForm.department_name_abbreviation}
                                     name="department_name_abbreviation"
                                     onChange={handleDeptChange}
-                                    className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 ${deptInvalidFields.includes('department_name_abbreviation') ? 'border-red-300' : 'border-gray-300'
+                                    className={`w-full px-4 py-2 rounded-md border focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out ${deptInvalidFields.includes('department_name_abbreviation') ? 'border-red-300' : 'border-gray-300'
                                         }`}
                                     placeholder="Enter Abbreviation"
                                     aria-invalid={deptInvalidFields.includes('department_name_abbreviation')}
@@ -321,11 +321,18 @@ function Department() {
                                 <button
                                     type="submit"
                                     disabled={submitting}
-                                    className={`py-2 px-4 rounded-md text-white ${submitting ? 'bg-primaryColor-light cursor-not-allowed' : 'bg-primaryColor hover:bg-primaryColor-dark transition'
-                                        }`}
+                                    className={`py-2 px-4 rounded-md text-white bg-primaryColor hover:bg-primaryColor-dark transition`}
                                     onClick={saveDepartment}
                                 >
-                                    {submitting ? 'Saving...' : 'Save'}
+
+                                    {submitting ? (
+                                        <>
+                                            Submitting
+                                            <ImSpinner5 className="inline-block animate-spin ml-1" />
+                                        </>
+                                    ) : (
+                                        "Submit"
+                                    )}
                                 </button>
                             </div>
                         </form>
@@ -335,8 +342,8 @@ function Department() {
 
             {/* Course Modal */}
             {courseForm.id && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-                    <div className="bg-white p-8 rounded-lg w-full max-w-lg mx-4 shadow-lg">
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 px-4">
+                    <div className="bg-white p-8 rounded-lg w-full max-w-lg shadow-lg">
                         <h2 className="text-xl font-semibold text-gray-800">Add Program</h2>
                         <h3 className="text-secondaryColor font-semibold text-lg mb-6">
                             {courseDept.department_name} ({courseDept.department_name_abbreviation})
@@ -353,7 +360,7 @@ function Department() {
                                     value={courseForm.course_name}
                                     name="course_name"
                                     onChange={handleCourseChange}
-                                    className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 ${courseInvalidFields.includes('course_name') ? 'border-red-300' : 'border-gray-300'
+                                    className={`w-full px-4 py-2 rounded-md border focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out ${courseInvalidFields.includes('course_name') ? 'border-red-300' : 'border-gray-300'
                                         }`}
                                     placeholder="Enter Program Name"
                                     aria-invalid={courseInvalidFields.includes('course_name')}
@@ -370,7 +377,7 @@ function Department() {
                                     value={courseForm.course_name_abbreviation}
                                     name="course_name_abbreviation"
                                     onChange={handleCourseChange}
-                                    className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 ${courseInvalidFields.includes('course_name_abbreviation') ? 'border-red-300' : 'border-gray-300'
+                                    className={`w-full px-4 py-2 rounded-md border focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out ${courseInvalidFields.includes('course_name_abbreviation') ? 'border-red-300' : 'border-gray-300'
                                         }`}
                                     placeholder="Enter Abbreviation"
                                     aria-invalid={courseInvalidFields.includes('course_name_abbreviation')}
@@ -390,10 +397,17 @@ function Department() {
                                     type="submit"
                                     disabled={submitting}
                                     onClick={submitCourse}
-                                    className={`py-2 px-4 rounded-md text-white ${submitting ? 'bg-primaryColor-light cursor-not-allowed' : 'bg-primaryColor hover:bg-primaryColor-dark transition'
-                                        }`}
+                                    className={`py-2 px-4 rounded-md text-white bg-primaryColor hover:bg-primaryColor-dark transition`}
                                 >
-                                    {submitting ? 'Saving...' : 'Save'}
+
+                                    {submitting ? (
+                                        <>
+                                            Saving
+                                            <ImSpinner5 className="inline-block animate-spin ml-1" />
+                                        </>
+                                    ) : (
+                                        "Save"
+                                    )}
                                 </button>
                             </div>
                         </form>
@@ -403,7 +417,7 @@ function Department() {
 
             {isAssignModalOpen && (
                 <div
-                    className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+                    className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 px-4"
                     role="dialog"
                     aria-modal="true"
                     aria-labelledby="modal-title"
@@ -430,7 +444,7 @@ function Department() {
                                     type="text"
                                     value={searchFaculty}
                                     onChange={(e) => setSearchFaculty(e.target.value)}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryColor focus:border-transparent placeholder-gray-400"
+                                    className="w-full px-4 py-2 border-gray-300 rounded-lg border focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out placeholder-gray-400"
                                     placeholder="Enter faculty name or ID"
                                     aria-label="Search for faculty members"
                                 />
@@ -502,7 +516,7 @@ function Department() {
             )}
 
             {isAssignNewModalOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 px-4">
                     <div className="bg-white p-8 rounded-lg w-full max-w-lg shadow-lg relative">
                         <h2 className="text-2xl font-semibold text-gray-800 flex items-center">
                             <span>Assign New Program Head</span>
@@ -525,7 +539,7 @@ function Department() {
                                     type="text"
                                     value={searchFaculty}
                                     onChange={(e) => setSearchFaculty(e.target.value)}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryColor focus:border-transparent placeholder-gray-400"
+                                    className="w-full px-4 py-2 border-gray-300 rounded-lg border focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out placeholder-gray-400"
                                     placeholder="Enter faculty name or ID"
                                     aria-label="Search for faculty members"
                                 />

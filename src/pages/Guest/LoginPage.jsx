@@ -40,11 +40,11 @@ function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-indigo-300 via-blue-400 to-indigo-500 px-5">
-            <div className="bg-white p-8 rounded-3xl shadow-xl w-full max-w-md space-y-6 transform transition-all duration-300">
+        <div className="min-h-screen flex   flex-col items-center justify-center bg-gradient-to-r from-indigo-300 via-blue-400 to-indigo-500 px-5">
+            <div className="bg-white p-6 rounded-3xl shadow-xl w-full max-w-md space-y-6 transform transition-all duration-300">
                 <h2 className="text-4xl font-extrabold text-center text-gray-800 mb-4">Login</h2>
 
-                <form onSubmit={handleLogin} className="space-y-5">
+                <form onSubmit={handleLogin} className="space-y-4">
                     <div>
                         <label htmlFor="idNumber" className="block text-sm font-semibold text-gray-700 mb-1">
                             ID No.
@@ -55,7 +55,7 @@ function LoginPage() {
                             value={form.user_id_no}
                             name="user_id_no"
                             onChange={handleFormChange}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700  focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder-gray-400"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder-gray-400"
                             placeholder="Enter your ID Number"
                             required
                         />
@@ -72,7 +72,7 @@ function LoginPage() {
                                 value={form.password}
                                 name="password"
                                 onChange={handleFormChange}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700  focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder-gray-400"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder-gray-400"
                                 placeholder="Enter your password"
                                 required
                             />
@@ -115,8 +115,16 @@ function LoginPage() {
                     Forgot Password?
                 </button>
             </div>
+            <div className="pt-4 text-center space-y-2">
+                <p className="text-sm text-gray-500">Developed by:</p>
+                <div className="flex flex-col justify-center text-gray-700 text-sm">
+                    <span>Barry T. Gebe</span>
+                    <span>Daven Rose S. Areñola</span>
+                    <span>Ferdinand Joe O. Bullanday</span>
+                    <span>Irish Jean J. Tumarong</span>
+                </div>
+            </div>
         </div>
-
     );
 }
 

@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import axiosInstance from "../../../axios/axiosInstance";
 import { Link } from "react-router-dom";
 import { formatDateShort } from "../../utilities/utils";
-import Loading from "../../components/Loading";
+import { ImSpinner5 } from "react-icons/im";
+import PreLoader from "../../components/preloader/PreLoader";
 function SchoolYear() {
     const [submitting, setSubmitting] = useState(false);
     const [enrollmentConflict, setEnrollmentConflict] = useState(false);
@@ -134,7 +135,7 @@ function SchoolYear() {
         return result.toISOString().split('T')[0];
     };
 
-    if (fetching) return <Loading />
+    if (fetching) return <PreLoader />
 
     return (
         <>
@@ -148,7 +149,7 @@ function SchoolYear() {
                     placeholder="Search School Year (e.g., 2021-2022)"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="p-2 border border-gray-300 rounded-lg w-full sm:w-1/3 mb-4 sm:mb-0"
+                    className="p-2 border border-gray-300 rounded-lg w-full sm:w-1/3 mb-4 sm:mb-0 focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out "
                 />
 
                 {/* Add School Year Button */}
@@ -222,7 +223,7 @@ function SchoolYear() {
                                         onChange={handleFormChange}
                                         type="number"
                                         min="1"
-                                        className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 ${shoolYearInvalidFields.includes('start_year') && 'border-red-300'
+                                        className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 ease-in-out ${shoolYearInvalidFields.includes('start_year') && 'border-red-300'
                                             }`}
                                     />
                                     <h1 className="text-4xl">-</h1>
@@ -231,7 +232,7 @@ function SchoolYear() {
                                         value={form.end_year}
                                         name="end_year"
                                         type="number"
-                                        className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 ${shoolYearInvalidFields.includes('end_year') && 'border-red-300'
+                                        className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 ease-in-out ${shoolYearInvalidFields.includes('end_year') && 'border-red-300'
                                             }`}
                                     />
                                 </div>
@@ -244,7 +245,7 @@ function SchoolYear() {
                                     value={form.semester_id}
                                     name="semester_id"
                                     onChange={handleFormChange}
-                                    className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 ${shoolYearInvalidFields.includes('semester_id') && 'border-red-300'
+                                    className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 ease-in-out ${shoolYearInvalidFields.includes('semester_id') && 'border-red-300'
                                         }`}
                                 >
                                     {!form.semester_id && <option value="" disabled>Select semester...</option>}
@@ -265,7 +266,7 @@ function SchoolYear() {
                                         name="start_date"
                                         type="date"
                                         min={`${form.start_year}-01-01`}  // Set the minimum year based on form.start_year
-                                        className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 ${shoolYearInvalidFields.includes('start_date') && 'border-red-300'}`}
+                                        className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out cursor-pointer ${shoolYearInvalidFields.includes('start_date') && 'border-red-300'}`}
                                     />
                                 </div>
 
@@ -276,7 +277,7 @@ function SchoolYear() {
                                         onChange={handleFormChange}
                                         name="end_date"
                                         type="date"
-                                        className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 ${shoolYearInvalidFields.includes('end_date') && 'border-red-300'}`}
+                                        className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out cursor-pointer ${shoolYearInvalidFields.includes('end_date') && 'border-red-300'}`}
                                     />
                                 </div>
                             </div>
@@ -293,7 +294,15 @@ function SchoolYear() {
                                 onClick={submitSchoolYear}
                                 className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 mb-2  mt-4"
                             >
-                                Submit
+
+                                {submitting ? (
+                                    <>
+                                        Submitting
+                                        <ImSpinner5 className="inline-block animate-spin ml-1" />
+                                    </>
+                                ) : (
+                                    "Submit"
+                                )}
                             </button>
 
                             <button

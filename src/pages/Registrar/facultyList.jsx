@@ -3,10 +3,9 @@ import axiosInstance from "../../../axios/axiosInstance";
 import { capitalizeFirstLetter, formatFullName, formatPhoneNumber, getFirstLetter, isValidEmail, removeHyphens } from "../../utilities/utils";
 import Toast from "../../components/Toast";
 import { showToast } from "../../components/Toast";
-import Loading from "../../components/Loading";
-import { FcViewDetails } from "react-icons/fc";
 import { NavLink, useNavigate } from "react-router-dom";
 import { ImSpinner5 } from "react-icons/im";
+import PreLoader from "../../components/preloader/PreLoader";
 
 function FacultyList() {
     const navigate = useNavigate();
@@ -148,6 +147,10 @@ function FacultyList() {
         setSubmitting(true);
 
         const invalidFields = [];
+        if (!form.present_address) invalidFields.push('present_address');
+        if (!form.zip_code) invalidFields.push('zip_code');
+        if (!form.contact_number || form.contact_number.length !== 11) invalidFields.push('contact_number');
+        if (!form.email_address) invalidFields.push('email_address');
         if (!form.department_id) invalidFields.push('department_id');
 
         setFacultyFormFields(invalidFields);
@@ -203,13 +206,15 @@ function FacultyList() {
         </option>
     ));
 
-    departmentsData.unshift(
-        <option key="default" disabled value="">
-            Select dept...
-        </option>
-    );
+    if (!form.department_id) {
+        departmentsData.unshift(
+            <option key="default" disabled value="">
+                Select dept...
+            </option>
+        );
+    }
 
-    if (fetching) return <Loading />
+    if (fetching) return <PreLoader />
 
     return (
         <>
@@ -222,7 +227,7 @@ function FacultyList() {
                             onChange={(e) => { setSearchBar(e.target.value) }}
                             type="text"
                             placeholder="Search faculty..."
-                            className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 mb-2 md:mb-0"
+                            className="px-4 py-2 rounded-md mb-2 md:mb-0 border focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out"
                         />
                         <button
                             onClick={() => { setIsFacultyModalOpen(true) }}
@@ -249,7 +254,7 @@ function FacultyList() {
                                         (String(faculty.last_name) + String(faculty.first_name) + getFirstLetter(String(faculty.middle_name))).toLowerCase().includes(searchBar.toLowerCase())) &&
                                     <tr
                                         key={index}
-                                            className={`border-b hover:bg-[#deeced] cursor-pointer`}
+                                        className={`border-b hover:bg-[#deeced] cursor-pointer`}
                                         onClick={() => navigate(`faculty-details?faculty-id=${faculty.user_id_no}`)}
                                     >
                                         <td className="py-2 px-2 transition duration-200 hover:py-3 md:px-4">{faculty.user_id_no}</td>
@@ -275,168 +280,170 @@ function FacultyList() {
 
             {isFacultyModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-                    <div className="bg-white p-4 rounded-md w-[600px] h-[515px] overflow-y-auto flex flex-col justify-between">
+                    <div className="bg-white p-4 rounded-md w-96 h-[470px] overflow-y-auto flex flex-col justify-between">
                         <div>
-                            <h2 className="text-2xl font-bold text-center mb-2">Add Faculty </h2>
+                            <h2 className="text-2xl font-bold text-center mb-4">Add Faculty </h2>
                             {step === 1 && (
                                 <>
-                                    <div>
+                                    <div className="space-y-4">
                                         {/* First Name */}
-                                        <div className="mb-2">
-                                            <label className="block text-sm font-medium">First Name:</label>
+                                        <div className="relative">
+                                            <label className="block text-sm font-medium text-gray-600  absolute left-1 -top-2.5 bg-white px-1">First Name:</label>
                                             <input
                                                 value={form.first_name}
                                                 name="first_name"
                                                 onChange={handleFormChange}
                                                 type="text"
-                                                className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 ${facultyFormFields.includes('first_name') && 'border-red-300'}`}
+                                                className={`w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out ${facultyFormFields.includes('first_name') && 'border-red-300'}`}
                                             />
                                         </div>
 
                                         {/* Middle Name */}
-                                        <div className="mb-2">
-                                            <label className="block text-sm font-medium">Middle Name</label>
+                                        <div className="relative">
+                                            <label className="block text-sm font-medium  text-gray-600 absolute left-1 -top-2.5 bg-white px-1">Middle Name</label>
                                             <input
                                                 value={form.middle_name}
                                                 name="middle_name"
                                                 onChange={handleFormChange}
                                                 type="text"
-                                                className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 ${facultyFormFields.includes('middle_name') && 'border-red-300'}`}
+                                                className={`w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out ${facultyFormFields.includes('middle_name') && 'border-red-300'}`}
                                             />
                                         </div>
 
                                         {/* Last Name */}
-                                        <div className="mb-2">
-                                            <label className="block text-sm font-medium">Last Name</label>
+                                        <div className="relative">
+                                            <label className="block text-sm font-medium  text-gray-600 absolute left-1 -top-2.5 bg-white px-1">Last Name</label>
                                             <input
                                                 value={form.last_name}
                                                 name="last_name"
                                                 onChange={handleFormChange}
                                                 type="text"
-                                                className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 ${facultyFormFields.includes('last_name') && 'border-red-300'}`}
+                                                className={`w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out ${facultyFormFields.includes('last_name') && 'border-red-300'}`}
                                             />
                                         </div>
-
-                                        {/* Gender */}
-                                        <div className={`mb-2  ${facultyFormFields.includes('gender') && 'border-red-300'}`}>
-                                            <label className="block text-sm font-medium">Gender</label>
-                                            <div className="flex items-center space-x-4">
-                                                <label className="flex items-center">
-                                                    <input
-                                                        type="radio"
-                                                        name="gender"
-                                                        value="female"
-                                                        checked={form.gender === 'female'}
-                                                        onChange={handleFormChange}
-                                                        className="form-radio"
-                                                    />
-                                                    <span className="ml-2">Female</span>
-                                                </label>
-                                                <label className="flex items-center">
-                                                    <input
-                                                        type="radio"
-                                                        name="gender"
-                                                        value="male"
-                                                        checked={form.gender === 'male'}
-                                                        onChange={handleFormChange}
-                                                        className="form-radio"
-                                                    />
-                                                    <span className="ml-2">Male</span>
-                                                </label>
-                                            </div>
-                                        </div>
-
+                                        
                                         {/* Birthday */}
-                                        <div className="mb-2">
-                                            <label className="block text-sm font-medium">Birthday</label>
+                                        <div className="relative">
+                                            <label className="block text-sm font-medium text-gray-600 absolute left-1 -top-2.5 bg-white px-1">Birthday</label>
                                             <input
                                                 value={form.birthday}
                                                 name="birthday"
                                                 onChange={handleFormChange}
                                                 type="date"
-                                                className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 ${facultyFormFields.includes('birthday') && 'border-red-300'}`}
+                                                className={`w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out ${facultyFormFields.includes('birthday') && 'border-red-300'}`}
                                             />
                                         </div>
+
+                                        {/* Gender */}
+                                        <div className={`relative ${facultyFormFields.includes('gender') ? 'border-red-500 rounded-md' : ''}`}>
+                                            <label className="block text-sm font-semibold text-gray-700 mb-1 absolute left-1 -top-2.5 bg-white px-1">Gender</label>
+                                            <div className="border rounded-md border-gray-300 px-3 py-3">
+                                                <div className="flex items-center space-x-6">
+                                                    <label className="flex items-center cursor-pointer">
+                                                        <input
+                                                            type="radio"
+                                                            name="gender"
+                                                            value="female"
+                                                            checked={form.gender === 'female'}
+                                                            onChange={handleFormChange}
+                                                            className="form-radio h-4 w-4 text-cyan-600 focus:ring-cyan-500 hover:bg-cyan-100 transition"
+                                                        />
+                                                        <span className="ml-2 text-sm text-gray-700">Female</span>
+                                                    </label>
+                                                    <label className="flex items-center cursor-pointer">
+                                                        <input
+                                                            type="radio"
+                                                            name="gender"
+                                                            value="male"
+                                                            checked={form.gender === 'male'}
+                                                            onChange={handleFormChange}
+                                                            className="form-radio h-4 w-4 text-cyan-600 focus:ring-cyan-500 hover:bg-cyan-100 transition"
+                                                        />
+                                                        <span className="ml-2 text-sm text-gray-700">Male</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                     </div>
                                 </>
                             )}
 
                             {step === 2 && (
-                                <>
-                                    <div className="mb-2">
-                                        <label className="block text-sm font-medium">Address</label>
+                                <div className="space-y-4">
+                                    <div className="relative">
+                                        <label className="block text-sm font-medium  text-gray-600 absolute left-1 -top-2.5 bg-white px-1">Address</label>
                                         <input
                                             value={form.present_address}
                                             name="present_address"
                                             onChange={handleFormChange}
                                             type="text"
-                                            className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400  ${facultyFormFields.includes('present_address') && 'border-red-300'}`} />
+                                            className={`w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out  ${facultyFormFields.includes('present_address') && 'border-red-300'}`} />
                                     </div>
 
-                                    <div className="mb-2">
-                                        <label className="block text-sm font-medium">Zip code</label>
+                                    <div className="relative">
+                                        <label className="block text-sm font-medium  text-gray-600 absolute left-1 -top-2.5 bg-white px-1">Zip code</label>
                                         <input
                                             value={form.zip_code}
                                             name="zip_code"
                                             onChange={handleFormChange}
                                             type="text"
-                                            className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400  ${facultyFormFields.includes('zip_code') && 'border-red-300'}`} />
+                                            className={`w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out  ${facultyFormFields.includes('zip_code') && 'border-red-300'}`} />
                                     </div>
 
-                                    <div className="mb-2">
-                                        <label className="block text-sm font-medium">Contact no.</label>
+                                    <div className="relative">
+                                        <label className="block text-sm font-medium  text-gray-600 absolute left-1 -top-2.5 bg-white px-1">Contact no.</label>
                                         <input
                                             value={formatPhoneNumber(form.contact_number)}
                                             name="contact_number"
                                             onChange={handleFormChange}
                                             type="text"
-                                            className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400  ${facultyFormFields.includes('contact_number') && 'border-red-300'}`} />
+                                            className={`w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out ${facultyFormFields.includes('contact_number') && 'border-red-300'}`} />
                                     </div>
 
-                                    <div className="mb-2">
-                                        <label className="block text-sm font-medium">Email</label>
+                                    <div className="relative">
+                                        <label className="block text-sm font-medium  text-gray-600 absolute left-1 -top-2.5 bg-white px-1">Email</label>
                                         <input
                                             value={form.email_address}
                                             name="email_address"
                                             onChange={handleFormChange}
                                             type="email"
-                                            className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400  ${facultyFormFields.includes('email_address') && 'border-red-300'}`} />
+                                            className={`w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out ${facultyFormFields.includes('email_address') && 'border-red-300'}`} />
                                     </div>
-                                </>
-                            )}
 
-                            {step === 3 && (
-                                <>
-                                    <div className="mb-2">
-                                        <label className="block text-sm font-medium mb-1">Department</label>
+                                    <div className="relative">
+                                        <label className="block text-sm font-medium mb-1 text-gray-600 absolute left-1 -top-2.5 bg-white px-1">Department</label>
                                         <select
                                             value={form.department_id}
                                             name="department_id"
                                             onChange={handleFormChange}
-                                            className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 ${facultyFormFields.includes('department_id') && 'border-red-300'}`}>
+                                            className={`w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out ${facultyFormFields.includes('department_id') && 'border-red-300'}`}>
                                             {departmentsData}
                                         </select>
                                     </div>
-                                </>
+                                </div>
                             )}
                         </div>
 
                         <div>
-                            <div className="flex justify-between mt-2">
+                            <div className="relative flex justify-center items-center mt-2">
                                 <button
                                     disabled={step === 1}
                                     type="button"
                                     onClick={() => { setStep(step - 1) }}
-                                    className={`bg-gray-200 ${step === 1 ? 'opacity-50 cursor-not-allowed ' : 'hover:bg-gray-300'}py-2 px-4 rounded-md `}>
+                                    className={`absolute left-0 bg-gray-200 ${step === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-300'} py-2 px-4 rounded-md`}
+                                >
                                     Previous
                                 </button>
 
-                                <p className="self-center">{step}/3</p>
-                                {step <= 2 ? (
+                                <p className="text-center">{step}/2</p>
+
+                                {step <= 1 ? (
                                     <button
                                         type="button"
                                         onClick={nextStep}
-                                        className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">
+                                        className="absolute right-0 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
+                                    >
                                         Next
                                     </button>
                                 ) : (
@@ -444,7 +451,7 @@ function FacultyList() {
                                         disabled={submitting}
                                         type="button"
                                         onClick={submitUserInfo}
-                                        className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 flex items-center gap-2"
+                                        className="absolute right-0 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 flex items-center gap-2"
                                     >
                                         {submitting ? (
                                             <>
@@ -460,7 +467,24 @@ function FacultyList() {
 
                             <button
                                 type="button"
-                                onClick={() => setIsFacultyModalOpen(false)}
+                                onClick={() => {
+                                    setIsFacultyModalOpen(false);
+                                    setForm({
+                                        password: '',
+                                        user_role: 'faculty',
+                                        first_name: '',
+                                        last_name: '',
+                                        middle_name: '',
+                                        gender: '',
+                                        birthday: '',
+                                        contact_number: '09',
+                                        email_address: '',
+                                        present_address: '',
+                                        zip_code: '',
+                                        department_id: '',
+                                    });
+                                    setStep(1);
+                                }}
                                 className="w-full mt-4 border border-thirdColor text-thirdColor py-2 rounded-md hover:bg-thirdColor hover:text-white">
                                 Cancel
                             </button>

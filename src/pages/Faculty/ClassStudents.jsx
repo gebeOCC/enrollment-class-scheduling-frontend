@@ -22,9 +22,15 @@ function CLassStudents() {
         getClassStudents();
     }, []);
 
+    const sortedStudents = [...students].sort((a, b) => {
+        if (a.last_name.toLowerCase() < b.last_name.toLowerCase()) return -1;
+        if (a.last_name.toLowerCase() > b.last_name.toLowerCase()) return 1;
+        return 0;
+    });
+
     // Function to export data to Excel
     const exportToExcel = () => {
-        const dataToExport = students.map((student, index) => ({
+        const dataToExport = sortedStudents.map((student, index) => ({
             "#": index + 1,
             "Student ID no.": student.user_id_no,
             "Name": `${capitalizeFirstLetter(student.last_name)}, ${capitalizeFirstLetter(student.first_name)} ${getFirstLetter(student.middle_name)}.`,
@@ -41,7 +47,6 @@ function CLassStudents() {
 
         XLSX.writeFile(wb, fileName); // Write the Excel file with the dynamic file name
     };
-
 
     return (
         <>
@@ -81,7 +86,7 @@ function CLassStudents() {
                 </thead>
                 <tbody>
                     {students.length > 0 ? (
-                        students.map((student, index) => (
+                        sortedStudents.map((student, index) => (
                             <tr key={index} className={`border-b ${index % 2 === 0 ? "bg-white" : "bg-[#deeced]"}`}>
                                 <td className="py-2 px-4">{index + 1}</td>
                                 <td className="py-2 px-4">{student.user_id_no}</td>

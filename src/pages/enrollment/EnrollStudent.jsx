@@ -198,6 +198,7 @@ function EnrollStudent() {
             return;
         }
 
+
         const data = JSON.stringify({ classes: classes });
         try {
             await axiosInstance.post(
@@ -452,7 +453,6 @@ function EnrollStudent() {
                                     ) : (
                                         "Enroll Student"
                                     )}
-
                                 </button>
                                 <h1 className="text-lg">Total units: {classes.reduce((total, subject) => total + subject.credit_units, 0)}</h1>
                             </div>

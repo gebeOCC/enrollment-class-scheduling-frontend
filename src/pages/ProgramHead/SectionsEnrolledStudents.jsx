@@ -78,22 +78,22 @@ function EnrollStudent() {
                             .map((student, index) => (
                                 <tr
                                     key={index}
-                                    className="border-b hover:bg-[#deeced] cursor-pointer"
+                                    className="border-b hover:bg-[#deeced]"
                                 >
-                                    <td className="py-2 px-4 transition duration-200 hover:py-3">{student.user.user_id_no}</td>
-                                    <td className="py-2 px-4 transition duration-200 hover:py-3">
+                                    <td className="py-2 px-4 transition duration-200">{student.user.user_id_no}</td>
+                                    <td className="py-2 px-4 transition duration-200">
                                         {capitalizeFirstLetter(student.user.user_information.last_name)}, {capitalizeFirstLetter(student.user.user_information.first_name)}{" "}
                                         {student.user.user_information.middle_name && getFirstLetter(student.user.user_information.middle_name) + '.'}
                                     </td>
-                                    <td className="py-2 px-4 transition duration-200 hover:py-3">{student.user.user_information.email_address}</td>
-                                    <td className="py-2 px-4 transition duration-200 hover:py-3">{student.user.user_information.contact_number}</td>
-                                    <Link to={`${section}/cor?student-id=${student.user.user_id_no}`}>
-                                        <td className="py-2 px-4 transition duration-200 hover:py-3">
+                                    <td className="py-2 px-4 transition duration-200">{student.user.user_information.email_address}</td>
+                                    <td className="py-2 px-4 transition duration-200">{student.user.user_information.contact_number}</td>
+                                    <td className="py-2 px-4 transition duration-200">
+                                        <Link to={`${section}/cor?student-id=${student.user.user_id_no}`}>
                                             <button className="bg-blue-500 text-white py-1 px-3 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-200">
                                                 COR
                                             </button>
-                                        </td>
-                                    </Link>
+                                        </Link>
+                                    </td>
                                 </tr>
                             ))
                     ) : (

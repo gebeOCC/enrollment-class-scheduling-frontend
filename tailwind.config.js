@@ -26,7 +26,10 @@ export default {
             'xl': '1280px',
 
             '2xl': '1536px',
-        }
+        },
+        fontFamily: {
+            sans: ['Inter', 'Roboto', 'Open Sans', 'sans-serif'],
+        },
     },
     plugins: [],
 }

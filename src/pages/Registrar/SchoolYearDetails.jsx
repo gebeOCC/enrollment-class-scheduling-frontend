@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import axiosInstance from "../../../axios/axiosInstance";
 import { useEffect, useState } from "react";
-import Loading from "../../components/Loading";
+import PreLoader from "../../components/preloader/PreLoader";
 function SchoolYearDetails() {
     const { schoolYear } = useParams();
     const { semester } = useParams();
@@ -25,7 +25,7 @@ function SchoolYearDetails() {
     }, [])
 
     if (fetching) {
-        return <Loading />;
+        return <PreLoader />;
     }
 
     if (!schoolYeardetails) {

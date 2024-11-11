@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import axiosInstance from "../../../axios/axiosInstance";
 import { useLocation, useParams, useNavigate, Navigate } from "react-router-dom";
 import { capitalizeFirstLetter, convertToAMPM, formatDate, formatFullName, getFirstLetter } from "../../utilities/utils";
-import Loading from "../../components/Loading";
 import { useReactToPrint } from "react-to-print";
+import PreLoader from "../../components/preloader/PreLoader";
 
 function StudentCor() {
     const { courseid, yearlevel, section } = useParams();
@@ -51,7 +51,7 @@ function StudentCor() {
         contentRef: componentRef,
     });
 
-    if (fetching) return <Loading />
+    if (fetching) return <PreLoader />
 
     return (
         <div className="space-y-4">
@@ -91,10 +91,10 @@ function StudentCor() {
                         <div className="col-span-1 font-bold">Gender:</div>
                         <div className="col-span-2 border-b border-gray-900">{studentInfo.user.user_information.gender}</div>
 
-                        <div className="col-span-1 font-bold">Name:</div>
-                        <div className="col-span-1 border-b border-gray-900">{studentInfo.user.user_information.last_name},</div>
-                        <div className="col-span-1 border-b border-gray-900">{studentInfo.user.user_information.first_name}</div>
-                        <div className="col-span-1 border-b border-gray-900">{studentInfo.user.user_information.middle_name}</div>
+                        <div className="col-span-1 col-start-1 font-bold">Name:</div>
+                        <div className="col-span-1 col-start-2 border-b border-gray-900">{studentInfo.user.user_information.last_name},</div>
+                        <div className="col-span-1 col-start-3 border-b border-gray-900">{studentInfo.user.user_information.first_name}</div>
+                        <div className="col-span-1 col-start-4 border-b border-gray-900">{studentInfo.user.user_information.middle_name}</div>
                         <div className="col-span-2 "></div>
                         <div className="col-span-1 font-bold">Student Type:</div>
                         <div className="col-span-2 border-b border-gray-900">{studentInfo.student_type.student_type_name}</div>
@@ -108,7 +108,7 @@ function StudentCor() {
                     <table className="table-auto w-full text-xs border-collapse">
                         <thead>
                             <tr className="bg-gray-200">
-                                <th className="border">#</th>
+                                <th className="border"></th>
                                 <th className="border">Class Code</th>
                                 <th className="border">Subject Code</th>
                                 <th className="border">Descriptive Title</th>

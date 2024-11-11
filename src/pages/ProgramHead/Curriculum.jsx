@@ -3,6 +3,7 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import axiosInstance from '../../../axios/axiosInstance';
 import Toast from '../../components/Toast';
 import { showToast } from '../../components/Toast';
+import { ImSpinner5 } from 'react-icons/im';
 
 function Curriculum() {
     const { courseid } = useParams();
@@ -237,7 +238,7 @@ function Curriculum() {
                 {course.course_name &&
                     <>
                         <h1 className="text-4xl font-bold text-blue-600">
-                        {course.course_name} <span className='text-lg sm:text-xl md:text-2xl text-gray-500'> ({schoolYear})</span>
+                            {course.course_name} <span className='text-lg sm:text-xl md:text-2xl text-gray-500'> ({schoolYear})</span>
                         </h1>
                         <div className="flex items-center shadow-light p-2 rounded-2xl">
                             <label htmlFor="edit-toggle" className="mr-2 font-semibold text-gray-700">
@@ -458,9 +459,13 @@ function Curriculum() {
                                                         onClick={submitSubjectForm}
                                                         className="h-8 w-10 px-2 py-1 bg-blue-500 text-white hover:bg-blue-600 transition flex items-center justify-center"
                                                     >
-                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
-                                                            <path fillRule="evenodd" d="M19.916 4.626a.75.75 0 0 1 .208 1.04l-9 13.5a.75.75 0 0 1-1.154.114l-6-6a.75.75 0 0 1 1.06-1.06l5.353 5.353 8.493-12.74a.75.75 0 0 1 1.04-.207Z" clipRule="evenodd" />
-                                                        </svg>
+                                                        {submitting ? (
+                                                            <ImSpinner5 className="size-6 inline-block animate-spin ml-1" />
+                                                        ) : (
+                                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
+                                                                <path fillRule="evenodd" d="M19.916 4.626a.75.75 0 0 1 .208 1.04l-9 13.5a.75.75 0 0 1-1.154.114l-6-6a.75.75 0 0 1 1.06-1.06l5.353 5.353 8.493-12.74a.75.75 0 0 1 1.04-.207Z" clipRule="evenodd" />
+                                                            </svg>
+                                                        )}
                                                     </button>
                                                 </div>
                                                 {subjectExist &&
@@ -504,7 +509,8 @@ function Curriculum() {
                             type="submit"
                             onClick={submitNewSemester}
                             className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 mb-2">
-                            Yes
+                            Save
+                            {submitting && <ImSpinner5 className="inline-block animate-spin ml-1" />}
                         </button>
                         <button
                             type="button"
