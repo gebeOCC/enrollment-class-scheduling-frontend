@@ -1,50 +1,85 @@
 import { useEffect, useState, useRef } from "react";
 import axiosInstance from "../../../axios/axiosInstance";
-import { convertToAMPM, formatFullName } from "../../utilities/utils";
 import { PiSpinnerBold } from "react-icons/pi";
-import html2canvas from "html2canvas"; // Import html2canvas
+import html2canvas from "html2canvas";
+import CorGenerator from "./CorGenerator";
+import ScheduleGenerator from "./ScheduleGenerator";
 
 function StudentClasses() {
     const [classes, setClasses] = useState([]);
-    const [schoolYear, setSchoolYear] = useState({});
-    const [enrolled, setEnrolled] = useState(true);
+    const [schoolYear, setSchoolYear] = useState(null);
+    const [enrolled, setEnrolled] = useState(false);
     const [fetching, setFetching] = useState(true);
-    const componentRef = useRef(null); // Create a reference for the content to print
+    const componentRef = useRef(null);
+
+    const [selected, setSelected] = useState('COR');
 
     const getStudentClasses = async () => {
-        await axiosInstance.get(`get-student-classes`)
-            .then(response => {
-                if (response.data.message === 'success') {
-                    setClasses(response.data.studentClasses);
-                    setSchoolYear(response.data.schoolYear);
-                } else if (response.data.message === 'not enrolled') {
-                    setSchoolYear(response.data.schoolYear);
-                    setEnrolled(false);
-                }
-            })
-            .finally(() => {
-                setFetching(false);
-            });
+        try {
+            const response = await axiosInstance.get(`get-student-classes`);
+            if (response.data.message === 'success') {
+                setClasses(response.data.studentClasses);
+                setSchoolYear(response.data.schoolYear);
+            } else if (response.data.message === 'not enrolled') {
+                setSchoolYear(response.data.schoolYear);
+                setEnrolled(false);
+            }
+        } catch (error) {
+            console.error('Error fetching student classes:', error);
+        } finally {
+            setFetching(false);
+        }
     };
 
     useEffect(() => {
         getStudentClasses();
     }, []);
 
-    // Function to capture the content as an image
     const captureAsImage = () => {
-        if (componentRef.current) {
-            html2canvas(componentRef.current).then((canvas) => {
-                // Convert the canvas to an image URL
-                const imageUrl = canvas.toDataURL("image/png");
+        const element = document.getElementById(selected);
+        if (element) {
+            const style = document.createElement('style');
+            document.head.appendChild(style);
+            style.sheet?.insertRule('body > div:last-child img { display: inline-block; }');
 
-                // Create a temporary link element
+            html2canvas(element, { scale: 5 }).then((canvas) => {
+                const imageUrl = canvas.toDataURL("image/png");
+                const filename = `${schoolYear?.start_year || 'Unknown'}-${schoolYear?.end_year || 'Unknown'} ${schoolYear?.semester_name || 'Unknown'} Semester.png`;
+
                 const link = document.createElement("a");
                 link.href = imageUrl;
-                link.download = `${schoolYear.start_year}-${schoolYear.end_year} ${schoolYear.semester_name} Semester.png`; // Set the download filename
-                link.click(); // Trigger the download
+                link.download = filename;
+                link.click();
+
+                style.remove();
             });
         }
+    };
+    const [dragging, setDragging] = useState(false);
+    const [offset, setOffset] = useState({ x: 0 });
+    const [position, setPosition] = useState({ x: 0 });
+
+    const handleMouseDown = (e) => {
+        setDragging(true);
+        setOffset({ x: e.clientX - position.x });
+    };
+
+    // Handle dragging
+    const handleMouseMove = (e) => {
+        if (!dragging) return;
+        setPosition({ x: e.clientX - offset.x });
+    };
+
+    // Stop dragging
+    const handleMouseUp = () => {
+        setDragging(false);
+    };
+
+    // Apply the drag styles
+    const draggableStyle = {
+        position: 'relative',
+        left: position.x,
+        cursor: dragging ? 'grabbing' : 'grab',
     };
 
     if (fetching) {
@@ -55,59 +90,64 @@ function StudentClasses() {
         );
     }
 
+    if (!enrolled && !schoolYear) {
+        return (
+            <div className="text-center text-red-600">
+                <h2>You are not enrolled in any classes for the current semester.</h2>
+            </div>
+        );
+    }
+
     return (
         <>
-            <div className="space-y-4">
-                <div className="bg-white p-4 rounded-lg shadow-light overflow-hidden text-center flex justify-center items-center">
+            <div className="w-full flex flex-col justify-center items-center space-y-4">
+                <div className="bg-white p-4 rounded-lg shadow-light overflow-hidden text-center flex justify-center items-center w-full">
                     <h1 className="text-4xl font-bold text-blue-600">
-                        ({schoolYear.start_year}-{schoolYear.end_year} {schoolYear.semester_name} Semester)
+                        {schoolYear?.start_year}-{schoolYear?.end_year} {schoolYear?.semester_name} Semester
                     </h1>
                 </div>
-                <div className='bg-white p-4 rounded-lg shadow-light overflow-hidden'>
-                    <div ref={componentRef} className="p-6"> {/* Add ref here to capture the third div */}
-                        {enrolled ? (
-                            <>
-                                <h1 className="text-2xl font-bold mb-4">
-                                    {classes?.year_section?.course?.course_name_abbreviation} - {classes?.year_section?.year_level?.year_level}{classes?.year_section?.section}
-                                </h1>
-                                <table className="w-full bg-white">
-                                    <thead>
-                                        <tr className="bg-[#2980b9] text-white">
-                                            {['Class Section', 'Subject Code', 'Descriptive Title', 'Credit Units', 'Day', 'Time', 'Room', 'Instructor'].map((header) => (
-                                                <th key={header} className="text-left p-2">{header}</th>
-                                            ))}
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {classes.student_subject && classes.student_subject.length > 0 ? (
-                                            classes.student_subject.map((classSubject, index) => (
-                                                <tr key={index} className={`border-b ${index % 2 === 0 ? "bg-white" : "bg-[#e1e6ea]"}`}>
-                                                    <td className="p-2">{classSubject.year_section_subjects.class_code}</td>
-                                                    <td className="p-2">{classSubject.year_section_subjects.subject.subject_code}</td>
-                                                    <td className="p-2">{classSubject.year_section_subjects.subject.descriptive_title}</td>
-                                                    <td className="p-2">{classSubject.year_section_subjects.subject.credit_units}</td>
-                                                    <td className="p-2">{classSubject.year_section_subjects.day}</td>
-                                                    <td className="p-2">{`${convertToAMPM(classSubject.year_section_subjects.start_time)} - ${convertToAMPM(classSubject.year_section_subjects.end_time)}`}</td>
-                                                    <td className="p-2">{classSubject.year_section_subjects.room.room_name}</td>
-                                                    <td className="p-2">{formatFullName(classSubject.year_section_subjects.user_information)}</td>
-                                                </tr>
-                                            ))
-                                        ) : (
-                                            <tr>
-                                                <td colSpan="8" className="text-center p-2">No class</td>
-                                            </tr>
-                                        )}
-                                    </tbody>
-                                </table>
-                            </>
-                        ) : (
-                            <h1 className="text-2xl font-bold"> Not enrolled</h1>
-                        )}
-                    </div>
+
+                <div className="flex items-center space-x-1 p-1 bg-gray-300 w-max rounded-lg text-black">
+                    {/* Button for COR */}
+                    <button
+                        onClick={() => setSelected('COR')}
+                        className={`w-36 px-4 py-2 rounded-lg ${selected === 'COR' ? 'bg-white text-blue-500' : ''
+                            } transition-colors duration-300 `}
+                    >
+                        COR
+                    </button>
+
+                    {/* Button for Schedule */}
+                    <button
+                        onClick={() => setSelected('Schedule')}
+                        className={`w-36 px-4 py-2 rounded-lg ${selected === 'Schedule' ? 'bg-white text-blue-500' : ''
+                            } transition-colors duration-300 `}
+                    >
+                        Schedule
+                    </button>
                 </div>
+                <div className="w-96 md:w-min rounded-lg overflow-x-scroll">
+                    {selected == 'COR' ? (
+                        <div className='w-max bg-white rounded-lg'>
+                            <div id="COR" ref={componentRef} className="p-6">
+                                <CorGenerator data={classes} />
+                            </div>
+                        </div>
+                    ) : (
+                        <ScheduleGenerator data={classes} />
+                    )
+                    }
+                </div>
+                <button
+                    onClick={captureAsImage}
+                    className="bg-transparent border-2 border-blue-600 text-blue-600 px-3 py-2 rounded-lg w-full sm:w-auto 
+             hover:bg-blue-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 
+             active:bg-blue-700 active:border-blue-700 shadow-md hover:shadow-lg transition-all duration-200 ease-in-out"
+                >
+                    Download as Image
+                </button>
+
             </div>
-            {/* Button to capture and download the image */}
-            <button onClick={captureAsImage} className="bg-blue-600 text-white p-2 rounded-lg mt-4">Download as Image</button>
         </>
     );
 }

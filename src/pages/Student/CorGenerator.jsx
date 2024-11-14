@@ -54,9 +54,9 @@ function CorGenerator({ data }) {
                 </div>
 
                 <table className="table-auto w-full text-[10px] border-collapse">
-                    <thead className="">
+                    <thead className="bg-gray-200">
                         {/* Row for main headers */}
-                        <tr className="bg-gray-200 h-5">
+                        <tr className="h-5">
                             <th className="border border-r-black" rowSpan="2"></th>
                             <th className="border border-black" rowSpan="2">Class Code</th>
                             <th className="border border-black" rowSpan="2">Subject Code</th>
@@ -66,7 +66,7 @@ function CorGenerator({ data }) {
                             <th className="border border-black" rowSpan="2">Instructor</th>
                         </tr>
                         {/* Row for sub-headers */}
-                        <tr className="bg-gray-200 h-5">
+                        <tr className="h-5">
                             <th className="border border-black">Lec</th>
                             <th className="border border-black">Lab</th>
                             <th className="border border-black">Credit</th>

@@ -762,7 +762,7 @@ function SideBar() {
                                                                             : "p-2 flex items-center space-x-2 py-2 rounded-md duration-100 focus:bg-[#4e90ca] hover:bg-[#3d7cb1]"
                                                 }
                                                 onClick={() => {
-                                                    if (location.pathname !== '/classes' && onMobile) {
+                                                    if (location.pathname !== '/enrollment-record' && onMobile) {
                                                         setSidebarOpen(false);
                                                     }
                                                 }}
@@ -772,7 +772,7 @@ function SideBar() {
                                                         {sidebarOpen ? (
                                                             <>
                                                                 {isActive ? <HiClipboardList /> : <HiOutlineClipboardList />}
-                                                                <span>Classes</span>
+                                                                <span>Enrollment Record</span>
                                                             </>
                                                         ) : (
                                                             <div className="w-full flex flex-col items-center">
