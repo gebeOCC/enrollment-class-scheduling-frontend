@@ -150,7 +150,7 @@ function Rooms() {
                 {departmentRooms.map((departmentRoom, index) => (
                     <div
                         key={index}
-                        className={`w-full md:w-full bg-white p-4 rounded-md shadow-light ${departmentRoom.id == deptId ? 'border border-[#00ff1a]' : ''}`}>
+                        className={`w-full md:w-full bg-white p-4 rounded-md shadow-light ${departmentRoom.id == deptId ? 'ring-2 ring-[#00ff1a]' : ''}`}>
                         <div className="flex justify-between mb-4">
                             <h3
                                 className="text-black font-bold text-lgcursor-pointer inline-block self-center text-2xl">
@@ -159,7 +159,8 @@ function Rooms() {
 
                             {departmentRoom.id == deptId ? (
                                 <button
-                                    className="bg-green-500 text-white px-2 py-1 rounded opacity-75 cursor-not-allowed">
+                                    onClick={() => { setDeptId(0) }}
+                                    className="bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded opacity-75 cursor-pointer">
                                     Selected
                                 </button>
                             ) : (
@@ -174,7 +175,9 @@ function Rooms() {
 
                         <div className="space-y-2">
                             {departmentRoom.room.map((room, index) => (
-                                <div key={index} className="bg-yellow-400 text-black flex justify-between items-center px-3 py-2 rounded-md" style={{ backgroundColor: "#FFC107" }}>
+                                <div
+                                    key={index}
+                                    className="bg-yellow-400 text-black flex justify-between items-center px-3 py-2 rounded-md" style={{ backgroundColor: "#FFC107" }}>
                                     <span style={{ color: "495057" }}>{room.room_name}</span>
                                     <button
                                         style={{ color: "#C82333" }}
@@ -196,18 +199,17 @@ function Rooms() {
 
             {isRoomModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-                    <div className="bg-white p-6 rounded-md w-[300px]">
+                    <div className="bg-white p-4 rounded-md w-[300px]">
                         <h2 className="text-lg font-bold mb-4">Add Room</h2>
                         <form>
-                            <div>
-                                <label className="block text-gray-700">Name:</label>
+                            <div className="relative">
+                                <label className="block text-sm font-medium text-gray-600  absolute left-1 -top-2.5 bg-white px-1">Room Name:</label>
                                 <input
                                     type="text"
                                     value={roomName}
                                     name="room_name"
                                     onChange={(e) => { if (submitting) return; setRoomName(e.target.value) }}
-                                    className={`w-full px-3 py-2 border rounded-md border focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out ${roomNameInputEmpty && 'border-red-300'}`}
-                                    placeholder="Room Name"
+                                    className={`w-full px-3 py-2 rounded-md border border-gray-400 focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out ${roomNameInputEmpty && 'border-red-300'}`}
                                 />
                             </div>
                             {roomExist &&

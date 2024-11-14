@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axiosInstance from "../../../axios/axiosInstance";
 import { ImSpinner5 } from "react-icons/im";
+import PreLoader from "../../components/preloader/PreLoader";
 
 function Profile() {
     const [userInfo, setUserInfo] = useState(null);
@@ -57,7 +58,7 @@ function Profile() {
             });
     };
 
-    if (!userInfo) return <div>Loading...</div>;
+    if (!userInfo) return <PreLoader />;
 
     const { user_information, user_id_no, user_role } = userInfo;
     const { first_name, last_name, middle_name, gender, birthday, contact_number, email_address, present_address, zip_code } = user_information;

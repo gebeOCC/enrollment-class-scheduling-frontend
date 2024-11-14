@@ -69,7 +69,7 @@ function SchoolYearDetails() {
                         <button
                             disabled={submitting}
                             onClick={setAsDefault}
-                            className="bg-blue-500 text-white text-xs font-bold uppercase rounded-full px-4 py-2 transition-transform duration-300 ease-in-out transform hover:scale-105 shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 border border-blue-600">
+                            className="bg-green-300 text-black text-xs font-bold rounded-full px-2 py-1 transition-transform duration-300 ease-in-out transform shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500">
                             Set as Current
                         </button>
                     )}

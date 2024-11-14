@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import axiosInstance from '../../axios/axiosInstance';
+import WebsiteLoading from '../components/WebsiteLoading';
 
 const AuthContext = createContext();
 
@@ -37,10 +38,8 @@ export const AuthProvider = ({ children }) => {
         fetchUserRole();
     }, []);
 
-    if (fetching) {
-        return <div></div>;
-    }
-
+    if (fetching) return <WebsiteLoading />
+    
     return (
         <AuthContext.Provider value={{ userRole, fetching, enrollmentOngoing, preparation, courses, enrollmentData, firstName }}>
             {children}

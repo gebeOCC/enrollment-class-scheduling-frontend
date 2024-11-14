@@ -26,8 +26,9 @@ import EnrollmentRecord from "./pages/Student/EnrollmentRecord";
 import FacultyDetails from "./pages/Registrar/FacultyDetails";
 import RegistrarEnrollmentCourse from "./pages/Registrar/RegistrarEnrollmentCourse";
 import Profile from "./pages/All/Profile";
-import SectionsEnrolledStudents from "./pages/ProgramHead/SectionsEnrolledStudents";
+import SectionsEnrolledStudents from "./pages/enrollment/SectionsEnrolledStudents";
 import StudentCor from "./pages/enrollment/StudentCor";
+import WebsiteLoading from "./components/WebsiteLoading";
 
 function App() {
     const { userRole, enrollmentOngoing, preparation } = useAuth();

@@ -8,6 +8,7 @@ import { FiSearch } from "react-icons/fi";
 import { FaCirclePlus } from "react-icons/fa6";
 import AddNewStudentModal from "../GlobalFunction/AddNewStudentModal";
 import { ImSpinner5 } from "react-icons/im";
+import PreLoader from "../../components/preloader/PreLoader";
 function EnrollStudent() {
     // page start
     const { courseid, yearlevel } = useParams();
@@ -22,6 +23,7 @@ function EnrollStudent() {
     const [selesctedStudentType, setSelesctedStudentType] = useState("");
     const [yearSectionId, setYearSectionId] = useState(0);
     const [regularStudent, setRegularStudent] = useState(true);
+    const [fetching, setFetching] = useState(true);
 
     useEffect(() => {
         if (classes.length === 0) {
@@ -66,6 +68,9 @@ function EnrollStudent() {
                         setStudentType(response.data.studentType);
                         setYearSectionId(response.data.yearSectionId);
                     }
+                })
+                .finally(() => {
+                    setFetching(false);
                 })
         }
 
@@ -240,6 +245,8 @@ function EnrollStudent() {
         }
     }
 
+    if (fetching) return <PreLoader />
+
     return (
         <>
             <div className="space-y-4">
@@ -285,6 +292,7 @@ function EnrollStudent() {
                                 ))}
                             </select>
                         </div>
+                        {/* Add student details button appear when student type is freshman or transferee */}
                         {(selesctedStudentType == 1 || selesctedStudentType == 2) && (
                             <button
                                 onClick={() => { setIsStudentModalOpen(true) }}
@@ -366,23 +374,23 @@ function EnrollStudent() {
                         </div>
                         <div className="space-y-1">
                             <div
-                                className={`font-bold grid grid-cols-[100px_100px_1fr_120px_180px_90px_auto] gap-4 items-center bg-white px-2 transition duration-200 ease-in-out`}>
-                                <div className="font-bold text-gray-700">
+                                className={`font-bold text-gray-900 grid grid-cols-[100px_100px_1fr_120px_180px_90px_auto] gap-4 items-center bg-white px-2 transition duration-200 ease-in-out`}>
+                                <div>
                                     Class code
                                 </div>
-                                <div className="font-bold text-gray-700">
+                                <div>
                                     Subject code
                                 </div>
-                                <div className="text-gray-600">
+                                <div>
                                     Descriptive title
                                 </div>
-                                <div className="text-gray-600">
+                                <div>
                                     Day
                                 </div>
-                                <div className="text-gray-600">
+                                <div>
                                     Time
                                 </div>
-                                <div className="text-gray-600">
+                                <div>
                                     Credit units
                                 </div>
                                 <svg
@@ -404,24 +412,24 @@ function EnrollStudent() {
                             {classes.map((classSubject, index) => (
                                 <div
                                     key={index}
-                                    className={`border grid grid-cols-[100px_100px_1fr_120px_180px_90px_auto] gap-4 items-center bg-white p-2 rounded-lg transition duration-200 ease-in-out hover:bg-gray-100`}
+                                    className={`border border-black text-black grid grid-cols-[100px_100px_1fr_120px_180px_90px_auto] gap-4 items-center bg-white p-2 rounded-lg transition duration-200 ease-in-out hover:bg-gray-200`}
                                 >
-                                    <div className="text-gray-700">
+                                    <div>
                                         {classSubject.class_code}
                                     </div>
-                                    <div className="text-gray-700">
+                                    <div>
                                         {classSubject.subject_code}
                                     </div>
-                                    <div className="text-gray-600">
+                                    <div>
                                         {classSubject.descriptive_title}
                                     </div>
-                                    <div className="text-gray-600">
+                                    <div>
                                         {classSubject.day}
                                     </div>
-                                    <div className="text-gray-600">
+                                    <div>
                                         {convertToAMPM(classSubject.start_time)} - {convertToAMPM(classSubject.end_time)}
                                     </div>
-                                    <div className="text-gray-600 text-center">
+                                    <div className="text-center">
                                         {classSubject.credit_units}
                                     </div>
                                     <svg
@@ -459,7 +467,8 @@ function EnrollStudent() {
                         </div>
                     </div>
                 </div>
-                {/* List of Student Classes */}
+
+                {/* List of searched subjects/classes */}
                 <div className="flex flex-col space-y-4 h-auto p-4 bg-white rounded-lg shadow-lg">
                     <div className="col-span-3 space-y-2">
                         <div className="flex justify-between">
@@ -501,7 +510,7 @@ function EnrollStudent() {
                         {subjectSearch.map((classSubject, index) => (
                             <div
                                 key={index}
-                                className={`border grid grid-cols-[100px_100px_1fr_120px_180px_90px_auto] gap-4 items-center ${detectConflict(classSubject) ? 'bg-red-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100'}  p-2 rounded-lg transition duration-200 ease-in-out`}
+                                className={`border border-black grid grid-cols-[100px_100px_1fr_120px_180px_90px_auto] gap-4 items-center ${detectConflict(classSubject) ? 'bg-red-600 text-white' : 'bg-white text-black hover:bg-gray-200'}  p-2 rounded-lg transition duration-200 ease-in-out`}
                             >
                                 <div className="">
                                     {classSubject.class_code}

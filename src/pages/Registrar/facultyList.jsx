@@ -15,6 +15,7 @@ function FacultyList() {
     const [userIdExist, setUserIdExist] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [fetching, setFetching] = useState(true);
+    const [showCount, setShowCount] = useState(10);
 
     const getFacultyList = async () => {
         await axiosInstance.get(`get-faculty-list`)
@@ -89,6 +90,10 @@ function FacultyList() {
             }
 
             if (!formattedNumber.startsWith('09')) {
+                setForm(prev => ({
+                    ...prev,
+                    [name]: '09' + value
+                }));
                 return;
             }
         } else if (name === 'zip_code') {
@@ -219,9 +224,19 @@ function FacultyList() {
     return (
         <>
             <div className="p-6 bg-white shadow-md rounded-lg">
-                <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
+                <div className="flex flex-col sm:flex-row justify-between items-center mb-2">
                     <h2 className="text-2xl font-bold mb-2 sm:mb-0">Faculty List</h2>
                     <div className="flex flex-col sm:flex-row space-x-0 sm:space-x-2 w-full sm:w-auto">
+                        <select
+                            value={showCount}
+                            onChange={(e) => setShowCount(parseInt(e.target.value))}
+                            className="border px-2 rounded-md h-10 text-center bg-white outline-none cursor-pointer w-full mb-2 md:mb-0 md:w-20"
+                        >
+                            <option value={10}>10</option>
+                            <option value={25}>25</option>
+                            <option value={50}>50</option>
+                            <option value={100}>100</option>
+                        </select>
                         <input
                             value={searchBar}
                             onChange={(e) => { setSearchBar(e.target.value) }}
@@ -249,22 +264,28 @@ function FacultyList() {
                         </thead>
                         <tbody>
                             {faculties.length > 0 ? (
-                                faculties.map((faculty, index) => (
-                                    (searchBar === "" || faculty.user_id_no.toLowerCase().includes(searchBar.toLowerCase()) ||
-                                        (String(faculty.last_name) + String(faculty.first_name) + getFirstLetter(String(faculty.middle_name))).toLowerCase().includes(searchBar.toLowerCase())) &&
-                                    <tr
-                                        key={index}
-                                        className={`border-b hover:bg-[#deeced] cursor-pointer`}
-                                        onClick={() => navigate(`faculty-details?faculty-id=${faculty.user_id_no}`)}
-                                    >
-                                        <td className="py-2 px-2 transition duration-200 hover:py-3 md:px-4">{faculty.user_id_no}</td>
-                                        <td className="py-2 px-2 transition duration-200 hover:py-3 md:px-4">
-                                            {formatFullName(faculty)}
-                                        </td>
-                                        <td className="py-2 px-2 transition duration-200 hover:py-3 md:px-4 hidden sm:table-cell">{faculty.email_address}</td>
-                                        <td className="py-2 px-2 transition duration-200 hover:py-3 md:px-4 hidden sm:table-cell">{faculty.department_name_abbreviation}</td>
-                                    </tr>
-                                ))
+                                faculties
+                                    .filter((faculty) => (
+                                        searchBar === "" ||
+                                        faculty.user_id_no.toLowerCase().includes(searchBar.toLowerCase()) ||
+                                        (String(faculty.last_name) + String(faculty.first_name) + getFirstLetter(String(faculty.middle_name)))
+                                            .toLowerCase().includes(searchBar.toLowerCase())
+                                    ))
+                                    .slice(0, showCount)
+                                    .map((faculty, index) => (
+                                        <tr
+                                            key={index}
+                                            className={`border-b hover:bg-[#deeced] cursor-pointer`}
+                                            onClick={() => navigate(`faculty-details?faculty-id=${faculty.user_id_no}`)}
+                                        >
+                                            <td className="py-2 px-2 transition duration-200 hover:py-3 md:px-4">{faculty.user_id_no}</td>
+                                            <td className="py-2 px-2 transition duration-200 hover:py-3 md:px-4">
+                                                {formatFullName(faculty)}
+                                            </td>
+                                            <td className="py-2 px-2 transition duration-200 hover:py-3 md:px-4 hidden sm:table-cell">{faculty.email_address}</td>
+                                            <td className="py-2 px-2 transition duration-200 hover:py-3 md:px-4 hidden sm:table-cell">{faculty.department_name_abbreviation}</td>
+                                        </tr>
+                                    ))
                             ) : (
                                 <tr>
                                     <td className="py-2 px-2 md:px-4" colSpan="6">
@@ -279,7 +300,7 @@ function FacultyList() {
 
 
             {isFacultyModalOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 px-4">
                     <div className="bg-white p-4 rounded-md w-96 h-[470px] overflow-y-auto flex flex-col justify-between">
                         <div>
                             <h2 className="text-2xl font-bold text-center mb-4">Add Faculty </h2>
@@ -288,7 +309,7 @@ function FacultyList() {
                                     <div className="space-y-4">
                                         {/* First Name */}
                                         <div className="relative">
-                                            <label className="block text-sm font-medium text-gray-600  absolute left-1 -top-2.5 bg-white px-1">First Name:</label>
+                                            <label className="block text-sm font-medium text-gray-600 absolute left-1 -top-2.5 bg-white px-1">First Name:</label>
                                             <input
                                                 value={form.first_name}
                                                 name="first_name"
@@ -321,7 +342,7 @@ function FacultyList() {
                                                 className={`w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out ${facultyFormFields.includes('last_name') && 'border-red-300'}`}
                                             />
                                         </div>
-                                        
+
                                         {/* Birthday */}
                                         <div className="relative">
                                             <label className="block text-sm font-medium text-gray-600 absolute left-1 -top-2.5 bg-white px-1">Birthday</label>
@@ -335,9 +356,9 @@ function FacultyList() {
                                         </div>
 
                                         {/* Gender */}
-                                        <div className={`relative ${facultyFormFields.includes('gender') ? 'border-red-500 rounded-md' : ''}`}>
-                                            <label className="block text-sm font-semibold text-gray-700 mb-1 absolute left-1 -top-2.5 bg-white px-1">Gender</label>
-                                            <div className="border rounded-md border-gray-300 px-3 py-3">
+                                        <div className={`relative`}>
+                                            <label className="block text-sm text-gray-600 mb-1 absolute left-1 -top-2.5 bg-white px-1">Gender</label>
+                                            <div className={`border rounded-md px-3 py-3 ${facultyFormFields.includes('gender') ? 'border-red-300 rounded-md' : 'border-gray-300'}`}>
                                                 <div className="flex items-center space-x-6">
                                                     <label className="flex items-center cursor-pointer">
                                                         <input

@@ -44,21 +44,32 @@ function AddNewStudentModal({ setStudentIdSearch, open, setOpen, setStudentInfo 
         defaultPasswordChange()
     }, [form.last_name, form.birthday, isDefaultChecked])
 
+    const [studentFormFields, setStudentFormFields] = useState([""]);
+
     const nextStep = () => {
-        let newWarnings = {};
+        const invalidFields = [];
 
         if (step === 1) {
-            if (form.first_name === '') newWarnings.first_name = 'First name is required';
-            if (form.last_name === '') newWarnings.last_name = 'Last name is required';
-            if (form.gender === '') newWarnings.gender = 'Gender is required';
-            if (form.birthday === '') newWarnings.birthday = 'Birthday is required';
-
-            if (Object.keys(newWarnings).length === 0) {
-                setStep(step + 1);
-            }
+            if (!form.first_name) invalidFields.push('first_name');
+            if (!form.last_name) invalidFields.push('last_name');
+            if (!form.gender) invalidFields.push('gender');
+            if (!form.birthday) invalidFields.push('birthday');
+        } else if (step === 2) {
+            if (!form.present_address) invalidFields.push('present_address');
+            if (!form.zip_code) invalidFields.push('zip_code');
+            if (!form.contact_number || form.contact_number.length !== 11) invalidFields.push('contact_number');
+            if (!form.email_address || !isValidEmail(form.email_address)) invalidFields.push('email_address');
         }
 
-        setWarnings(newWarnings);
+
+        console.log(invalidFields);
+
+        setStudentFormFields(invalidFields);
+
+        if (invalidFields.length > 0) {
+            return;
+        }
+        setStep(step + 1);
     };
 
     const handleFormChange = (e) => {
@@ -81,6 +92,10 @@ function AddNewStudentModal({ setStudentIdSearch, open, setOpen, setStudentInfo 
             }
 
             if (!formattedNumber.startsWith('09')) {
+                setForm(prev => ({
+                    ...prev,
+                    [name]: '09' + value
+                }));
                 return;
             }
         } else if (
@@ -101,27 +116,17 @@ function AddNewStudentModal({ setStudentIdSearch, open, setOpen, setStudentInfo 
     };
 
     const submitUserInfo = async (event) => {
-        let newWarnings = {};
-
-        if (form.present_address === '') newWarnings.present_address = 'Address is required';
-        if (form.zip_code === '') newWarnings.zip_code = 'Zip code is required';
-        if (form.contact_number === '' || form.contact_number.length !== 11) newWarnings.contact_number = 'Contact number is required';
-        if (form.email_address === '' || !isValidEmail(form.email_address)) newWarnings.email_address = 'Email address is required';
-
-        setWarnings(newWarnings);
-
-        if (Object.keys(newWarnings).length !== 0) {
-            return;
-        }
-
-        console.log('submit');
-
         event.preventDefault();
         setSubmitting(true);
 
-        setWarnings(newWarnings);
+        const invalidFields = [];
+        if (!form.present_address) invalidFields.push('present_address');
+        if (!form.zip_code) invalidFields.push('zip_code');
+        if (!form.contact_number || form.contact_number.length !== 11) invalidFields.push('contact_number');
+        if (!form.email_address) invalidFields.push('email_address');
 
-        if (Object.keys(newWarnings).length > 0) {
+        setStudentFormFields(invalidFields);
+        if (invalidFields.length > 0) {
             setSubmitting(false);
             return;
         }
@@ -158,154 +163,160 @@ function AddNewStudentModal({ setStudentIdSearch, open, setOpen, setStudentInfo 
     return (
         <>
             {open && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-                    <div className="bg-white p-4 rounded-md w-[600px] h-[515px] overflow-y-auto flex flex-col justify-between">
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 px-4">
+                    <div className="bg-white p-4 rounded-md w-96 h-[470px] overflow-y-auto flex flex-col justify-between">
                         <div>
-                            <h2 className="text-2xl font-bold text-center mb-2">Add Student</h2>
+                            <h2 className="text-2xl font-bold text-center mb-4">Add Student</h2>
                             {step === 1 && (
                                 <>
-                                    <div>
+                                    <div className="space-y-4">
                                         {/* First Name */}
-                                        <div className="mb-2">
-                                            <label className="block text-sm font-medium">First Name</label>
+                                        <div className="relative">
+                                            <label className="block text-sm font-medium text-gray-600 absolute left-1 -top-2.5 bg-white px-1">First Name:</label>
                                             <input
                                                 value={form.first_name}
                                                 name="first_name"
                                                 onChange={handleFormChange}
                                                 type="text"
-                                                className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 ${warnings.first_name && 'border-red-300'}`}
+                                                className={`w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out ${studentFormFields.includes('first_name') && 'border-red-300'}`}
                                             />
                                         </div>
 
                                         {/* Middle Name */}
-                                        <div className="mb-2">
-                                            <label className="block text-sm font-medium">Middle Name</label>
+                                        <div className="relative">
+                                            <label className="block text-sm font-medium  text-gray-600 absolute left-1 -top-2.5 bg-white px-1">Middle Name</label>
                                             <input
                                                 value={form.middle_name}
                                                 name="middle_name"
                                                 onChange={handleFormChange}
                                                 type="text"
-                                                className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 ${warnings.middle_name && 'border-red-300'}`}
+                                                className={`w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out ${studentFormFields.includes('middle_name') && 'border-red-300'}`}
                                             />
                                         </div>
 
                                         {/* Last Name */}
-                                        <div className="mb-2">
-                                            <label className="block text-sm font-medium">Last Name</label>
+                                        <div className="relative">
+                                            <label className="block text-sm font-medium  text-gray-600 absolute left-1 -top-2.5 bg-white px-1">Last Name</label>
                                             <input
                                                 value={form.last_name}
                                                 name="last_name"
                                                 onChange={handleFormChange}
                                                 type="text"
-                                                className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 ${warnings.last_name && 'border-red-300'}`}
+                                                className={`w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out ${studentFormFields.includes('last_name') && 'border-red-300'}`}
                                             />
                                         </div>
 
-                                        {/* Gender */}
-                                        <div className={`mb-2 ${warnings.birthday && 'border border-red-300'}`}>
-                                            <label className="block text-sm font-medium">Gender</label>
-                                            <div className="flex items-center space-x-4">
-                                                <label className="flex items-center">
-                                                    <input
-                                                        type="radio"
-                                                        name="gender"
-                                                        value="female"
-                                                        checked={form.gender === 'female'}
-                                                        onChange={handleFormChange}
-                                                        className="form-radio"
-                                                    />
-                                                    <span className="ml-2">Female</span>
-                                                </label>
-                                                <label className="flex items-center">
-                                                    <input
-                                                        type="radio"
-                                                        name="gender"
-                                                        value="male"
-                                                        checked={form.gender === 'male'}
-                                                        onChange={handleFormChange}
-                                                        className="form-radio"
-                                                    />
-                                                    <span className="ml-2">Male</span>
-                                                </label>
-                                            </div>
-                                        </div>
-
                                         {/* Birthday */}
-                                        <div className="mb-2">
-                                            <label className="block text-sm font-medium">Birthday</label>
+                                        <div className="relative">
+                                            <label className="block text-sm font-medium text-gray-600 absolute left-1 -top-2.5 bg-white px-1">Birthday</label>
                                             <input
                                                 value={form.birthday}
                                                 name="birthday"
                                                 onChange={handleFormChange}
                                                 type="date"
-                                                className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 ${warnings.birthday && 'border-red-300'}`}
+                                                className={`w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out ${studentFormFields.includes('birthday') && 'border-red-300'}`}
                                             />
                                         </div>
+
+                                        {/* Gender */}
+                                        <div className={`relative`}>
+                                            <label className="block text-sm text-gray-600 mb-1 absolute left-1 -top-2.5 bg-white px-1">Gender</label>
+                                            <div className={`border rounded-md px-3 py-3 ${studentFormFields.includes('gender') ? 'border-red-300 rounded-md' : 'border-gray-300'}`}>
+                                                <div className="flex items-center space-x-6">
+                                                    <label className="flex items-center cursor-pointer">
+                                                        <input
+                                                            type="radio"
+                                                            name="gender"
+                                                            value="female"
+                                                            checked={form.gender === 'female'}
+                                                            onChange={handleFormChange}
+                                                            className="form-radio h-4 w-4 text-cyan-600 focus:ring-cyan-500 hover:bg-cyan-100 transition"
+                                                        />
+                                                        <span className="ml-2 text-sm text-gray-700">Female</span>
+                                                    </label>
+                                                    <label className="flex items-center cursor-pointer">
+                                                        <input
+                                                            type="radio"
+                                                            name="gender"
+                                                            value="male"
+                                                            checked={form.gender === 'male'}
+                                                            onChange={handleFormChange}
+                                                            className="form-radio h-4 w-4 text-cyan-600 focus:ring-cyan-500 hover:bg-cyan-100 transition"
+                                                        />
+                                                        <span className="ml-2 text-sm text-gray-700">Male</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                     </div>
                                 </>
                             )}
 
                             {step === 2 && (
-                                <>
-                                    <div className="mb-2">
-                                        <label className="block text-sm font-medium">Address</label>
+                                <div className="space-y-4">
+                                    <div className="relative">
+                                        <label className="block text-sm font-medium  text-gray-600 absolute left-1 -top-2.5 bg-white px-1">Address</label>
                                         <input
                                             value={form.present_address}
                                             name="present_address"
                                             onChange={handleFormChange}
                                             type="text"
-                                            className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400  ${warnings.present_address && 'border-red-300'}`} />
+                                            className={`w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out  ${studentFormFields.includes('present_address') && 'border-red-300'}`} />
                                     </div>
 
-                                    <div className="mb-2">
-                                        <label className="block text-sm font-medium">Zip Code</label>
+                                    <div className="relative">
+                                        <label className="block text-sm font-medium  text-gray-600 absolute left-1 -top-2.5 bg-white px-1">Zip code</label>
                                         <input
                                             value={form.zip_code}
                                             name="zip_code"
                                             onChange={handleFormChange}
                                             type="text"
-                                            className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400  ${warnings.zip_code && 'border-red-300'}`} />
+                                            className={`w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out  ${studentFormFields.includes('zip_code') && 'border-red-300'}`} />
                                     </div>
 
-                                    <div className="mb-2">
-                                        <label className="block text-sm font-medium">Contact Number</label>
+                                    student                                <div className="relative">
+                                        <label className="block text-sm font-medium  text-gray-600 absolute left-1 -top-2.5 bg-white px-1">Contact no.</label>
                                         <input
                                             value={formatPhoneNumber(form.contact_number)}
                                             name="contact_number"
                                             onChange={handleFormChange}
                                             type="text"
-                                            className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400  ${warnings.contact_number && 'border-red-300'}`} />
+                                            className={`w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out ${studentFormFields.includes('contact_number') && 'border-red-300'}`} />
                                     </div>
 
-                                    <div className="mb-2">
-                                        <label className="block text-sm font-medium">Email</label>
+                                    <div className="relative">
+                                        <label className="block text-sm font-medium  text-gray-600 absolute left-1 -top-2.5 bg-white px-1">Email</label>
                                         <input
                                             value={form.email_address}
                                             name="email_address"
                                             onChange={handleFormChange}
                                             type="email"
-                                            className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400  ${warnings.email_address && 'border-red-300'}`} />
+                                            className={`w-full px-3 py-2 rounded-md border border-gray-300 focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out ${studentFormFields.includes('email_address') && 'border-red-300'}`} />
                                     </div>
-                                </>
+                                </div>
                             )}
                         </div>
 
                         <div>
-                            <div className="flex justify-between mt-2">
+                            <div className="relative flex justify-center items-center mt-2">
                                 <button
                                     disabled={step === 1}
-                                    onClick={() => setStep(step - 1)}
-                                    className={`py-2 px-4 rounded-md ${step === 1 ? 'bg-gray-200 cursor-not-allowed' : 'bg-gray-300 hover:bg-gray-400'} transition`}
+                                    type="button"
+                                    onClick={() => { setStep(step - 1) }}
+                                    className={`absolute left-0 bg-gray-200 ${step === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-300'} py-2 px-4 rounded-md`}
                                 >
                                     Previous
                                 </button>
 
-                                <p className="self-center">{step}/2</p>
+                                <p className="text-center">{step}/2</p>
+
                                 {step <= 1 ? (
                                     <button
                                         type="button"
                                         onClick={nextStep}
-                                        className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">
+                                        className="absolute right-0 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
+                                    >
                                         Next
                                     </button>
                                 ) : (
@@ -313,7 +324,8 @@ function AddNewStudentModal({ setStudentIdSearch, open, setOpen, setStudentInfo 
                                         disabled={submitting}
                                         type="button"
                                         onClick={submitUserInfo}
-                                        className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">
+                                        className="absolute right-0 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 flex items-center gap-2"
+                                    >
                                         {submitting ? (
                                             <>
                                                 Submitting
@@ -328,8 +340,25 @@ function AddNewStudentModal({ setStudentIdSearch, open, setOpen, setStudentInfo 
 
                             <button
                                 type="button"
-                                onClick={() => setOpen(false)}
-                                className="w-full mt-4 border border-thirdColor text-thirdColor py-2 rounded-md hover:bg-thirdColor hover:text-white">
+                                onClick={() => {
+                                    setOpen(false);
+                                    setForm({
+                                        password: '',
+                                        user_role: 'faculty',
+                                        first_name: '',
+                                        last_name: '',
+                                        middle_name: '',
+                                        gender: '',
+                                        birthday: '',
+                                        contact_number: '09',
+                                        email_address: '',
+                                        present_address: '',
+                                        zip_code: '',
+                                        department_id: '',
+                                    });
+                                    setStep(1);
+                                }}
+                                className="w-full mt-4 border border-gray-300 text-gray-700 py-2 rounded-md hover:bg-gray-300">
                                 Cancel
                             </button>
                         </div>

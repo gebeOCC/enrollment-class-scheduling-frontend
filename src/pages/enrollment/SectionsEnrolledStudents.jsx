@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axiosInstance from "../../../axios/axiosInstance";
 import { useLocation, useParams, useNavigate, Navigate, Link } from "react-router-dom";
 import { capitalizeFirstLetter, getFirstLetter } from "../../utilities/utils";
+import PreLoader from "../../components/preloader/PreLoader";
 
 function EnrollStudent() {
     const { courseid, yearlevel } = useParams();
@@ -13,6 +14,7 @@ function EnrollStudent() {
     const [students, setStudents] = useState([]);
     const [searchBar, setSearchBar] = useState("");
     const [showCount, setShowCount] = useState(10);
+    const [fetching, setFetching] = useState(true);
 
     useEffect(() => {
         const getCourseName = async () => {
@@ -34,12 +36,17 @@ function EnrollStudent() {
                     if (response.data.message === 'success') {
                         setStudents(response.data.students);
                     }
+                })
+                .finally(() => {
+                    setFetching(false);
                 });
         };
 
         getCourseName();
         getYearLevelSectionSectionStudents();
     }, [courseid, yearlevel, section]);
+
+    if (fetching) return <PreLoader />
 
     return (
         <div className="space-y-4">
