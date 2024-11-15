@@ -107,6 +107,12 @@ export function formatFullName(userInfo) {
     return `${capitalizeFirstLetter(last_name)}, ${capitalizeFirstLetter(first_name)}${middle_name ? ' ' + getFirstLetter(capitalizeFirstLetter(middle_name)) + '.' : ''}`;
 };
 
+// format full name into this format "Lastname, Firstname M."
+export function formatFullNameFML(userInfo) {
+    const { last_name, first_name, middle_name } = userInfo;
+    return `${capitalizeFirstLetter(first_name)} ${middle_name ? ' ' + getFirstLetter(capitalizeFirstLetter(middle_name)) + '.' : ''} ${capitalizeFirstLetter(last_name)}`;
+};
+
 // format date into valid yyyy/mm/dd
 export function formatBirthday(birthday) {
     if (!birthday) return '';

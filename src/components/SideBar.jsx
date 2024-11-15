@@ -28,11 +28,9 @@ function SideBar() {
             if (window.innerWidth <= 640) {
                 setSidebarOpen(false);
                 setOnMobile(true);
-                console.log('on mobile');
             } else if (window.innerWidth > 640 && onMobile) {
                 setSidebarOpen(true);
                 setOnMobile(false);
-                console.log('not on mobile');
             }
         };
 
@@ -56,11 +54,11 @@ function SideBar() {
                         <HiBars3
                             onClick={toggleSidebar}
                             className="md:hidden cursor-pointer  transition-transform duration-300 ease-in-out transform w-10 h-10 hover:scale-110 active:scale-90"
-                            size={30}/>
+                            size={30} />
                         <img
                             src={OCC_LOGO}
                             alt="Logo"
-                            className="w-10 h-10"/>
+                            className="w-10 h-10" />
                         {sidebarOpen &&
                             <h2 className="text-4xl font-bold">
                                 OCC
@@ -214,8 +212,8 @@ function SideBar() {
                                                 to="/school-year"
                                                 className={({ isActive }) =>
                                                     isActive
-                                                                            ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
-                                                                            : "p-2 flex items-center space-x-2 py-2 rounded-md duration-100 focus:bg-[#4e90ca] hover:bg-[#3d7cb1]"
+                                                        ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
+                                                        : "p-2 flex items-center space-x-2 py-2 rounded-md duration-100 focus:bg-[#4e90ca] hover:bg-[#3d7cb1]"
                                                 }
                                                 onClick={() => {
                                                     if (location.pathname !== '/school-year' && onMobile) {
@@ -251,8 +249,8 @@ function SideBar() {
                                                 to="/classes"
                                                 className={({ isActive }) =>
                                                     isActive
-                                                                            ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
-                                                                            : "p-2 flex items-center space-x-2 py-2 rounded-md duration-100 focus:bg-[#4e90ca] hover:bg-[#3d7cb1]"
+                                                        ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
+                                                        : "p-2 flex items-center space-x-2 py-2 rounded-md duration-100 focus:bg-[#4e90ca] hover:bg-[#3d7cb1]"
                                                 }
                                                 onClick={() => {
                                                     if (location.pathname !== '/classes' && onMobile) {
@@ -288,8 +286,8 @@ function SideBar() {
                                                 to="/faculty-list"
                                                 className={({ isActive }) =>
                                                     isActive
-                                                                            ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
-                                                                            : "p-2 flex items-center space-x-2 py-2 rounded-md duration-100 focus:bg-[#4e90ca] hover:bg-[#3d7cb1]"
+                                                        ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
+                                                        : "p-2 flex items-center space-x-2 py-2 rounded-md duration-100 focus:bg-[#4e90ca] hover:bg-[#3d7cb1]"
                                                 }
                                                 onClick={() => {
                                                     if (location.pathname !== '/faculty-list' && onMobile) {
@@ -320,8 +318,8 @@ function SideBar() {
                                                 to="/student-list"
                                                 className={({ isActive }) =>
                                                     isActive
-                                                                            ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
-                                                                            : "p-2 flex items-center space-x-2 py-2 rounded-md duration-100 focus:bg-[#4e90ca] hover:bg-[#3d7cb1]"
+                                                        ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
+                                                        : "p-2 flex items-center space-x-2 py-2 rounded-md duration-100 focus:bg-[#4e90ca] hover:bg-[#3d7cb1]"
                                                 }
                                                 onClick={() => {
                                                     if (location.pathname !== '/student-list' && onMobile) {
@@ -358,8 +356,8 @@ function SideBar() {
                                                 to="/rooms"
                                                 className={({ isActive }) =>
                                                     isActive
-                                                                            ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
-                                                                            : "p-2 flex items-center space-x-2 py-2 rounded-md duration-100 focus:bg-[#4e90ca] hover:bg-[#3d7cb1]"
+                                                        ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
+                                                        : "p-2 flex items-center space-x-2 py-2 rounded-md duration-100 focus:bg-[#4e90ca] hover:bg-[#3d7cb1]"
                                                 }
                                                 onClick={() => {
                                                     if (location.pathname !== '/rooms' && onMobile) {
@@ -428,8 +426,8 @@ function SideBar() {
                                                                         to={`enrollment/${course.hashed_course_id}`}
                                                                         className={({ isActive }) =>
                                                                             isActive
-                                                                            ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
-                                                                            : "p-2 flex items-center space-x-2 py-2 rounded-md duration-100 focus:bg-[#4e90ca] hover:bg-[#3d7cb1]"
+                                                                                ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
+                                                                                : "p-2 flex items-center space-x-2 py-2 rounded-md duration-100 focus:bg-[#4e90ca] hover:bg-[#3d7cb1]"
                                                                         }
                                                                         onClick={() => {
                                                                             if (location.pathname !== `/enrollment/${course.hashed_course_id}` && onMobile) {
@@ -499,8 +497,8 @@ function SideBar() {
                                                 to="/courses"
                                                 className={({ isActive }) =>
                                                     isActive
-                                                                            ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
-                                                                            : "p-2 flex items-center space-x-2 py-2 rounded-md duration-100 focus:bg-[#4e90ca] hover:bg-[#3d7cb1]"
+                                                        ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
+                                                        : "p-2 flex items-center space-x-2 py-2 rounded-md duration-100 focus:bg-[#4e90ca] hover:bg-[#3d7cb1]"
                                                 }
                                                 onClick={() => {
                                                     if (location.pathname !== '/faculty-list' && onMobile) {
@@ -531,8 +529,8 @@ function SideBar() {
                                                 to="/faculty-list"
                                                 className={({ isActive }) =>
                                                     isActive
-                                                                            ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
-                                                                            : "p-2 flex items-center space-x-2 py-2 rounded-md duration-100 focus:bg-[#4e90ca] hover:bg-[#3d7cb1]"
+                                                        ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
+                                                        : "p-2 flex items-center space-x-2 py-2 rounded-md duration-100 focus:bg-[#4e90ca] hover:bg-[#3d7cb1]"
                                                 }
                                                 onClick={() => {
                                                     if (location.pathname !== '/faculty-list' && onMobile) {
@@ -563,8 +561,8 @@ function SideBar() {
                                                 to="/classes"
                                                 className={({ isActive }) =>
                                                     isActive
-                                                                            ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
-                                                                            : "p-2 flex items-center space-x-2 py-2 rounded-md duration-100 focus:bg-[#4e90ca] hover:bg-[#3d7cb1]"
+                                                        ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
+                                                        : "p-2 flex items-center space-x-2 py-2 rounded-md duration-100 focus:bg-[#4e90ca] hover:bg-[#3d7cb1]"
                                                 }
                                                 onClick={() => {
                                                     if (location.pathname !== '/classes' && onMobile) {
@@ -620,8 +618,8 @@ function SideBar() {
                                                                         to={`enrollment/${course.hashed_course_id}`}
                                                                         className={({ isActive }) =>
                                                                             isActive
-                                                                            ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
-                                                                            : "p-2 flex items-center space-x-2 py-2 rounded-md duration-100 focus:bg-[#4e90ca] hover:bg-[#3d7cb1]"  // Added hover state
+                                                                                ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
+                                                                                : "p-2 flex items-center space-x-2 py-2 rounded-md duration-100 focus:bg-[#4e90ca] hover:bg-[#3d7cb1]"  // Added hover state
                                                                         }
                                                                     >
                                                                         <i className="fas fa-calendar-alt text-white"></i>
@@ -652,8 +650,8 @@ function SideBar() {
                                                 to="/classes"
                                                 className={({ isActive }) =>
                                                     isActive
-                                                                            ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
-                                                                            : "p-2 flex items-center space-x-2 py-2 rounded-md duration-100 focus:bg-[#4e90ca] hover:bg-[#3d7cb1]"
+                                                        ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
+                                                        : "p-2 flex items-center space-x-2 py-2 rounded-md duration-100 focus:bg-[#4e90ca] hover:bg-[#3d7cb1]"
                                                 }
                                                 onClick={() => {
                                                     if (location.pathname !== '/classes' && onMobile) {
@@ -689,8 +687,8 @@ function SideBar() {
                                                 to="/classes"
                                                 className={({ isActive }) =>
                                                     isActive
-                                                                            ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
-                                                                            : "p-2 flex items-center space-x-2 py-2 rounded-md duration-100 focus:bg-[#4e90ca] hover:bg-[#3d7cb1]"
+                                                        ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
+                                                        : "p-2 flex items-center space-x-2 py-2 rounded-md duration-100 focus:bg-[#4e90ca] hover:bg-[#3d7cb1]"
                                                 }
                                                 onClick={() => {
                                                     if (location.pathname !== '/classes' && onMobile) {
@@ -726,8 +724,8 @@ function SideBar() {
                                                 to="/classes"
                                                 className={({ isActive }) =>
                                                     isActive
-                                                                            ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
-                                                                            : "p-2 flex items-center space-x-2 py-2 rounded-md duration-100 focus:bg-[#4e90ca] hover:bg-[#3d7cb1]"
+                                                        ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
+                                                        : "p-2 flex items-center space-x-2 py-2 rounded-md duration-100 focus:bg-[#4e90ca] hover:bg-[#3d7cb1]"
                                                 }
                                                 onClick={() => {
                                                     if (location.pathname !== '/classes' && onMobile) {
@@ -758,8 +756,8 @@ function SideBar() {
                                                 to="/enrollment-record"
                                                 className={({ isActive }) =>
                                                     isActive
-                                                                            ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
-                                                                            : "p-2 flex items-center space-x-2 py-2 rounded-md duration-100 focus:bg-[#4e90ca] hover:bg-[#3d7cb1]"
+                                                        ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
+                                                        : "p-2 flex items-center space-x-2 py-2 rounded-md duration-100 focus:bg-[#4e90ca] hover:bg-[#3d7cb1]"
                                                 }
                                                 onClick={() => {
                                                     if (location.pathname !== '/enrollment-record' && onMobile) {
@@ -776,8 +774,8 @@ function SideBar() {
                                                             </>
                                                         ) : (
                                                             <div className="w-full flex flex-col items-center">
-                                                                    {isActive ? <HiClipboardList /> : <HiOutlineClipboardList />}
-                                                                    <span className="text-[8px] text-center">Enrollment Record</span>
+                                                                {isActive ? <HiClipboardList /> : <HiOutlineClipboardList />}
+                                                                <span className="text-[8px] text-center">Enrollment Record</span>
                                                             </div>
                                                         )
                                                         }

@@ -3,6 +3,7 @@ import axiosInstance from "../../../axios/axiosInstance";
 import { PiSpinnerBold } from "react-icons/pi";
 import CorGenerator from "./CorGenerator";
 import ScheduleGenerator from "./ScheduleGenerator";
+import PreLoader from "../../components/preloader/PreLoader";
 
 function EnrollmentRecord() {
     const [classes, setClasses] = useState([]);
@@ -30,26 +31,21 @@ function EnrollmentRecord() {
 
     const [selected, setSelected] = useState('COR');
 
-    if (fetching) {
-        return (
-            <div className="flex justify-center items-center h-full text-blue-600">
-                <PiSpinnerBold className="animate-spin text-4xl" size={45} />
-            </div>
-        );
-    }
+    if (fetching) return <PreLoader />
 
     return (
         <div className="w-full flex flex-col justify-center items-center space-y-4">
             <div className="bg-white p-4 rounded-lg shadow-light overflow-hidden text-center flex justify-center items-center w-full">
-                <h1 className="text-4xl font-bold text-blue-600">
-                    Enrollment Record
+                <h1 className="text-4xl font-bold text-blue-600 flex flex-col sm:flex-row gap-2">
+                    <span>Enrollment</span>
+                    <span>Record</span>
                 </h1>
             </div>
-            <div className="flex items-center space-x-1 p-1 bg-gray-300 w-max rounded-lg text-black">
+            <div className="flex items-center space-x-1 p-1 bg-gray-300 w-full sm:w-96 rounded-lg text-black">
                 {/* Button for COR */}
                 <button
                     onClick={() => setSelected('COR')}
-                    className={`w-36 px-4 py-2 rounded-lg ${selected === 'COR' ? 'bg-white text-blue-500' : ''
+                    className={`w-1/2 px-4 py-2 rounded-lg ${selected === 'COR' ? 'bg-white text-blue-500' : ''
                         } transition-colors duration-300 `}
                 >
                     COR
@@ -58,7 +54,7 @@ function EnrollmentRecord() {
                 {/* Button for Schedule */}
                 <button
                     onClick={() => setSelected('Schedule')}
-                    className={`w-36 px-4 py-2 rounded-lg ${selected === 'Schedule' ? 'bg-white text-blue-500' : ''
+                    className={`w-1/2 px-4 py-2 rounded-lg ${selected === 'Schedule' ? 'bg-white text-blue-500' : ''
                         } transition-colors duration-300 `}
                 >
                     Schedule
@@ -66,9 +62,9 @@ function EnrollmentRecord() {
             </div>
             {data ?
                 (
-                    <div className="w-96 md:w-min rounded-lg overflow-x-scroll">
+                    <div className="w-80 md:w-min rounded-lg overflow-x-scroll">
                         {classes.map((classes, index) => (
-                            <>
+                            <div key={index}>
                                 {selected == 'COR' ? (
                                     <div className='w-max bg-white rounded-lg'>
                                         <div id="COR" className="p-6">
@@ -79,7 +75,7 @@ function EnrollmentRecord() {
                                     <ScheduleGenerator data={classes} />
                                 )
                                 }
-                            </>
+                            </div>
                         ))
                         }
                     </div>

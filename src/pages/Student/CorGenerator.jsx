@@ -1,10 +1,9 @@
-
 import OCC_LOGO from '../../images/OCC_LOGO.png';
 import { convertToAMPM, formatDate, formatFullName } from '../../utilities/utils';
 function CorGenerator({ data }) {
     return (
-        <div className="space-y-4 p-5 flex justify-center bg-white w-min rounded-lg">
-            <div className="p-5 border border-gray-600 w-[800px] space-y-4">
+        <div className="space-y-4 p-5 flex justify-center bg-white rounded-lg">
+            <div className="p-5 border border-gray-600 w-full space-y-4">
                 <div className="flex items-center justify-center space-x-4">
                     <div className="text-center flex flex-col relative">
                         <img src={OCC_LOGO} alt="Logo" className="h-full absolute -left-40" />

@@ -6,6 +6,9 @@ export default {
     ],
     theme: {
         extend: {
+            boxShadow: {
+                'inner-custom': 'inset 4px 4px 30px rgba(0, 0, 0, 0.2)',
+            },
             colors: {
                 primaryColor: '#0070FF',
                 secondaryColor: '#3498DB',
