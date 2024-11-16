@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import axiosInstance from "../../../axios/axiosInstance";
 import html2canvas from "html2canvas";
 import CorGenerator from "./CorGenerator";
@@ -13,7 +13,6 @@ function StudentClasses() {
     const [schoolYear, setSchoolYear] = useState(null);
     const [enrolled, setEnrolled] = useState(false);
     const [fetching, setFetching] = useState(true);
-    const componentRef = useRef(null);
 
     const [selected, setSelected] = useState('COR');
 
@@ -27,7 +26,11 @@ function StudentClasses() {
             } else if (response.data.message === 'not enrolled') {
                 setSchoolYear(response.data.schoolYear);
                 setEnrolled(false);
+            } else if (response.data.message === 'no current school year') {
+                setSchoolYear(response.data.schoolYear);
+                setEnrolled(false);
             }
+            console.log(response.data)
         } catch (error) {
             console.error('Error fetching student classes:', error);
         } finally {
@@ -78,39 +81,12 @@ function StudentClasses() {
     };
 
 
-    const [dragging, setDragging] = useState(false);
-    const [offset, setOffset] = useState({ x: 0 });
-    const [position, setPosition] = useState({ x: 0 });
-
-    const handleMouseDown = (e) => {
-        setDragging(true);
-        setOffset({ x: e.clientX - position.x });
-    };
-
-    // Handle dragging
-    const handleMouseMove = (e) => {
-        if (!dragging) return;
-        setPosition({ x: e.clientX - offset.x });
-    };
-
-    // Stop dragging
-    const handleMouseUp = () => {
-        setDragging(false);
-    };
-
-    // Apply the drag styles
-    const draggableStyle = {
-        position: 'relative',
-        left: position.x,
-        cursor: dragging ? 'grabbing' : 'grab',
-    };
-
     if (fetching) return <PreLoader />
 
-    if (!enrolled && !schoolYear) {
+    if (!schoolYear) {
         return (
             <div className="text-center text-red-600">
-                <h2>You are not enrolled in any classes for the current semester.</h2>
+                <h2>Current school year not set.</h2>
             </div>
         );
     }
@@ -124,53 +100,53 @@ function StudentClasses() {
                     </h1>
                 </div>
 
-                <div className="flex items-center space-x-1 p-1 bg-gray-300 w-full sm:w-96 rounded-lg text-black">
-                    {/* Button for COR */}
-                    <button
-                        onClick={() => setSelected('COR')}
-                        className={`w-1/2 px-4 py-2 rounded-lg ${selected === 'COR' ? 'bg-white text-blue-500' : ''
-                            } transition-colors duration-300 `}
-                    >
-                        COR
-                    </button>
-
-                    {/* Button for Schedule */}
-                    <button
-                        onClick={() => setSelected('Schedule')}
-                        className={`w-1/2 px-4 py-2 rounded-lg ${selected === 'Schedule' ? 'bg-white text-blue-500' : ''
-                            } transition-colors duration-300 `}
-                    >
-                        Schedule
-                    </button>
-                </div>
                 {enrolled ?
                     (
-                        <div className="relative">
-                            <button
-                                onClick={captureComponent}
-                                className="flex gap-2 items-center cursor-pointer duration-100 text-blue-500 w-max h-10 py-2 px-4 shadow-gray-400 shadow-md absolute top-0 right-0 bg-white rounded-tr-lg active:transform active:translate-x-[-4px] active:translate-y-[4px]">
-                                Download
-                                <FaDownload size={30} />
-                            </button>
+                        <>
+                            <div className="flex items-center space-x-1 p-1 bg-gray-300 w-full sm:w-96 rounded-lg text-black">
+                                {/* Button for COR */}
+                                <button
+                                    onClick={() => setSelected('COR')}
+                                    className={`w-1/2 px-4 py-2 rounded-lg ${selected === 'COR' ? 'bg-white text-blue-500' : ''
+                                        } transition-colors duration-300 `}
+                                >
+                                    COR
+                                </button>
 
-                            <div className="w-80 md:w-min rounded-lg overflow-x-auto bg-white shadow-inner p-4 flex">
-                                {selected == 'COR' ? (
-                                    <div className='w-max bg-white rounded-lg shadow-lg'>
-                                        <div id="COR">
-                                            <CorGenerator data={classes} />
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div id="Schedule">
-                                        <ScheduleGenerator data={classes} />
-                                    </div>
-                                )}
+                                {/* Button for Schedule */}
+                                <button
+                                    onClick={() => setSelected('Schedule')}
+                                    className={`w-1/2 px-4 py-2 rounded-lg ${selected === 'Schedule' ? 'bg-white text-blue-500' : ''
+                                        } transition-colors duration-300 `}
+                                >
+                                    Schedule
+                                </button>
                             </div>
-                        </div>
+                            <div className="relative">
+                                <button
+                                    onClick={captureComponent}
+                                    className="flex gap-2 items-center cursor-pointer duration-75 text-blue-500 w-max h-10 py-2 px-4 shadow-gray-400 shadow-md absolute top-0 right-0 bg-white rounded-tr-lg active:transform active:translate-x-[-4px] active:translate-y-[4px]">
+                                    Download
+                                    <FaDownload size={30} />
+                                </button>
 
-                    ) : (
-                        <div className='bg-white p-4 rounded-lg shadow-light overflow-hidden'>
-                            <h1 className="text-2xl font-bold"> No data</h1>
+                                <div className="w-80 h-[60vh] md:h-auto md:w-min bg-grid-pattern rounded-lg overflow-x-auto bg-white shadow-inner p-4 flex">
+                                    <div className='w-max bg-white rounded-lg shadow-lg h-max'>
+                                        {selected === 'COR' ? (
+                                            <div id="COR">
+                                                <CorGenerator data={classes} />
+                                            </div>
+                                        ) : (
+                                            <div id="Schedule">
+                                                <ScheduleGenerator data={classes} />
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </>) : (
+                        <div className="text-center text-red-600">
+                            <h2>You are not enrolled in any classes for the current semester.</h2>
                         </div>
                     )
                 }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import axiosInstance from '../../../axios/axiosInstance';
-import { checkPasswordComplexity } from '../../utilities/utils';
+import { checkPasswordComplexity, copyText } from '../../utilities/utils';
 import { PiSpinnerBold } from 'react-icons/pi';
 import { FaCheck, FaExclamation, FaRegCopy } from 'react-icons/fa6';
 import PreLoader from '../../components/preloader/PreLoader';
@@ -106,11 +106,14 @@ function FacultyDetails() {
     };
 
     const handleCopy = () => {
-        navigator.clipboard.writeText(facultyDetails.user_id_no);
-        setCopied(true);
-
-        // Reset after 3 seconds
-        setTimeout(() => setCopied(false), 3000);
+        copyText(facultyDetails.user_id_no).then((success) => {
+            if (success) {
+                setCopied(true);
+                setTimeout(() => setCopied(false), 3000);
+            } else {
+                console.error('Failed to copy text.');
+            }
+        });
     };
 
     return (

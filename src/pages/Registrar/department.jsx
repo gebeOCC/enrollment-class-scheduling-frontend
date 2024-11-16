@@ -71,7 +71,6 @@ function Department() {
         axiosInstance.get(`get-departments-courses/`)
             .then(response => {
                 setDepartmentsCourses(response.data);
-                console.log(response.data);
             })
             .finally(() => {
                 setFetching(false);
@@ -141,7 +140,6 @@ function Department() {
             await axiosInstance.get(`get-department-faculties/${facultyAssign.department_id}`)
                 .then(response => {
                     setDeptFaculties(response.data)
-                    console.log(response.data)
                 });
         }
         if (facultyAssign.department_id) {

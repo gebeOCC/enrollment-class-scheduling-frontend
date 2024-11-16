@@ -23,8 +23,8 @@ function ScheduleGenerator({ data }) {
                     <span className="text-gray-600 font-normal">
                         {data.year_section.school_year.semester.semester_name} Semester
                     </span>
-                    <div className="flex items-center justify-center text-sm text-gray-500">
-                        <span className="mr-3 font-semibold">|</span>
+                    <div className="flex items-center space-x-2 justify-center text-sm text-gray-500">
+                        <span className="font-semibold">|</span>
                         <span>
                             {data?.year_section?.course?.course_name_abbreviation} - {data?.year_section?.year_level?.year_level}
                             {data?.year_section?.section}

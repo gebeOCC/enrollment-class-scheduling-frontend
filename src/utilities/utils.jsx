@@ -161,3 +161,33 @@ export function checkPasswordComplexity(password) {
         },
     };
 }
+
+export function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        return navigator.clipboard.writeText(text)
+            .then(() => true) // Resolved if successful
+            .catch((err) => {
+                console.error('Clipboard write failed:', err);
+                return false;
+            });
+    } else {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed'; // Avoid scrolling
+        textArea.style.left = '-9999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+
+        try {
+            document.execCommand('copy');
+            return Promise.resolve(true); // Resolved if successful
+        } catch (err) {
+            console.error('Fallback copy failed:', err);
+            return Promise.resolve(false);
+        } finally {
+            document.body.removeChild(textArea);
+        }
+    }
+}

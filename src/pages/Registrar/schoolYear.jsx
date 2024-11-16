@@ -149,7 +149,7 @@ function SchoolYear() {
                     placeholder="Search School Year (e.g., 2021-2022)"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="p-2 border border-gray-300 rounded-lg w-full sm:w-1/3 mb-4 sm:mb-0 focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out "
+                    className="p-2 border border-gray-300 rounded-lg w-full sm:w-72 mb-4 sm:mb-0 focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out "
                 />
 
                 {/* Add School Year Button */}

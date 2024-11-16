@@ -6,8 +6,14 @@ export default {
     ],
     theme: {
         extend: {
-            boxShadow: {
-                'inner-custom': 'inset 4px 4px 30px rgba(0, 0, 0, 0.2)',
+            backgroundImage: {
+                'grid-pattern': `
+                    linear-gradient(to right, rgba(0, 0, 0, 0.1) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(0, 0, 0, 0.1) 1px, transparent 1px)
+                `,
+            },
+            backgroundSize: {
+                'grid-pattern': '20px 20px',
             },
             colors: {
                 primaryColor: '#0070FF',

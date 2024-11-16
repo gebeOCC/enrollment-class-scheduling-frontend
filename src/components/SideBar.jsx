@@ -7,14 +7,15 @@ import { formatDate, formatDateShort } from "../utilities/utils";
 import { HiBars3 } from "react-icons/hi2";
 import { MdDashboard, MdMeetingRoom, MdOutlineDashboard, MdOutlineMeetingRoom } from "react-icons/md";
 import { IoBook, IoBookOutline, IoCalendarOutline, IoCalendarSharp } from "react-icons/io5";
-import { PiBuildingFill, PiBuildingLight, PiChalkboardTeacher, PiChalkboardTeacherFill, PiStudent, PiStudentFill } from "react-icons/pi";
+import { PiChalkboardTeacher, PiChalkboardTeacherFill, PiStudent, PiStudentFill } from "react-icons/pi";
 import { GoPerson, GoPersonFill } from "react-icons/go";
 import { BsBuildings, BsBuildingsFill } from "react-icons/bs";
 import { HiClipboardList, HiOutlineClipboardList } from "react-icons/hi";
 
 function SideBar() {
-    const { userRole, fetching, enrollmentOngoing, preparation, courses, enrollmentData } = useAuth();
+    const { userRole, enrollmentOngoing, preparation, courses, enrollmentData } = useAuth();
     const [sidebarOpen, setSidebarOpen] = useState(true);
+    const [getScreen, setGetScreen] = useState(true);
     const location = useLocation();
 
     const toggleSidebar = () => {
@@ -38,12 +39,11 @@ function SideBar() {
 
         window.addEventListener('resize', handleResize);
 
+        setGetScreen(false);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    if (fetching) {
-        return <div>Loading...</div>;
-    }
+    if(getScreen) return <></>
 
     return (
         <div className="flex h-screen overflow-hidden">

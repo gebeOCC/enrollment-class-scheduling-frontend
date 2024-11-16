@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import axiosInstance from "../../../axios/axiosInstance";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
-import { capitalizeFirstLetter, convertToAMPM, formatDate, formatFullName, getFirstLetter } from "../../utilities/utils";
 import { useReactToPrint } from "react-to-print";
 import PreLoader from "../../components/preloader/PreLoader";
 import CorGenerator from "../Student/CorGenerator";
@@ -9,22 +8,13 @@ import CorGenerator from "../Student/CorGenerator";
 function StudentCor() {
     const { courseid, yearlevel, section } = useParams();
     const location = useLocation();
-    const navigate = useNavigate();
     const searchParams = new URLSearchParams(location.search);
-    const [courseName, setCourseName] = useState([]);
     const [studentInfo, setStudentInfo] = useState([]);
     const studentId = searchParams.get('student-id');
     const [fetching, setFetching] = useState(true);
     const componentRef = useRef(null);
 
     useEffect(() => {
-        const getCourseName = async () => {
-            await axiosInstance.get(`get-course-name/${courseid}`)
-                .then(response => {
-                    setCourseName(response.data);
-                });
-        };
-
         const getStudentEnrollmentInfo = async () => {
             const yearLevelNumber =
                 yearlevel === 'First-Year' ? '1' :
@@ -35,7 +25,6 @@ function StudentCor() {
             await axiosInstance.get(`get-student-enrollment-info/${courseid}/${yearLevelNumber}/${section}/${studentId}`)
                 .then(response => {
                     if (response.data.message === 'success') {
-                        console.log(response.data);
                         setStudentInfo(response.data.studentinfo);
                     }
                 })
@@ -44,7 +33,6 @@ function StudentCor() {
                 });
         };
 
-        getCourseName();
         getStudentEnrollmentInfo();
     }, [courseid, yearlevel, section]);
 
