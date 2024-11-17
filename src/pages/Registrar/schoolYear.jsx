@@ -4,7 +4,9 @@ import { Link } from "react-router-dom";
 import { formatDateShort } from "../../utilities/utils";
 import { ImSpinner5 } from "react-icons/im";
 import PreLoader from "../../components/preloader/PreLoader";
+import { AuthProvider } from "../../context/AuthContext";
 function SchoolYear() {
+    const { userRole } = AuthProvider;
     const [submitting, setSubmitting] = useState(false);
     const [enrollmentConflict, setEnrollmentConflict] = useState(false);
     const [semesters, setSemesters] = useState([]);
@@ -153,11 +155,13 @@ function SchoolYear() {
                 />
 
                 {/* Add School Year Button */}
-                <button
-                    onClick={() => { setIsSchoolYearModalOpen(true) }}
-                    className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
-                    Add School Year
-                </button>
+                {userRole == 'registrar' &&
+                    <button
+                        onClick={() => { setIsSchoolYearModalOpen(true) }}
+                        className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                        Add School Year
+                    </button>
+                }
             </div>
 
             {/* School Year List */}

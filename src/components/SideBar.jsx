@@ -43,7 +43,7 @@ function SideBar() {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    if(getScreen) return <></>
+    if (getScreen) return <></>
 
     return (
         <div className="flex h-screen overflow-hidden">
@@ -491,7 +491,38 @@ function SideBar() {
                                                 </div>
                                             </>
                                         }
-
+                                        <li>
+                                            <NavLink
+                                                to="/school-year"
+                                                className={({ isActive }) =>
+                                                    isActive
+                                                        ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
+                                                        : "p-2 flex items-center space-x-2 py-2 rounded-md duration-100 focus:bg-[#4e90ca] hover:bg-[#3d7cb1]"
+                                                }
+                                                onClick={() => {
+                                                    if (location.pathname !== '/school-year' && onMobile) {
+                                                        setSidebarOpen(false);
+                                                    }
+                                                }}
+                                            >
+                                                {({ isActive }) => (
+                                                    <>
+                                                        {sidebarOpen ? (
+                                                            <>
+                                                                {isActive ? <IoCalendarSharp /> : <IoCalendarOutline />}
+                                                                <span>School year</span>
+                                                            </>
+                                                        ) : (
+                                                            <div className="w-full flex flex-col items-center">
+                                                                {isActive ? <IoCalendarSharp /> : <IoCalendarOutline />}
+                                                                <span className="text-[8px]">School year</span>
+                                                            </div>
+                                                        )
+                                                        }
+                                                    </>
+                                                )}
+                                            </NavLink>
+                                        </li>
                                         <li>
                                             <NavLink
                                                 to="/courses"

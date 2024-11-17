@@ -23,7 +23,7 @@ function SchoolYearDetails() {
     useEffect(() => {
         getSChoolYearDetails();
     }, [])
-
+    
     if (fetching) {
         return <PreLoader />;
     }

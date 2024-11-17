@@ -5,7 +5,7 @@ import CorGenerator from "./CorGenerator";
 import ScheduleGenerator from "./ScheduleGenerator";
 import PreLoader from "../../components/preloader/PreLoader";
 import { FaDownload } from "react-icons/fa";
-import { formatFullName, formatFullNameFML } from "../../utilities/utils";
+import { formatFullName } from "../../utilities/utils";
 import html2pdf from 'html2pdf.js';
 
 function StudentClasses() {
