@@ -44,11 +44,11 @@ function LoginPage() {
 
     return (
         <div className="h-screen w-screen  min-h-screen flex flex-col items-center justify-center bg-gray-50 px-5">
-            <section class="container">
-                <div class="login-container">
-                    <div class="form-container bg-white">
-                        <h1 class="opacity mb-6 text-4xl font-semibold">LOGIN</h1>
-                        <img src={OCC_LOGO} alt="illustration" class="illustration" />
+            <section className="container">
+                <div className="login-container">
+                    <div className="form-container bg-white">
+                        <h1 className="opacity mb-6 text-4xl font-semibold">LOGIN</h1>
+                        <img src={OCC_LOGO} alt="illustration" className="illustration" />
                         <form onSubmit={handleLogin} className="space-y-6">
                             <div className="space-y-6">
                                 <input
@@ -95,12 +95,12 @@ function LoginPage() {
                                 {submitting ? 'Logging in...' : 'Login'}
                             </button>
                         </form>
-                        <div class="register-forget opacity text-black">
+                        <div className="register-forget opacity text-black">
                             <a className="text-black cursor-pointer" onClick={() => handleForgotPassword()}>FORGOT PASSWORD</a>
                         </div>
                     </div>
                 </div>
-                <div class="theme-btn-container"></div>
+                <div className="theme-btn-container"></div>
             </section>
         </div>
     );
