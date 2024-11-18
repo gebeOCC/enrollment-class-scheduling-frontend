@@ -4,9 +4,9 @@ import { Link } from "react-router-dom";
 import { formatDateShort } from "../../utilities/utils";
 import { ImSpinner5 } from "react-icons/im";
 import PreLoader from "../../components/preloader/PreLoader";
-import { AuthProvider } from "../../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 function SchoolYear() {
-    const { userRole } = AuthProvider;
+    const { userRole } = useAuth();
     const [submitting, setSubmitting] = useState(false);
     const [enrollmentConflict, setEnrollmentConflict] = useState(false);
     const [semesters, setSemesters] = useState([]);
@@ -141,7 +141,6 @@ function SchoolYear() {
 
     return (
         <>
-
             <h2 className="text-2xl font-bold text-center mb-4">School Year List</h2>
 
             {/* Search Bar */}

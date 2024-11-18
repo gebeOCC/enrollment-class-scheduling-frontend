@@ -9,6 +9,7 @@ export const AuthProvider = ({ children }) => {
     const [userRole, setUserRole] = useState('');
     const [enrollmentOngoing, setEnrollmentOngoing] = useState(false);
     const [preparation, setPreparation] = useState(false);
+    const [load, setLoad] = useState(true);
     const [courses, setCourses] = useState([]);
     const [enrollmentData, setEnrollmentData] = useState([]);
     const [firstName, setFirstName] = useState('');
@@ -35,10 +36,12 @@ export const AuthProvider = ({ children }) => {
                     setFetching(false);
                 });
         }
+
         fetchUserRole();
+        setTimeout(() => setLoad(false), 500);
     }, []);
 
-    if (fetching) return <WebsiteLoading />
+    if (fetching || load) return <WebsiteLoading />
     
     return (
         <AuthContext.Provider value={{ userRole, fetching, enrollmentOngoing, preparation, courses, enrollmentData, firstName }}>

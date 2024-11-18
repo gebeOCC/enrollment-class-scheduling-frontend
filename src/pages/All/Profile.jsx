@@ -71,7 +71,7 @@ function Profile() {
 
     return (
         <div className="space-y-4">
-            <div className="w-full bg-white rounded-lg shadow-lg p-6">
+            <div className="w-full bg-white rounded-lg shadow-light p-6">
                 {/* User Info */}
                 <div className="text-center mb-6">
                     <h2 className="text-3xl font-semibold">{first_name} {last_name}</h2>
@@ -99,7 +99,7 @@ function Profile() {
             </div>
 
             {/* Change Password Form */}
-            <div className="max-w-4xl w-full bg-white rounded-lg shadow-lg p-6">
+            <div className="max-w-4xl w-full sm:w-1/2 bg-white rounded-lg shadow-light p-6">
                 <div className="mt-6">
                     <h3 className="text-xl font-semibold mb-4">Change Password</h3>
 

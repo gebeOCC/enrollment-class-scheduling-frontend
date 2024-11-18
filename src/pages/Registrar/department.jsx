@@ -198,7 +198,7 @@ function Department() {
 
     return (
         <>
-            <div className="container space-y-4">
+            <div className="space-y-4">
                 {departmentsCourses.length > 0 ? (
                     departmentsCourses.map((department, index) => (
                         <div
