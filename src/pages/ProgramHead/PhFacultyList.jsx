@@ -1,20 +1,24 @@
 import { useEffect, useState } from "react"
 import axiosInstance from "../../../axios/axiosInstance"
 import { capitalizeFirstLetter, formatFullName, getFirstLetter } from "../../utilities/utils"
+import PreLoader from "../../components/preloader/PreLoader";
 
 function PhFacultyList() {
-
     const [searchBar, setSearchBar] = useState('');
     const [faculties, setFaculties] = useState([]);
     const [editFaculty, setEditFaculty] = useState([]);
     const [activeModal, setActiveModal] = useState(false);
     const [evaluatorModal, setEvaluatorModal] = useState(false);
     const [submitting, setSubmitting] = useState(false);
+    const [fetching, setFetching] = useState(true);
 
     const getFacultyList = () => {
         axiosInstance.get(`ph-get-faculty-list`)
             .then(response => {
                 setFaculties(response.data)
+            })
+            .finally(() => {
+                setFetching(false);
             })
     }
 
@@ -99,6 +103,8 @@ function PhFacultyList() {
         }
     }
 
+    if (fetching) return <PreLoader />
+
     return (
         <>
             <div className="p-6 bg-white shadow-md rounded-lg">
@@ -110,7 +116,7 @@ function PhFacultyList() {
                             onChange={(e) => { setSearchBar(e.target.value) }}
                             type="text"
                             placeholder="Search faculty..."
-                            className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 mb-2 md:mb-0 w-72"
+                            className="px-4 py-2 rounded-md mb-2 md:mb-0 w-full sm:w-72 border focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out"
                         />
                     </div>
                 </div>

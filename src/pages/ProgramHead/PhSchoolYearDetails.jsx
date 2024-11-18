@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import axiosInstance from "../../../axios/axiosInstance"
 import { useParams } from "react-router-dom";
 import PreLoader from "../../components/preloader/PreLoader";
+import { Bar } from "react-chartjs-2";
 
 function PhSchoolYearDetails() {
     const { schoolYear } = useParams();
@@ -10,14 +11,17 @@ function PhSchoolYearDetails() {
     const [schoolYeardetails, setSchoolYearDetails] = useState([]);
     const [fetching, setfetching] = useState(true);
     const [selectedCourse, setSelectedCourse] = useState(0);
+    const [enrolles, setEnrolles] = useState([]);
 
     useEffect(() => {
         const schoolYearDetails = async () => {
             await axiosInstance.get(`get-school-year-details/${schoolYear}/${semester}`)
                 .then(response => {
-                    console.log(response.data);
+                    // console.log(response.data);
                     setReports(response.data.coursesReports);
                     setSchoolYearDetails(response.data.schoolYearDetails);
+                    setEnrolles(response.data.coursesReports.department.course);
+                    // console.table(response.data.coursesReports.department.course);
                 })
                 .finally(() => {
                     setfetching(false);
@@ -25,6 +29,67 @@ function PhSchoolYearDetails() {
         }
         schoolYearDetails()
     }, [])
+
+    const yearSection = selectedCourse === 0
+        ? enrolles
+            .flatMap(enrollee => enrollee.year_section)  // Flatten all year_section objects
+            .reduce((acc, current) => {
+                // Find if there is already an entry for the same date_enrolled in the accumulator
+                const existing = acc.find(item => item.date_enrolled === current.date_enrolled);
+
+                if (existing) {
+                    // If found, combine total_students (sum them up) for the same date_enrolled
+                    existing.total_students += current.total_students;
+                } else {
+                    // Otherwise, add the new entry to the accumulator
+                    acc.push({ ...current });
+                }
+
+                return acc;
+            }, [])  // Initialize accumulator as an empty array
+        : enrolles.find(enrollee => enrollee.id === selectedCourse)?.year_section || [];
+
+    const labels = yearSection.map((enroll) => enroll.date_enrolled);
+
+    const colors = yearSection.map(() =>
+        `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.6)`
+    );
+
+    const data = {
+        labels,
+        datasets: [
+            {
+                label: "Total Students",
+                data: yearSection.map((enroll) => enroll.total_students),
+                backgroundColor: colors,
+            },
+        ],
+    };
+
+
+    const options = {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: "top",
+            },
+            title: {
+                display: true,
+                text: "Enrollment Over Time",
+            },
+            datalabels: {
+                anchor: "center",  // Place the label in the center of the bar
+                align: "center",   // Align the text within the center
+                formatter: (value) => value, // Display the actual value
+                color: "#fff",     // White color for the text to stand out
+                font: {
+                    weight: "bold",
+                    size: 14,   // Adjust size for readability
+                },
+            },
+        },
+    };
+
     if (fetching) return <PreLoader />
 
     return (
@@ -49,9 +114,8 @@ function PhSchoolYearDetails() {
                 </div>
             </div>
 
-            <div className="p-4 bg-white rounded-lg shadow-lg w-full flex gap-4 sm:flex-col items-center justify-center sm:w-min sm:space-y-4">
+            <div className="p-4 bg-white rounded-lg shadow-lg w-full flex gap-4 sm:gap-0 sm:flex-col items-center sm:items-start justify-center sm:w-min sm:space-y-4">
                 <h1 className="text-2xl font-bold text-gray-800 flex items-center">Course:</h1>
-
                 {/* Select dropdown for mobile screens */}
                 <select
                     value={selectedCourse}
@@ -91,12 +155,10 @@ function PhSchoolYearDetails() {
                 </div>
             </div>
 
-
-
             {/* Reports */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
                 {/* Total Enrolled Students */}
-                <div className="bg-gradient-to-r from-teal-500 to-blue-500 p-6 rounded-lg shadow-xl text-white shadow-light">
+                <div className="bg-gradient-to-r from-teal-500 to-blue-500 p-6 rounded-lg text-white shadow-light">
                     <h2 className="text-2xl font-semibold mb-4">Total Enrolled</h2>
                     <div className="flex justify-between items-center">
                         <span className="text-3xl font-bold">
@@ -108,7 +170,7 @@ function PhSchoolYearDetails() {
                 </div>
 
                 {/* Student Types */}
-                <div className="bg-blue-500 p-6 rounded-lg shadow-md text-white shadow-light">
+                <div className="bg-blue-500 p-6 rounded-lg text-white shadow-light">
                     <h2 className="text-2xl font-bold mb-4">Student Types</h2>
                     <table className="w-full table-auto">
                         <thead>
@@ -165,6 +227,7 @@ function PhSchoolYearDetails() {
                         </tbody>
                     </table>
                 </div>
+
                 <div className="space-y-4 shadow-light">
                     <div className="bg-white p-4 rounded-lg shadow-lg">
                         <h2 className="text-2xl font-bold text-gray-800 mb-4"> Gender Statistics</h2>
@@ -246,6 +309,9 @@ function PhSchoolYearDetails() {
                         </div>
                     </div>
                 </div>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow-light col-span-3 row-span-3">
+                <Bar data={data} options={options} />
             </div>
         </div >
     )

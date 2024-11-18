@@ -626,39 +626,71 @@ function SideBar() {
                                     <>
                                         {(enrollmentOngoing || preparation) &&
                                             <>
-                                                <div className="px-2">
-                                                    <div className="py-4 rounded-lg bg-cyan-700 shadow-md">
-                                                        {/* Enrollment Status */}
-                                                        <p className="px-4 text-sm font-bold text-white">
-                                                            ENROLLMENT{' '}
-                                                            <span className="text-gray-200 font-thin">
-                                                                {(!enrollmentOngoing && preparation) ? 'preparation' : 'started'}
-                                                            </span>
-                                                        </p>
+                                                <div>
+                                                    <div className={`${sidebarOpen ? 'p-2' : 'p-1'} rounded-lg bg-cyan-700 shadow-md mb-1`}>
+                                                        {sidebarOpen ? (
+                                                            <div>
+                                                                {/* Enrollment Status */}
+                                                                <p className="w-full text-sm font-bold text-white">
+                                                                    ENROLLMENT{' '}
+                                                                    <span className="text-gray-200 font-thin">
+                                                                        {(!enrollmentOngoing && preparation) ? 'preparation' : 'started'}
+                                                                    </span>
+                                                                </p>
 
-                                                        {/* Enrollment Date Range */}
-                                                        <p className="px-4 text-xs italic text-gray-300 mb-3">
-                                                            {formatDate(enrollmentData.start_date)} - {formatDate(enrollmentData.end_date)}
-                                                        </p>
+                                                                {/* Enrollment Date Range */}
+                                                                <p className="w-full text-xs italic text-gray-300">
+                                                                    {`${formatDateShort(enrollmentData.start_date)} - ${formatDateShort(enrollmentData.end_date)}`}
+                                                                </p>
+                                                            </div>
+                                                        ) : (
+                                                            <div>
+                                                                {/* Enrollment Status */}
+                                                                <p className="w-full font-bold text-white text-[8px]">
+                                                                    ENROLLMENT
+                                                                </p>
+                                                            </div>
+                                                        )
+
+                                                        }
 
                                                         {/* Course List */}
-                                                        <div className="space-y-1">
+                                                        <div>
                                                             {courses.map((course, index) => (
-                                                                <li key={index} className="px-4">
+                                                                <li key={index} className="w-full">
                                                                     <NavLink
                                                                         to={`enrollment/${course.hashed_course_id}`}
                                                                         className={({ isActive }) =>
                                                                             isActive
                                                                                 ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
-                                                                                : "p-2 flex items-center space-x-2 py-2 rounded-md duration-100 focus:bg-[#4e90ca] hover:bg-[#3d7cb1]"  // Added hover state
+                                                                                : "p-2 flex items-center rounded-md  space-x-2 py-2 duration-100 focus:bg-[#4e90ca]  hover:bg-[#3d7cb1]"  // Added hover state
                                                                         }
+                                                                        onClick={() => {
+                                                                            if (location.pathname !== `/enrollment/${course.hashed_course_id}` && onMobile) {
+                                                                                setSidebarOpen(false);
+                                                                            }
+                                                                        }}
                                                                     >
-                                                                        <i className="fas fa-calendar-alt text-white"></i>
-                                                                        <span className="text-white">{course.course_name_abbreviation}</span>
+                                                                        {({ isActive }) => (
+                                                                            <>
+                                                                                {sidebarOpen ? (
+                                                                                    <>
+                                                                                        {isActive ? <IoBook /> : <IoBookOutline />}
+                                                                                        <span>{course.course_name_abbreviation}</span>
+                                                                                    </>
+                                                                                ) : (
+                                                                                    <div className="w-full flex flex-col items-center">
+                                                                                        {isActive ? <IoBook /> : <IoBookOutline />}
+                                                                                        <span className="text-[8px]">{course.course_name_abbreviation}</span>
+                                                                                    </div>
+                                                                                )
+                                                                                }
+                                                                            </>
+                                                                        )}
                                                                     </NavLink>
                                                                 </li>
                                                             ))}
-                                                            <li className="px-4">
+                                                            <li className="w-full">
                                                                 <NavLink
                                                                     to="dashboard"
                                                                     className={({ isActive }) =>
@@ -666,9 +698,28 @@ function SideBar() {
                                                                             ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
                                                                             : "p-2 flex items-center space-x-2 py-2 rounded-md duration-100 focus:bg-[#4e90ca] hover:bg-[#3d7cb1]"
                                                                     }
+                                                                    onClick={() => {
+                                                                        if (location.pathname !== '/dashboard' && onMobile) {
+                                                                            setSidebarOpen(false);
+                                                                        }
+                                                                    }}
                                                                 >
-                                                                    <i className="fas fa-calendar-alt"></i>
-                                                                    <span>Dashboard</span>
+                                                                    {({ isActive }) => (
+                                                                        <>
+                                                                            {sidebarOpen ? (
+                                                                                <>
+                                                                                    {isActive ? <MdDashboard /> : <MdOutlineDashboard />}
+                                                                                    <span>Dashboard</span>
+                                                                                </>
+                                                                            ) : (
+                                                                                <div className="w-full flex flex-col items-center">
+                                                                                    {isActive ? <MdDashboard /> : <MdOutlineDashboard />}
+                                                                                    <span className="text-[8px]">Dashboard</span>
+                                                                                </div>
+                                                                            )
+                                                                            }
+                                                                        </>
+                                                                    )}
                                                                 </NavLink>
                                                             </li>
                                                         </div>

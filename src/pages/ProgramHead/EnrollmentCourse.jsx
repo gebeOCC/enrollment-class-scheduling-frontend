@@ -5,7 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 import SkeletonEnrollmentCourse from "../../components/skeletons/SkeletonEnrollmentCourse";
 import { ImSpinner5 } from "react-icons/im";
 function EnrollmentCourse() {
-    const { userRole, enrollmentOngoing, preparation, } = useAuth();
+    const { userRole, enrollmentOngoing } = useAuth();
     const { courseid } = useParams();
     const [course, setCourse] = useState([]);
 
@@ -99,11 +99,9 @@ function EnrollmentCourse() {
     return (
         <>
             <div className="bg-white p-4 rounded-lg shadow overflow-hidden mb-6 text-center">
-                <>
-                    <h1 className=" md:text-4xl h-10 font-bold text-blue-600">
-                        {course.course_name}
-                    </h1>
-                </>
+                <h1 className="text-2xl md:text-4xl font-bold text-blue-600 flex justify-center items-center content-center">
+                    {course.course_name}
+                </h1>
             </div>
 
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
@@ -111,11 +109,13 @@ function EnrollmentCourse() {
                     <div key={index} className="bg-white p-6 rounded-lg shadow-light hover:shadow-xl transition-shadow duration-300 overflow-hidden">
                         <div className="mb-4 flex justify-between items-center">
                             <h2 className="text-2xl font-semibold text-gray-800">{yearLevel.year_level_name}</h2>
-                            <button
-                                onClick={() => { createNewSection(yearLevel.id) }}
-                                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-transform transform hover:scale-105">
-                                Add Section
-                            </button>
+                            {userRole != 'registrar' &&
+                                <button
+                                    onClick={() => { createNewSection(yearLevel.id) }}
+                                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-transform transform hover:scale-105">
+                                    Add Section
+                                </button>
+                            }
                         </div>
                         <table className="w-full border-collapse">
                             <thead>
@@ -133,7 +133,7 @@ function EnrollmentCourse() {
                                         <td className="p-2 space-x-2 flex items-center">
                                             {userRole === 'program_head' &&
                                                 <Link to={`class/${yearLevel.year_level_name.replace(/\s+/g, '-')}?section=${section.section}`}>
-                                                    <button className="text-white bg-indigo-500 px-2 py-1 rounded hover:bg-indigo-600 hover:shadow-md transition-50 active:bg-blue-600">
+                                                    <button className="hidden sm:flex text-white bg-indigo-500 px-2 py-1 rounded hover:bg-indigo-600 hover:shadow-md transition-50 active:bg-blue-600">
                                                         Class
                                                     </button>
                                                 </Link>
@@ -145,7 +145,7 @@ function EnrollmentCourse() {
                                             </Link>
                                             {enrollmentOngoing ? (
                                                 <Link to={`enroll-student/${yearLevel.year_level_name.replace(/\s+/g, '-')}?section=${section.section}`}>
-                                                    <button className="hidden sm:block items-center bg-purple-600 text-white px-2 py-1 rounded-lg transition-transform transform hover:scale-105 hover:shadow-md active:scale-95">
+                                                    <button className="hidden sm:flex items-center bg-purple-600 text-white px-2 py-1 rounded-lg transition-transform transform hover:scale-105 hover:shadow-md active:scale-95">
                                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
                                                             <path strokeLinecap="round" strokeLinejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
                                                         </svg>
@@ -153,7 +153,7 @@ function EnrollmentCourse() {
                                                     </button>
                                                 </Link>
                                             ) : (
-                                                <button className="hidden sm:block items-center bg-gray-400 text-white px-2 py-1 rounded-lg cursor-not-allowed">
+                                                <button className="hidden sm:flex items-center bg-gray-400 text-white px-2 py-1 rounded-lg cursor-not-allowed">
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
                                                         <path strokeLinecap="round" strokeLinejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
                                                     </svg>

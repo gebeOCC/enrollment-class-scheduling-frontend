@@ -1,18 +1,26 @@
 import { useEffect, useState } from "react";
 import axiosInstance from "../../../axios/axiosInstance";
 import { Link } from "react-router-dom";
+import PreLoader from "../../components/preloader/PreLoader";
 function Courses() {
     const [courses, setCourses] = useState([])
+    const [fetching, setFetching] = useState(true);
+
+    const getCourses = async () => {
+        await axiosInstance.get(`get-department-courses`)
+            .then(response => {
+                setCourses(response.data)
+            })
+            .finally(() => {
+                setFetching(false);
+            })
+    }
 
     useEffect(() => {
-        const getCourses = async () => {
-            await axiosInstance.get(`get-department-courses`)
-                .then(response => {
-                    setCourses(response.data)
-                })
-        }
         getCourses()
     }, [])
+
+    if (fetching) return <PreLoader />
 
     return (
         <>

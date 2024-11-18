@@ -91,7 +91,7 @@ function LoginPage() {
 
                             <button
                                 disabled={submitting}
-                                className="">
+                                className="login-button">
                                 {submitting ? 'Logging in...' : 'Login'}
                             </button>
                         </form>

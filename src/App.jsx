@@ -49,7 +49,7 @@ function App() {
             <Route path="/classes/:classId" element={<CLassStudents />} />
             {(enrollmentOngoing || preparation) &&
                 <>
-                    <Route path="/enrollment/:courseid" element={<RegistrarEnrollmentCourse />} />
+                <Route path="/enrollment/:courseid" element={<EnrollmentCourse />} />
                     <Route path="/enrollment/:courseid/enroll-student/:yearlevel" element={<EnrollStudent />} />
                     <Route path="/enrollment/:courseid/students/:yearlevel" element={<SectionsEnrolledStudents />} />
                     <Route path="/enrollment/:courseid/students/:yearlevel/:section/:studentid" element={<StudentCor />} />
