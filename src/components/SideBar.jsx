@@ -3,7 +3,7 @@ import OCC_LOGO from '../images/OCC_LOGO.png';
 import Header from "./Header";
 import { useAuth } from "../context/AuthContext";
 import { useEffect, useState } from "react";
-import { formatDate, formatDateShort } from "../utilities/utils";
+import { formatDateShort } from "../utilities/utils";
 import { HiBars3 } from "react-icons/hi2";
 import { MdDashboard, MdMeetingRoom, MdOutlineDashboard, MdOutlineMeetingRoom } from "react-icons/md";
 import { IoBook, IoBookOutline, IoCalendarOutline, IoCalendarSharp } from "react-icons/io5";
@@ -98,7 +98,6 @@ function SideBar() {
                                                                 </p>
                                                             </div>
                                                         )
-
                                                         }
 
                                                         {/* Course List */}

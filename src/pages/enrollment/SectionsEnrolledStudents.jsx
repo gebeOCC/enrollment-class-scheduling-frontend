@@ -94,13 +94,19 @@ function EnrollStudent() {
                                     </td>
                                     <td className="hidden sm:table-cell py-2 px-4 transition duration-200">{student.user.user_information.email_address}</td>
                                     <td className="py-2 px-4 transition duration-200">{student.user.user_information.contact_number}</td>
-                                    <td className="hidden sm:table-cell py-2 px-4 transition duration-200">
+                                    <td className="hidden sm:table-cell py-2 px-4 transition duration-200 space-x-2">
+                                        <Link to={`${section}/subjects/student?student-id=${student.user.user_id_no}`}>
+                                            <button className="bg-green-500 text-white py-1 px-3 rounded-lg shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 transition duration-200">
+                                                Subject
+                                            </button>
+                                        </Link>
                                         <Link to={`${section}/cor?student-id=${student.user.user_id_no}`}>
                                             <button className="bg-blue-500 text-white py-1 px-3 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-200">
                                                 COR
                                             </button>
                                         </Link>
                                     </td>
+
                                 </tr>
                             ))
                     ) : (
