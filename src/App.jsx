@@ -24,12 +24,11 @@ import EnrollStudent from "./pages/enrollment/EnrollStudent";
 import StudentDetails from "./pages/Registrar/StudentDetails";
 import EnrollmentRecord from "./pages/Student/EnrollmentRecord";
 import FacultyDetails from "./pages/Registrar/FacultyDetails";
-import RegistrarEnrollmentCourse from "./pages/Registrar/RegistrarEnrollmentCourse";
 import Profile from "./pages/All/Profile";
 import SectionsEnrolledStudents from "./pages/enrollment/SectionsEnrolledStudents";
 import StudentCor from "./pages/enrollment/StudentCor";
-import WebsiteLoading from "./components/WebsiteLoading";
 import PhSchoolYearDetails from "./pages/ProgramHead/PhSchoolYearDetails";
+import StudentSubjects from "./pages/enrollment/StudentSubjects";
 
 function App() {
     const { userRole, enrollmentOngoing, preparation } = useAuth();
@@ -49,10 +48,11 @@ function App() {
             <Route path="/classes/:classId" element={<CLassStudents />} />
             {(enrollmentOngoing || preparation) &&
                 <>
-                <Route path="/enrollment/:courseid" element={<EnrollmentCourse />} />
+                    <Route path="/enrollment/:courseid" element={<EnrollmentCourse />} />
                     <Route path="/enrollment/:courseid/enroll-student/:yearlevel" element={<EnrollStudent />} />
                     <Route path="/enrollment/:courseid/students/:yearlevel" element={<SectionsEnrolledStudents />} />
                     <Route path="/enrollment/:courseid/students/:yearlevel/:section/:studentid" element={<StudentCor />} />
+                    <Route path="/enrollment/:courseid/students/:yearlevel/:section/subjects/:studentid" element={<StudentSubjects />} />
                     <Route path="/dashboard" element={<EnrollmentDashboardRegistrar />} />
                     <Route path="*" element={<Navigate to="/dashboard" />} />
                 </>
@@ -77,6 +77,7 @@ function App() {
                     <Route path="/enrollment/:courseid/enroll-student/:yearlevel" element={<EnrollStudent />} />
                     <Route path="/enrollment/:courseid/students/:yearlevel" element={<SectionsEnrolledStudents />} />
                     <Route path="/enrollment/:courseid/students/:yearlevel/:section/:studentid" element={<StudentCor />} />
+                    <Route path="/enrollment/:courseid/students/:yearlevel/:section/subjects/:studentid" element={<StudentCor />} />
                     <Route path="/dashboard" element={<EnrollmentDashboardProgramHead />} />
                     <Route path="*" element={<Navigate to="/dashboard" />} />
                 </>

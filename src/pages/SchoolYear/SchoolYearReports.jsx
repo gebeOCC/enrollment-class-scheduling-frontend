@@ -241,7 +241,7 @@ function SchoolYearReports({ courseData }) {
 
 
             </div>
-            <div className="bg-white p-4 rounded-lg shadow-light col-span-3 row-span-3">
+            <div className="bg-white p-4 rounded-lg shadow-light col-span-3 row-span-3 h-1/2">
                 <Bar data={data} options={options} />
             </div>
         </div>

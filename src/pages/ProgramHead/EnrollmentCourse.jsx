@@ -12,6 +12,7 @@ function EnrollmentCourse() {
     const [yearLevels, setYearLevels] = useState([]);
 
     const [noMaxStudent, setNoMaxStudent] = useState(false);
+    const [fetching, setFetching] = useState(true);
 
     const [yearSectionForm, setYearSectionForm] = useState({
         course_id: courseid,
@@ -35,9 +36,13 @@ function EnrollmentCourse() {
                 .then(response => {
                     setYearLevels(response.data);
                     console.log(response.data);
+                })
+                .finally(() => {
+                    setFetching(false);
                 });
         };
 
+        setFetching(true);
         getYearLevels();
         getCourseName()
     }, [courseid]);
@@ -94,7 +99,7 @@ function EnrollmentCourse() {
         });
     };
 
-    if (yearLevels.length < 1) return <SkeletonEnrollmentCourse />;
+    if (fetching) return <SkeletonEnrollmentCourse />;
 
     return (
         <>
