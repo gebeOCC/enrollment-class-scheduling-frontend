@@ -1108,7 +1108,7 @@ function YearLevelSectionSubjects() {
                     )}
                 </button>
             }
-            
+
             {
                 editClass &&
                 <>
@@ -1162,14 +1162,14 @@ function YearLevelSectionSubjects() {
                                     convert24HourTimeToMinutes(classTime.end_time),
                                     convert24HourTimeToMinutes(classForm.start_time),
                                     convert24HourTimeToMinutes(classForm.end_time)
-                                )) || (editClass && hasTimeConflict(
-                                    convert24HourTimeToMinutes(classTime.start_time),
-                                    convert24HourTimeToMinutes(classTime.end_time),
-                                    convert24HourTimeToMinutes(editForm.start_time),
-                                    convert24HourTimeToMinutes(editForm.end_time)
                                 )) && !editClass
                                         ? 'bg-red-500 text-white font-semibold'
-                                        : classTime.id == editForm.id && 'bg-green-400'
+                                        : classTime.id == editForm.id ? `bg-green-400 ` : `${(editClass && hasTimeConflict(
+                                            convert24HourTimeToMinutes(classTime.start_time),
+                                            convert24HourTimeToMinutes(classTime.end_time),
+                                            convert24HourTimeToMinutes(editForm.start_time),
+                                            convert24HourTimeToMinutes(editForm.end_time)
+                                    )) && 'bg-red-500'}`
                                     }`}>
                                     {`${convertToAMPM(classTime.start_time)} - ${convertToAMPM(classTime.end_time)}`}
                                 </div>
@@ -1192,14 +1192,14 @@ function YearLevelSectionSubjects() {
                                     convert24HourTimeToMinutes(instructorTime.end_time),
                                     convert24HourTimeToMinutes(classForm.start_time),
                                     convert24HourTimeToMinutes(classForm.end_time)
-                                )) || (editClass && hasTimeConflict(
-                                    convert24HourTimeToMinutes(instructorTime.start_time),
-                                    convert24HourTimeToMinutes(instructorTime.end_time),
-                                    convert24HourTimeToMinutes(editForm.start_time),
-                                    convert24HourTimeToMinutes(editForm.end_time)
                                 )) && !editClass
                                         ? 'bg-red-500 text-white font-semibold'
-                                        : instructorTime.id == editForm.id && 'bg-green-400'
+                                    : instructorTime.id == editForm.id ? `bg-green-400 ` : `${(editClass && hasTimeConflict(
+                                            convert24HourTimeToMinutes(instructorTime.start_time),
+                                            convert24HourTimeToMinutes(instructorTime.end_time),
+                                            convert24HourTimeToMinutes(editForm.start_time),
+                                            convert24HourTimeToMinutes(editForm.end_time)
+                                        )) && 'bg-red-500'}`
                                     }`}>
                                     {`${convertToAMPM(instructorTime.start_time)} - ${convertToAMPM(instructorTime.end_time)}`}
                                 </div>

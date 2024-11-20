@@ -132,7 +132,7 @@ function SchoolYearReports({ courseData }) {
             </div>
 
             {/* Reports */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
                 {/* Total Enrolled Students */}
                 <div className="bg-gradient-to-br from-teal-500 to-blue-600 p-6 rounded-xl text-white shadow-lg h-min">
                     <h2 className="text-2xl font-semibold mb-4 border-b border-white/50 pb-2">
@@ -197,7 +197,7 @@ function SchoolYearReports({ courseData }) {
                 </div>
 
 
-                <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 row-span-2">
+                <div className="bg-white p-6 rounded-xl shadow-light border border-gray-200 row-span-2">
                     <h2 className="text-2xl font-bold text-gray-800 mb-4 border-b border-black pb-2">
                         Gender Statistics
                     </h2>
@@ -241,7 +241,7 @@ function SchoolYearReports({ courseData }) {
 
 
             </div>
-            <div className="bg-white p-4 rounded-lg shadow-light col-span-3 row-span-3 h-1/2">
+            <div className="bg-white p-4 rounded-xl shadow-light col-span-3 row-span-3 h-1/2">
                 <Bar data={data} options={options} />
             </div>
         </div>

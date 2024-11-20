@@ -50,9 +50,9 @@ function CLassStudents() {
 
     return (
         <>
-            <section className="bg-white p-6 rounded-lg shadow-md text-center flex justify-center items-center mb-4">
+            <section className="bg-white p-6 rounded-lg shadow-light text-center flex justify-center items-center mb-4">
                 {classInfo.subject_code && (
-                    <div className="grid grid-cols-[1fr_auto_auto_auto] gap-4 items-center">
+                    <div className="grid grid-cols-1 gap-0 sm:grid-cols-[1fr_auto_auto_auto] sm:gap-4 items-center">
                         <h1 className="text-xl font-bold">
                             {classInfo.subject_code}: {classInfo.descriptive_title}
                         </h1>
@@ -74,27 +74,27 @@ function CLassStudents() {
                 Export to Excel
             </button>
 
-            <table className="min-w-full bg-white">
+            <table className="min-w-full bg-white shadow-light text-sm sm:text-lg">
                 <thead>
                     <tr className="w-full bg-[#00b6cf] text-white text-left">
-                        <th className="py-2 px-4">#</th>
-                        <th className="py-2 px-4">Student ID no.</th>
+                        <th className="py-2 px-4 hidden sm:table-cell">#</th>
+                        <th className="py-2 px-4 hidden sm:table-cell">Student ID no.</th>
                         <th className="py-2 px-4">Name</th>
                         <th className="py-2 px-4">Email</th>
-                        <th className="py-2 px-4">Course & Year</th>
+                        <th className="py-2 px-4 hidden sm:table-cell">Course & Year</th>
                     </tr>
                 </thead>
                 <tbody>
                     {students.length > 0 ? (
                         sortedStudents.map((student, index) => (
-                            <tr key={index} className={`border-b ${index % 2 === 0 ? "bg-white" : "bg-[#deeced]"}`}>
-                                <td className="py-2 px-4">{index + 1}</td>
-                                <td className="py-2 px-4">{student.user_id_no}</td>
+                            <tr key={index} className={`border-b odd:bg-white even:bg-[#deeced]`}>
+                                <td className="py-2 px-4 hidden sm:table-cell">{index + 1}</td>
+                                <td className="py-2 px-4 hidden sm:table-cell">{student.user_id_no}</td>
                                 <td className="py-2 px-4">
                                     {capitalizeFirstLetter(student.last_name)}, {capitalizeFirstLetter(student.first_name)} {getFirstLetter(student.middle_name)}.
                                 </td>
                                 <td className="py-2 px-4">{student.email_address}</td>
-                                <td className="py-2 px-4">{student.course_name_abbreviation}-{student.year_level}{student.section}</td>
+                                <td className="py-2 px-4 hidden sm:table-cell">{student.course_name_abbreviation}-{student.year_level}{student.section}</td>
                             </tr>
                         ))
                     ) : (

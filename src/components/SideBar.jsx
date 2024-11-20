@@ -485,6 +485,71 @@ function SideBar() {
                                                                     )}
                                                                 </NavLink>
                                                             </li>
+                                                            {/* <p>Schedules</p> */}
+                                                            <li className="w-full">
+                                                                <NavLink
+                                                                    to="room-schedules"
+                                                                    className={({ isActive }) =>
+                                                                        isActive
+                                                                            ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
+                                                                            : "p-2 flex items-center space-x-2 py-2 rounded-md duration-100 focus:bg-[#4e90ca] hover:bg-[#3d7cb1]"
+                                                                    }
+                                                                    onClick={() => {
+                                                                        if (location.pathname !== '/room-schedules' && onMobile) {
+                                                                            setSidebarOpen(false);
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    {({ isActive }) => (
+                                                                        <>
+                                                                            {sidebarOpen ? (
+                                                                                <>
+                                                                                    {isActive ? <GoPersonFill /> : <GoPerson />}
+                                                                                    <span>Room</span>
+                                                                                </>
+                                                                            ) : (
+                                                                                <div className="w-full flex flex-col items-center">
+                                                                                    {isActive ? <GoPersonFill /> : <GoPerson />}
+                                                                                    <span className="text-[8px]">Dashboard</span>
+                                                                                </div>
+                                                                            )
+                                                                            }
+                                                                        </>
+                                                                    )}
+                                                                </NavLink>
+                                                            </li>
+                                                            <li className="w-full">
+                                                                <NavLink
+                                                                    to="faculty-schedules"
+                                                                    className={({ isActive }) =>
+                                                                        isActive
+                                                                            ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
+                                                                            : "p-2 flex items-center space-x-2 py-2 rounded-md duration-100 focus:bg-[#4e90ca] hover:bg-[#3d7cb1]"
+                                                                    }
+                                                                    onClick={() => {
+                                                                        if (location.pathname !== '/room-schedules' && onMobile) {
+                                                                            setSidebarOpen(false);
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    {({ isActive }) => (
+                                                                        <>
+                                                                            {sidebarOpen ? (
+                                                                                <>
+                                                                                    {isActive ? <MdMeetingRoom /> : <MdOutlineMeetingRoom />}
+                                                                                    <span>Faculty</span>
+                                                                                </>
+                                                                            ) : (
+                                                                                <div className="w-full flex flex-col items-center">
+                                                                                    {isActive ? <MdMeetingRoom /> : <MdOutlineMeetingRoom />}
+                                                                                    <span className="text-[8px]">Dashboard</span>
+                                                                                </div>
+                                                                            )
+                                                                            }
+                                                                        </>
+                                                                    )}
+                                                                </NavLink>
+                                                            </li>
                                                         </div>
                                                     </div>
                                                 </div>

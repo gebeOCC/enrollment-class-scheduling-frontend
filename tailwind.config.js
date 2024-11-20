@@ -23,7 +23,21 @@ export default {
             boxShadow: {
                 'light': '0 0 10px 2px rgba(100, 100, 100, 0.1)',
                 'heavy': '0 0 10px 2px rgba(100, 100, 100, 0.2)',
-            }
+            },
+            animation: {
+                slideIn: 'slideIn 0.5s ease-out',
+                slideOut: 'slideOut 0.5s ease-in',
+            },
+            keyframes: {
+                slideIn: {
+                    '0%': { transform: 'translateY(100%)' },
+                    '100%': { transform: 'translateY(0)' },
+                },
+                slideOut: {
+                    '0%': { transform: 'translateY(0)' },
+                    '100%': { transform: 'translateY(100%)' },
+                },
+            },
         },
         screens: {
             'sm': '640px',

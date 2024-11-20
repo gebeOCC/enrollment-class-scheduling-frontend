@@ -103,7 +103,7 @@ function EnrollmentCourse() {
 
     return (
         <>
-            <div className="bg-white p-4 rounded-lg shadow overflow-hidden mb-6 text-center">
+            <div className="bg-white p-4 rounded-lg shadow-light overflow-hidden mb-6 text-center">
                 <h1 className="text-2xl md:text-4xl font-bold text-blue-600 flex justify-center items-center content-center">
                     {course.course_name}
                 </h1>
@@ -111,7 +111,7 @@ function EnrollmentCourse() {
 
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                 {yearLevels.map((yearLevel, index) => (
-                    <div key={index} className="bg-white p-6 rounded-lg shadow-light hover:shadow-xl transition-shadow duration-300 overflow-hidden">
+                    <div key={index} className="bg-white p-6 rounded-lg shadow-light transition-shadow duration-300 overflow-hidden">
                         <div className="mb-4 flex justify-between items-center">
                             <h2 className="text-2xl font-semibold text-gray-800">{yearLevel.year_level_name}</h2>
                             {userRole != 'registrar' &&

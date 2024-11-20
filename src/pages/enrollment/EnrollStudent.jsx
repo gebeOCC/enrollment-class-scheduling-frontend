@@ -493,7 +493,7 @@ function EnrollStudent() {
                                     value={subjectCode}
                                     name="student_id"
                                     onChange={handleSubjectCodeChange}
-                                    className="pr-8 text-lg w-44 px-3 py-2 border border-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out"
+                                    className="pr-8 text-lg w-44 px-3 py-2 border border-black focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-lg rounded-md transition duration-200 ease-in-out"
                                     placeholder=""
                                     aria-label="Search for faculty members"
                                 />

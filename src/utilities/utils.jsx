@@ -191,3 +191,30 @@ export function copyText(text) {
         }
     }
 }
+
+export function detectOwnClassesConflict(classDetails, classes) {
+    const conflictExists = classes.find(classSchedule => hasTimeConflict(
+        convert24HourTimeToMinutes(classSchedule.start_time),
+        convert24HourTimeToMinutes(classSchedule.end_time),
+        convert24HourTimeToMinutes(classDetails.start_time),
+        convert24HourTimeToMinutes(classDetails.end_time)
+    ) && classSchedule.day == classDetails.day && classDetails.id != classSchedule.id);
+    return !!conflictExists;
+}
+
+export function detectConflict(classDetails, classes) {
+    const conflictExists = classes.find(classSchedule => hasTimeConflict(
+        convert24HourTimeToMinutes(classSchedule.start_time),
+        convert24HourTimeToMinutes(classSchedule.end_time),
+        convert24HourTimeToMinutes(classDetails.start_time),
+        convert24HourTimeToMinutes(classDetails.end_time)
+    ) && classSchedule.day == classDetails.day && classDetails.id != classSchedule.id);
+    return !!conflictExists;
+}
+
+export function convertToRgba(hex, alpha) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}

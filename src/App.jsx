@@ -29,6 +29,11 @@ import SectionsEnrolledStudents from "./pages/enrollment/SectionsEnrolledStudent
 import StudentCor from "./pages/enrollment/StudentCor";
 import PhSchoolYearDetails from "./pages/ProgramHead/PhSchoolYearDetails";
 import StudentSubjects from "./pages/enrollment/StudentSubjects";
+import Schedule from "./pages/Schedule/Schedule";
+import FacultySchedules from "./pages/enrollment/FacultySchedules";
+import RoomSchedules from "./pages/enrollment/RoomSchedules";
+import SchoolYearFacultySchedule from "./pages/ProgramHead/SchoolYearFacultySchedule";
+import SchoolYearRoomSchedule from "./pages/ProgramHead/SchoolYearRoomSchedule";
 
 function App() {
     const { userRole, enrollmentOngoing, preparation } = useAuth();
@@ -70,6 +75,8 @@ function App() {
             <Route path="/faculty-list" element={<PhFacultyList />} />
             <Route path="/school-year" element={<SchoolYear />} />
             <Route path="/school-year/:schoolYear/:semester" element={<PhSchoolYearDetails />} />
+            <Route path="/school-year/:schoolYear/:semester/faculty-schedules" element={<SchoolYearFacultySchedule />} />
+            <Route path="/school-year/:schoolYear/:semester/room-schedules" element={<SchoolYearRoomSchedule />} />
             {(enrollmentOngoing || preparation) &&
                 <>
                     <Route path="/enrollment/:courseid" element={<EnrollmentCourse />} />
@@ -77,8 +84,10 @@ function App() {
                     <Route path="/enrollment/:courseid/enroll-student/:yearlevel" element={<EnrollStudent />} />
                     <Route path="/enrollment/:courseid/students/:yearlevel" element={<SectionsEnrolledStudents />} />
                     <Route path="/enrollment/:courseid/students/:yearlevel/:section/:studentid" element={<StudentCor />} />
-                    <Route path="/enrollment/:courseid/students/:yearlevel/:section/subjects/:studentid" element={<StudentCor />} />
+                    <Route path="/enrollment/:courseid/students/:yearlevel/:section/subjects/:studentid" element={<StudentSubjects />} />
                     <Route path="/dashboard" element={<EnrollmentDashboardProgramHead />} />
+                    <Route path="/room-schedules" element={<RoomSchedules />} />
+                    <Route path="/faculty-schedules" element={<FacultySchedules />} />
                     <Route path="*" element={<Navigate to="/dashboard" />} />
                 </>
             }
