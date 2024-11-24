@@ -43,7 +43,7 @@ function LoginPage() {
     };
 
     return (
-        <div className="h-screen w-screen  min-h-screen flex flex-col items-center justify-center bg-gray-50 px-5">
+        <div className="h-svh w-screen flex flex-col items-center justify-center bg-gray-50 px-5">
             <section className="container">
                 <div className="login-container">
                     <div className="form-container bg-white">

@@ -1,0 +1,26 @@
+/* Parent container styling for scrollbar */
+.scrollable-container {
+  overflow-y: auto; /* Change from 'scroll' to 'auto' */
+}
+
+/* Style for the scrollbar track */
+.scrollable-container::-webkit-scrollbar {
+  width: 3px;
+  /* Only visible when scrolling is needed */
+}
+
+/* Style for the scrollbar thumb */
+.scrollable-container::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 10px;
+}
+
+/* Style for the scrollbar thumb on hover */
+.scrollable-container::-webkit-scrollbar-thumb:hover {
+  background-color: #666;
+}
+
+/* Style for the scrollbar track */
+.scrollable-container::-webkit-scrollbar-track {
+  background-color: transparent;
+}

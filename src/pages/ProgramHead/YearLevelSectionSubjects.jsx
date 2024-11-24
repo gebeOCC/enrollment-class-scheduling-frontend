@@ -267,7 +267,6 @@ function YearLevelSectionSubjects() {
     }
 
     useEffect(() => {
-
         const getCourseName = async () => {
             await axiosInstance.get(`get-course-name/${courseid}`)
                 .then(response => {

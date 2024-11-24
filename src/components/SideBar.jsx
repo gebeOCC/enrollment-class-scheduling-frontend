@@ -1,19 +1,22 @@
+import { Suspense, useEffect, useState } from "react";
+import { MdDashboard, MdMeetingRoom, MdOutlineDashboard, MdOutlineMeetingRoom } from "react-icons/md";
+import { IoBook, IoBookOutline, IoCalendarOutline, IoCalendarSharp } from "react-icons/io5";
+import { HiClipboardList, HiOutlineClipboardList } from "react-icons/hi";
+import { BsBuildings, BsBuildingsFill } from "react-icons/bs";
+import { GoPerson, GoPersonFill } from "react-icons/go";
+import { HiBars3 } from "react-icons/hi2";
 import { Outlet, NavLink, useLocation } from "react-router-dom";
 import OCC_LOGO from '../images/OCC_LOGO.png';
 import Header from "./Header";
 import { useAuth } from "../context/AuthContext";
-import { useEffect, useState } from "react";
 import { formatDateShort } from "../utilities/utils";
-import { HiBars3 } from "react-icons/hi2";
-import { MdDashboard, MdMeetingRoom, MdOutlineDashboard, MdOutlineMeetingRoom } from "react-icons/md";
-import { IoBook, IoBookOutline, IoCalendarOutline, IoCalendarSharp } from "react-icons/io5";
 import { PiChalkboardTeacher, PiChalkboardTeacherFill, PiStudent, PiStudentFill } from "react-icons/pi";
-import { GoPerson, GoPersonFill } from "react-icons/go";
-import { BsBuildings, BsBuildingsFill } from "react-icons/bs";
-import { HiClipboardList, HiOutlineClipboardList } from "react-icons/hi";
+import FirstLoginModal from "../pages/All/FirstLoginModal";
+import './SideBar.css'
+import PreLoader from "./preloader/PreLoader";
 
 function SideBar() {
-    const { userRole, enrollmentOngoing, preparation, courses, enrollmentData } = useAuth();
+    const { userRole, enrollmentOngoing, preparation, courses, enrollmentData, passwordChange } = useAuth();
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [getScreen, setGetScreen] = useState(true);
     const location = useLocation();
@@ -46,7 +49,7 @@ function SideBar() {
     if (getScreen) return <></>
 
     return (
-        <div className="flex h-screen overflow-hidden">
+        <div className="flex h-svh overflow-hidden">
             <div className={`h-full fixed top-0 left-0 z-50  md:h-auto md:static bg-[#3e5c76] text-white flex-shrink-0 flex-col justify-between lg:block transition-all duration-200 ease-in-out ${sidebarOpen ? `'w-16 md:60 w-60` : `-translate-x-full md:translate-x-0 w-16`}`}>
                 <div className="flex flex-col h-full">
                     <div
@@ -66,7 +69,7 @@ function SideBar() {
                         }
                     </div>
 
-                    <ul className={`flex-grow overflow-x-hidden ${sidebarOpen ? 'py-4 px-2' : ''}`}>
+                    <ul className={`flex-grow scrollable-container ${sidebarOpen ? 'py-4 px-2' : ''}`}>
                         {(() => {
                             if (userRole === "registrar") {
                                 return (
@@ -510,7 +513,7 @@ function SideBar() {
                                                                             ) : (
                                                                                 <div className="w-full flex flex-col items-center">
                                                                                     {isActive ? <GoPersonFill /> : <GoPerson />}
-                                                                                    <span className="text-[8px]">Dashboard</span>
+                                                                                    <span className="text-[8px]">Room</span>
                                                                                 </div>
                                                                             )
                                                                             }
@@ -542,7 +545,7 @@ function SideBar() {
                                                                             ) : (
                                                                                 <div className="w-full flex flex-col items-center">
                                                                                     {isActive ? <MdMeetingRoom /> : <MdOutlineMeetingRoom />}
-                                                                                    <span className="text-[8px]">Dashboard</span>
+                                                                                    <span className="text-[8px]">Faculty</span>
                                                                                 </div>
                                                                             )
                                                                             }
@@ -938,15 +941,23 @@ function SideBar() {
                 </div >
             </div >
 
-            < div className="flex flex-col flex-grow" >
-                < div className="h-14 max-h-14 min-h-14 bg-white text-black flex items-center justify-between px-2" >
+            <div className="flex flex-col flex-grow">
+                <div className="h-14 max-h-14 min-h-14 bg-white text-black flex items-center justify-between px-2">
                     <Header sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
-                </div >
+                </div>
 
-                < div className="flex-grow p-4 bg-[#F0F4F8] overflow-auto" >
-                    <Outlet />
-                </div >
-            </div >
+                <div className="flex-grow p-4 bg-[#F0F4F8] overflow-auto">
+                    <Suspense fallback={<PreLoader />}>
+                        {/* This renders the nested routes */}
+                        <Outlet />
+                    </Suspense>
+                </div>
+            </div>
+
+
+            {(location.pathname !== '/profile' && !passwordChange) &&
+                <FirstLoginModal />
+            }
         </div >
     );
 }

@@ -107,7 +107,8 @@ function Schedule({ data }) {
                                 gridRow: rowIndex + 2, // Align with rows
                             }}
                         >
-                            {`${convertToAMPM(start).replace(/ AM| PM/g, "")} - ${convertToAMPM(end).replace(/ AM| PM/g, "")}`}
+                            {start} - {end}
+                            {/* {`${convertToAMPM(start).replace(/ AM| PM/g, "")} - ${convertToAMPM(end).replace(/ AM| PM/g, "")}`} */}
                         </div>
 
                         {/* Placeholder Cells for Days */}
@@ -148,7 +149,7 @@ function Schedule({ data }) {
                         style={{
                             gridRow: `${rowStart} / ${rowEnd}`,
                             gridColumn: `${colStart} / ${colStart + 1}`,
-                            backgroundColor: isConflict ? "rgba(255, 0, 0, 0.7)" : `${convertToRgba(color, 0.95)}`,
+                            backgroundColor: isConflict ? "rgba(255, 0, 0, 0.5)" : `${convertToRgba(color, 0.95)}`,
                         }}
                     >
                         <span>{class_code || ''}</span>

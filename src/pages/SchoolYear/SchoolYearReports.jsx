@@ -12,6 +12,7 @@ import {
 
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import { PiStudentFill } from "react-icons/pi";
+import { FaDownload } from "react-icons/fa";
 
 ChartJS.register(
     CategoryScale,
@@ -23,7 +24,11 @@ ChartJS.register(
     ChartDataLabels
 );
 
+import { useAuth } from "../../context/AuthContext";
+
 function SchoolYearReports({ courseData }) {
+
+    const { userRole } = useAuth();
 
     const [selectedCourse, setSelectedCourse] = useState(0);
 
@@ -90,7 +95,7 @@ function SchoolYearReports({ courseData }) {
     };
     return (
         <div className="space-y-4">
-            <div className="p-4 bg-white rounded-lg shadow-light w-full flex gap-4 sm:gap-0 sm:flex-col items-center sm:items-start justify-center sm:w-min sm:space-y-4">
+            <div className="p-4 bg-white rounded-lg shadow-light w-full flex gap-4 sm:gap-0 sm:flex-col items-center sm:items-start justify-center sm:w-full sm:space-y-4">
                 <h1 className="text-2xl font-bold text-gray-800 flex items-center">Course:</h1>
                 {/* Select dropdown for mobile screens */}
                 <select
@@ -109,11 +114,11 @@ function SchoolYearReports({ courseData }) {
 
                 {/* Buttons for desktop screens */}
                 <div className="hidden sm:block w-full">
-                    <div className="flex w-full items-center gap-4">
+                    <div className="grid grid-cols-6 items-center gap-x-4 gap-y-2 w-max">
                         <button
                             onClick={() => setSelectedCourse(0)}
                             className={`border w-36 px-6 py-3 rounded-lg text-sm font-semibold transition-all duration-300 
-                    ${selectedCourse == 0 ? 'bg-blue-600 text-white' : 'bg-white text-blue-600 hover:bg-blue-50'}`}
+                            ${selectedCourse == 0 ? 'bg-blue-600 text-white' : 'bg-white text-blue-600 hover:bg-blue-50'}`}
                         >
                             All
                         </button>
@@ -122,7 +127,7 @@ function SchoolYearReports({ courseData }) {
                                 key={index}
                                 onClick={() => setSelectedCourse(course.id)}
                                 className={`border w-36 px-6 py-3 rounded-lg text-sm font-semibold transition-all duration-300 
-                        ${selectedCourse == course.id ? 'bg-blue-600 text-white' : 'bg-white text-blue-600 hover:bg-blue-50'}`}
+                                ${selectedCourse == course.id ? 'bg-blue-600 text-white' : 'bg-white text-blue-600 hover:bg-blue-50'}`}
                             >
                                 {course.course_name_abbreviation}
                             </button>
@@ -148,8 +153,18 @@ function SchoolYearReports({ courseData }) {
                                 )
                                 .reduce((total, report) => total + report.enrolled_student_count, 0)}
                         </span>
+                        {userRole === 'registrar' && (
+                            <button
+                                className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-green-300"
+                                aria-label="Download Report"
+                            >
+                                <FaDownload className="text-xl" />
+                                <span>Download</span>
+                            </button>
+                        )}
                     </div>
                 </div>
+
 
 
                 {/* Student Types */}
@@ -237,9 +252,6 @@ function SchoolYearReports({ courseData }) {
                         </tbody>
                     </table>
                 </div>
-
-
-
             </div>
             <div className="bg-white p-4 rounded-xl shadow-light col-span-3 row-span-3 h-1/2">
                 <Bar data={data} options={options} />

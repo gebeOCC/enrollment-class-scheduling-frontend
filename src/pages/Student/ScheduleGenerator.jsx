@@ -32,7 +32,7 @@ function ScheduleGenerator({ data }) {
                     </div>
                 </div>
                 <span className="px-4 text-lg font-bold flex items-center bg-gray-100 border rounded-md text-gray-900 tracking-wide capitalize">
-                    {formatFullNameFML(data.user.user_information)}
+                    {formatFullNameFML(data.student.student_information)}
                 </span>
             </h1>
 
@@ -52,7 +52,7 @@ function ScheduleGenerator({ data }) {
                                 <td className="py-2 px-4 text-sm">{classSubject.year_section_subjects.day}</td>
                                 <td className="py-2 px-4 text-sm">{`${convertToAMPM(classSubject.year_section_subjects.start_time)} - ${convertToAMPM(classSubject.year_section_subjects.end_time)}`}</td>
                                 <td className="py-2 px-4 text-sm text-center">{classSubject.year_section_subjects.room.room_name}</td>
-                                <td className="py-2 px-4 text-sm">{formatFullName(classSubject.year_section_subjects.user_information)}</td>
+                                <td className="py-2 px-4 text-sm">{formatFullName(classSubject.year_section_subjects.instructor.instructor_information)}</td>
                             </tr>
                         ))
                     ) : (

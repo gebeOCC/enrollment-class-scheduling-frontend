@@ -26,6 +26,7 @@ function StudentCor() {
                 .then(response => {
                     if (response.data.message === 'success') {
                         setStudentInfo(response.data.studentinfo);
+                        console.log(response.data.studentinfo);
                     }
                 })
                 .finally(() => {

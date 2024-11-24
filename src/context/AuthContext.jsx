@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import axiosInstance from '../../axios/axiosInstance';
-import WebsiteLoading from '../components/WebsiteLoading';
+import WebsiteLoading from '../components/WebsiteLoading/WebsiteLoading';
 
 const AuthContext = createContext();
 
@@ -13,6 +13,7 @@ export const AuthProvider = ({ children }) => {
     const [courses, setCourses] = useState([]);
     const [enrollmentData, setEnrollmentData] = useState([]);
     const [firstName, setFirstName] = useState('');
+    const [passwordChange, setPasswordChange] = useState(0);
 
     useEffect(() => {
         const fetchUserRole = async () => {
@@ -27,6 +28,7 @@ export const AuthProvider = ({ children }) => {
                             setCourses(response.data.courses);
                         }
                         setFirstName(response.data.firstName)
+                        setPasswordChange(response.data.passwordChange)
                     }
                 })
                 .catch(error => {
@@ -42,9 +44,9 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     if (fetching || load) return <WebsiteLoading />
-    
+
     return (
-        <AuthContext.Provider value={{ userRole, fetching, enrollmentOngoing, preparation, courses, enrollmentData, firstName }}>
+        <AuthContext.Provider value={{ userRole, fetching, enrollmentOngoing, preparation, courses, enrollmentData, firstName, passwordChange }}>
             {children}
         </AuthContext.Provider>
     );

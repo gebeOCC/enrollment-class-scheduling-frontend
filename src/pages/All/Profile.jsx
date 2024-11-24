@@ -34,6 +34,7 @@ function Profile() {
         setSubmitting(true);
         if (newPassword !== confirmPassword) {
             setPasswordError("New passwords do not match.");
+            setSubmitting(false);
             return;
         }
 

@@ -76,12 +76,12 @@ function StudentDetails() {
     } = studentDetails;
 
     const submitPassword = async () => {
-        const { isValid } = checkPasswordComplexity(password);
-        setPasswordRequirements(checkPasswordComplexity(password));
+        // const { isValid } = checkPasswordComplexity(password);
+        // setPasswordRequirements(checkPasswordComplexity(password));
 
-        if (!isValid) {
-            return;
-        }
+        // if (!isValid) {
+        //     return;
+        // }
 
         await axiosInstance.post(`change-password/`, { id: studentDetails.id, password: password })
             .then(response => {
@@ -102,7 +102,7 @@ function StudentDetails() {
 
     return (
         <div className='space-y-4'>
-            <div className="w-full mx-auto shadow-sm bg-white rounded-xl p-8 text-gray-800">
+            <div className="w-full mx-auto shadow-light bg-white rounded-xl p-8 text-gray-800">
                 <div className="flex items-center mb-6 space-x-4">
                     <div className="flex-shrink-0">
                         <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center border-2 border-blue-600">

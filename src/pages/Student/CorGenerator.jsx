@@ -12,7 +12,7 @@ function CorGenerator({ data }) {
                         <h2 className="text-xl font-bold">CERTIFICATE OF REGISTRATION</h2>
                     </div>
                 </div>
-
+                
                 <div className="grid grid-cols-[40px,50px,35px,1px,75px,130px,100px,1fr,85px,80px] gap-x-2 text-xs">
                     <div className="col-span-2 font-bold">Registration No.:</div>
                     <div className="col-span-3 col-start-3 border-b border-gray-900 pl-2">{data.registration_number}</div>
@@ -29,20 +29,20 @@ function CorGenerator({ data }) {
                     <div className="col-span-1 border-b border-gray-900 text-center">{data.year_section.school_year.start_year}-{data.year_section.school_year.end_year}</div>
 
                     <div className="col-span-2 font-bold">Student ID No.:</div>
-                    <div className="col-span-3 col-start-3 border-b border-gray-900 pl-2">{data.user.user_id_no}</div>
+                    <div className="col-span-3 col-start-3 border-b border-gray-900 pl-2">{data.student.user_id_no}</div>
 
                     <div className="col-span-1 font-bold text-end">Course & Year:</div>
                     <div className="col-span-1 border-b border-gray-900 text-center">{data.year_section.course.course_name_abbreviation} - {data.year_section.year_level_id}{data.year_section.section}
                     </div>
 
                     <div className="col-span-1 col-start-9 font-bold">Gender:</div>
-                    <div className="col-span-1 border-b border-gray-900 text-center">{data.user.user_information.gender}</div>
+                    <div className="col-span-1 border-b border-gray-900 text-center">{data.student.student_information.gender}</div>
 
                     <div className="col-span-1 font-bold">Name:</div>
-                    <div className="col-span-2 border-b border-gray-900 text-center">{data.user.user_information.last_name}</div>
+                    <div className="col-span-2 border-b border-gray-900 text-center">{data.student.student_information.last_name}</div>
                     ,
-                    <div className="col-span-2 col-start-5 border-b border-gray-900 text-center">{data.user.user_information.first_name}</div>
-                    <div className="col-span-1 border-b border-gray-900 text-center">{data.user.user_information.middle_name}</div>
+                    <div className="col-span-2 col-start-5 border-b border-gray-900 text-center">{data.student.student_information.first_name}</div>
+                    <div className="col-span-1 border-b border-gray-900 text-center">{data.student.student_information.middle_name}</div>
 
                     <div className="col-span-1 col-start-9 font-bold">Student Type:</div>
                     <div className="col-span-1 border-b border-gray-900 text-center">{data.student_type.student_type_name}</div>
@@ -89,8 +89,8 @@ function CorGenerator({ data }) {
                                     {convertToAMPM(subjects.year_section_subjects.start_time)} - {convertToAMPM(subjects.year_section_subjects.end_time)}
                                 </td>
                                 <td className="border text-center">{subjects.year_section_subjects.room.room_name}</td>
-                                <td className="border">{formatFullName(subjects.year_section_subjects.user_information)}</td>
-                            </tr>
+                                    <td className="border">{formatFullName(subjects.year_section_subjects.instructor.instructor_information)}</td>
+                                </tr>
                         ))}
                         {/* Row for total units */}
                         <tr className="bg-gray-200">

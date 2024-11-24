@@ -4,7 +4,7 @@ import { useLocation, useParams, useNavigate, Navigate, Link } from "react-route
 import { capitalizeFirstLetter, getFirstLetter } from "../../utilities/utils";
 import PreLoader from "../../components/preloader/PreLoader";
 
-function EnrollStudent() {
+function SectionsEnrolledStudents() {
     const { courseid, yearlevel } = useParams();
     const location = useLocation();
     const navigate = useNavigate();
@@ -122,4 +122,4 @@ function EnrollStudent() {
     );
 }
 
-export default EnrollStudent;
+export default SectionsEnrolledStudents;

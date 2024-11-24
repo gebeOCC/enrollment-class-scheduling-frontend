@@ -53,7 +53,7 @@ function StudentClasses() {
             if (selected === 'COR') {
                 // If the selected component is COR, download as PDF
                 const options = {
-                    filename: `${formatFullName(classes.user.user_information)} ${schoolYear?.start_year || 'Unknown'}-${schoolYear?.end_year || 'Unknown'} ${schoolYear?.semester_name || 'Unknown'} Semester.pdf`,
+                    filename: `${formatFullName(classes.student.student_information)} ${schoolYear?.start_year || 'Unknown'}-${schoolYear?.end_year || 'Unknown'} ${schoolYear?.semester_name || 'Unknown'} Semester.pdf`,
                     html2canvas: { scale: 5 },
                     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
                 };
@@ -67,7 +67,7 @@ function StudentClasses() {
                 // Fallback to image download logic
                 html2canvas(element, { scale: 5 }).then((canvas) => {
                     const imageUrl = canvas.toDataURL("image/png");
-                    const filename = `${formatFullName(classes.user.user_information)} ${schoolYear?.start_year || 'Unknown'}-${schoolYear?.end_year || 'Unknown'} ${schoolYear?.semester_name || 'Unknown'} Semester.png`;
+                    const filename = `${formatFullName(classes.student.student_information)} ${schoolYear?.start_year || 'Unknown'}-${schoolYear?.end_year || 'Unknown'} ${schoolYear?.semester_name || 'Unknown'} Semester.png`;
 
                     const link = document.createElement("a");
                     link.href = imageUrl;

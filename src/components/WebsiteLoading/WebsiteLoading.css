@@ -1,0 +1,8 @@
+.occ {
+  background-image: url('../../images/OCC_LOGO.png');
+  background-size: cover;
+  background-position: center;
+  width: 20rem;
+  height: 20rem; 
+  border-radius: 50%;
+}

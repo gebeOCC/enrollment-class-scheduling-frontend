@@ -91,13 +91,13 @@ function FacultyDetails() {
     }
 
     const submitPassword = async () => {
-        const { isValid } = checkPasswordComplexity(password); // Call the function to get the validity
-        setPasswordRequirements(checkPasswordComplexity(password)); // Update the password validity state
+        // const { isValid } = checkPasswordComplexity(password); // Call the function to get the validity
+        // setPasswordRequirements(checkPasswordComplexity(password)); // Update the password validity state
 
-        console.log(passwordRequirements)
-        if (!isValid) {
-            return;
-        }
+        // console.log(passwordRequirements)
+        // if (!isValid) {
+        //     return;
+        // }
 
         await axiosInstance.post(`change-password/`, { id: facultyDetails.id, password: password })
             .then(response => {
