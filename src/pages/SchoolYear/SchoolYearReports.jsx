@@ -153,7 +153,7 @@ function SchoolYearReports({ courseData }) {
                                 )
                                 .reduce((total, report) => total + report.enrolled_student_count, 0)}
                         </span>
-                        {userRole === 'registrar' && (
+                        {/* {userRole === 'registrar' && (
                             <button
                                 className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-green-300"
                                 aria-label="Download Report"
@@ -161,7 +161,7 @@ function SchoolYearReports({ courseData }) {
                                 <FaDownload className="text-xl" />
                                 <span>Download</span>
                             </button>
-                        )}
+                        )} */}
                     </div>
                 </div>
 

@@ -4,14 +4,18 @@ import { useEffect, useState } from "react";
 import PreLoader from "../../components/preloader/PreLoader";
 import { Bar } from "react-chartjs-2";
 import SchoolYearReports from "../SchoolYear/SchoolYearReports";
+import { FaDownload } from "react-icons/fa";
+import { useAuth } from "../../context/AuthContext";
+import { utils, writeFile } from 'xlsx';
+
 function SchoolYearDetails() {
+    const { userRole } = useAuth();
     const { schoolYear } = useParams();
     const { semester } = useParams();
 
     const [submitting, setSubmitting] = useState(false);
     const [fetching, setFetching] = useState(true);
     const [schoolYeardetails, setSchoolYeardetails] = useState([])
-    const [selectedCourse, setSelectedCourse] = useState(0);
 
     const [reports, setReports] = useState([]);
 
@@ -61,6 +65,60 @@ function SchoolYearDetails() {
             })
     }
 
+    const exportToExcel = (data) => {
+        const dataToExport = data.map((data) => ({
+            "Program Name": data.course_name_abbreviation,
+            "Year Level": data.year_level_name,
+            "Last Name": data.last_name,
+            "First Name": data.first_name,
+            "Middle Name": data.middle_name,
+            "Gender": data.gender,
+            "Subject Code": data.subject_code,
+            "Subject": data.descriptive_title,
+        }));
+
+        const ws = utils.json_to_sheet(dataToExport); // Convert JSON to worksheet
+
+        // Set the column widths
+        const columnWidths = [
+            { wch: 15 }, // Program Name.
+            { wch: 10 }, // Year Level
+            { wch: 15 }, // Last Name
+            { wch: 15 }, // First Name
+            { wch: 15 }, // Middle Name
+            { wch: 10 }, // Gender
+            { wch: 15 }, // Subject Code
+            { wch: 30 }, // Subject
+        ];
+
+        ws['!cols'] = columnWidths; // Apply the column widths to the worksheet
+
+        const wb = utils.book_new(); // Create a new workbook
+        utils.book_append_sheet(wb, ws, "Students"); // Append the worksheet to the workbook
+
+        const fileName = `${schoolYeardetails.start_year}-${schoolYeardetails.end_year} ${schoolYeardetails.semester_name} Semester Promotional Report.xlsx`;
+
+        writeFile(wb, fileName); // Write the file
+    };
+
+
+    const downloadPromotionalReport = async () => {
+        setSubmitting(true);
+        await axiosInstance.get(`download-promotional-report`, {
+            params: {
+                id: schoolYeardetails.id,
+            },
+        })
+            .then(response => {
+                if (response.data.message == 'success') {
+                    exportToExcel(response.data.promotionalReport);
+                }
+            })
+            .finally(() => {
+                setSubmitting(false);
+            });
+    }
+
     return (
         <div className="space-y-4">
             <div className="bg-white p-4 rounded-lg shadow-light overflow-hidden text-center flex flex-col sm:flex-row justify-between items-center">
@@ -89,6 +147,17 @@ function SchoolYearDetails() {
                     )}
                 </div>
             </div>
+
+            {userRole === 'registrar' && (
+                <button
+                    onClick={downloadPromotionalReport}
+                    className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-green-300"
+                    aria-label="Download Report"
+                >
+                    <FaDownload className="text-xl" />
+                    <span>Promotional Report</span>
+                </button>
+            )}
 
             <SchoolYearReports courseData={reports} />
         </div>

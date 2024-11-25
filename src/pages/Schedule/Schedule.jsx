@@ -107,8 +107,7 @@ function Schedule({ data }) {
                                 gridRow: rowIndex + 2, // Align with rows
                             }}
                         >
-                            {start} - {end}
-                            {/* {`${convertToAMPM(start).replace(/ AM| PM/g, "")} - ${convertToAMPM(end).replace(/ AM| PM/g, "")}`} */}
+                            {`${convertToAMPM(start).replace(/ AM| PM/g, "")} - ${convertToAMPM(end).replace(/ AM| PM/g, "")}`}
                         </div>
 
                         {/* Placeholder Cells for Days */}
