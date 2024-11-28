@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axiosInstance from "../../../axios/axiosInstance";
 import { ImSpinner5 } from "react-icons/im";
 import PreLoader from "../../components/preloader/PreLoader";
+import { useAuth } from "../../context/AuthContext";
 
 function Profile() {
     const [userInfo, setUserInfo] = useState(null);
@@ -15,6 +16,7 @@ function Profile() {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [incorrectPassword, setIncorrectPassword] = useState(false);
     const [submitting, setSubmitting] = useState(false);
+    const {setPasswordChange} = useAuth();
 
     useEffect(() => {
         const getUserInfo = async () => {
@@ -50,6 +52,7 @@ function Profile() {
                     setNewPassword('');
                     setConfirmPassword('');
                     setIncorrectPassword(false);
+                    setPasswordChange(1)
                 } else if (response.data.message == 'The current password is incorrect') {
                     setIncorrectPassword(true)
                 }

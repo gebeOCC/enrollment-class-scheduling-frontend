@@ -46,7 +46,7 @@ export const AuthProvider = ({ children }) => {
     if (fetching || load) return <WebsiteLoading />
 
     return (
-        <AuthContext.Provider value={{ userRole, fetching, enrollmentOngoing, preparation, courses, enrollmentData, firstName, passwordChange }}>
+        <AuthContext.Provider value={{ userRole, fetching, enrollmentOngoing, preparation, courses, enrollmentData, firstName, passwordChange, setPasswordChange }}>
             {children}
         </AuthContext.Provider>
     );
