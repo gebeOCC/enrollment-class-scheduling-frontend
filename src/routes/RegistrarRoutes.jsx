@@ -1,5 +1,6 @@
 import { Navigate, Route } from "react-router-dom";
 import { lazy } from "react";
+import ClassRouter from "../pages/Faculty/Class/ClassRouter";
 const EnrollStudent = lazy(() => import("../pages/enrollment/EnrollStudent"));
 const SectionsEnrolledStudents = lazy(() => import("../pages/enrollment/SectionsEnrolledStudents"));
 const StudentCor = lazy(() => import("../pages/enrollment/StudentCor"));
@@ -29,7 +30,7 @@ const RegistrarRoutes = ({ enrollmentOngoing, preparation }) => (
         <Route path="/school-year" element={<SchoolYear />} />
         <Route path="/school-year/:schoolYear/:semester" element={<SchoolYearDetails />} />
         <Route path="/classes" element={<FacultyClasses />} />
-        <Route path="/classes/:classId" element={<CLassStudents />} />
+        <Route path="/classes/:classId" element={<ClassRouter />} />
         {(enrollmentOngoing || preparation) &&
             <>
                 <Route path="/enrollment/:courseid" element={<EnrollmentCourse />} />
