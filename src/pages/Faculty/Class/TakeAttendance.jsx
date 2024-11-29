@@ -274,7 +274,7 @@ function TakeAttendance({ classId }) {
             </div>
 
             <div className='place-self-start'>
-                {!attendanceLoading ? (
+                {attendanceLoading ? (
                     <SkeletonStudentsAttendanceList />
                 ) : (
                     <div>
