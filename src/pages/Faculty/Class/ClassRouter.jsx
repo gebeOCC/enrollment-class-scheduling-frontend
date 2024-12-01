@@ -5,6 +5,7 @@ import axiosInstance from "../../../../axios/axiosInstance";
 import { useParams } from "react-router-dom";
 import PreLoader from "../../../components/preloader/PreLoader";
 import { convertToAMPM } from "../../../utilities/utils";
+import StudentsAttendanceInfo from "./StudentsAttendanceInfo";
 
 function ClassRouter() {
     const { classId } = useParams();
@@ -29,7 +30,7 @@ function ClassRouter() {
 
     if (fetching) return < PreLoader />
 
-    if(!id) return <>Class not found</>
+    if (!id) return <>Class not found</>
 
     return (
         <>
@@ -63,6 +64,16 @@ function ClassRouter() {
                 </div>
                 {/* Take Attendance Tab */}
                 <div
+                    onClick={() => setTab('Students')}
+                    className={`cursor-pointer text-lg font-semibold ${tab === 'Students'
+                        ? 'text-cyan-600 border-b-2 border-cyan-600'
+                        : 'text-gray-600 hover:text-cyan-600'
+                        }`}
+                >
+                    Students
+                </div>
+                {/* Take Attendance Tab */}
+                <div
                     onClick={() => setTab('Take Attendance')}
                     className={`cursor-pointer text-lg font-semibold ${tab === 'Take Attendance'
                         ? 'text-cyan-600 border-b-2 border-cyan-600'
@@ -77,6 +88,7 @@ function ClassRouter() {
             <div className="pt-4">
                 {tab === 'Dashboard' && <ClassDashboard />}
                 {tab === 'Take Attendance' && <TakeAttendance classId={id} />}
+                {tab === 'Students' && <StudentsAttendanceInfo classId={id} />}
             </div>
         </>
     );
