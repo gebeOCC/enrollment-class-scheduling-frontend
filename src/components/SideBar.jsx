@@ -84,7 +84,8 @@ function SideBar() {
                                                                 <p className="w-full text-sm font-bold text-white">
                                                                     ENROLLMENT{' '}
                                                                     <span className="text-gray-200 font-thin">
-                                                                        {(!enrollmentOngoing && preparation) ? 'preparation' : 'started'}
+                                                                        {enrollmentOngoing && 'started'}
+                                                                        {preparation && 'preparation'}
                                                                     </span>
                                                                 </p>
 
@@ -400,7 +401,8 @@ function SideBar() {
                                                                 <p className="w-full text-sm font-bold text-white">
                                                                     ENROLLMENT{' '}
                                                                     <span className="text-gray-200 font-thin">
-                                                                        {(!enrollmentOngoing && preparation) ? 'preparation' : 'started'}
+                                                                        {enrollmentOngoing && 'started'}
+                                                                        {preparation && 'preparation'}
                                                                     </span>
                                                                 </p>
 
@@ -701,7 +703,8 @@ function SideBar() {
                                                                 <p className="w-full text-sm font-bold text-white">
                                                                     ENROLLMENT{' '}
                                                                     <span className="text-gray-200 font-thin">
-                                                                        {(!enrollmentOngoing && preparation) ? 'preparation' : 'started'}
+                                                                        {enrollmentOngoing && 'started'}
+                                                                        {preparation && 'preparation'}
                                                                     </span>
                                                                 </p>
 
