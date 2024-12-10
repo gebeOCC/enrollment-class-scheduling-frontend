@@ -5,7 +5,7 @@ import { capitalizeFirstLetter, convert24HourTimeToMinutes, convertToAMPM, getFi
 import { showToast } from "../../components/Toast";
 import Toast from "../../components/Toast";
 import { FiSearch } from "react-icons/fi";
-import { FaCirclePlus } from "react-icons/fa6";
+import { FaCircleMinus, FaCirclePlus } from "react-icons/fa6";
 import AddNewStudentModal from "../GlobalFunction/AddNewStudentModal";
 import { ImSpinner5 } from "react-icons/im";
 import PreLoader from "../../components/preloader/PreLoader";
@@ -178,12 +178,22 @@ function EnrollStudent() {
     }
 
     const detectConflict = (classDetails) => {
-        const conflictExists = classes.find(classSchedule => hasTimeConflict(
-            convert24HourTimeToMinutes(classSchedule.start_time),
-            convert24HourTimeToMinutes(classSchedule.end_time),
-            convert24HourTimeToMinutes(classDetails.start_time),
-            convert24HourTimeToMinutes(classDetails.end_time)
-        ) && classSchedule.day == classDetails.day);
+        const conflictExists = classes.find(classSchedule =>
+            (
+                hasTimeConflict(
+                    convert24HourTimeToMinutes(classSchedule.start_time),
+                    convert24HourTimeToMinutes(classSchedule.end_time),
+                    convert24HourTimeToMinutes(classDetails.start_time),
+                    convert24HourTimeToMinutes(classDetails.end_time)
+                )
+                ||
+                hasTimeConflict(
+                    convert24HourTimeToMinutes(classSchedule.start_time),
+                    convert24HourTimeToMinutes(classSchedule.end_time),
+                    convert24HourTimeToMinutes(classDetails.subject_secondary_schedule?.start_time),
+                    convert24HourTimeToMinutes(classDetails.subject_secondary_schedule?.end_time)
+                )
+            ) && (classSchedule.day == classDetails.day || classSchedule.day == classDetails.subject_secondary_schedule?.day));
 
         return !!conflictExists;
     };
@@ -202,7 +212,6 @@ function EnrollStudent() {
             setSubmitting(false);
             return;
         }
-
 
         const data = JSON.stringify({ classes: classes });
         try {
@@ -372,7 +381,7 @@ function EnrollStudent() {
                                 />
                             </div>
                         </div>
-                        <div className="space-y-1">
+                        <div>
                             <div
                                 className={`font-bold text-gray-900 grid grid-cols-[100px_100px_1fr_120px_180px_90px_auto] gap-4 items-center bg-white px-2 transition duration-200 ease-in-out`}>
                                 <div>
@@ -412,7 +421,7 @@ function EnrollStudent() {
                             {classes.map((classSubject, index) => (
                                 <div
                                     key={index}
-                                    className={`border border-black text-black grid grid-cols-[100px_100px_1fr_120px_180px_90px_auto] gap-4 items-center bg-white p-2 rounded-lg transition duration-200 ease-in-out hover:bg-gray-200`}
+                                    className={`border-b border-b-black text-black grid grid-cols-[100px_100px_1fr_120px_180px_90px_auto] gap-4 items-center bg-white p-2 transition duration-200 ease-in-out  hover:bg-cyan-200`}
                                 >
                                     <div>
                                         {classSubject.class_code}
@@ -424,10 +433,12 @@ function EnrollStudent() {
                                         {classSubject.descriptive_title}
                                     </div>
                                     <div>
-                                        {classSubject.day}
+                                        <div>{classSubject.day}</div>
+                                        <div>{classSubject.subject_secondary_schedule?.day || ''}</div>
                                     </div>
                                     <div>
-                                        {convertToAMPM(classSubject.start_time)} - {convertToAMPM(classSubject.end_time)}
+                                        <div>{convertToAMPM(classSubject.start_time)} - {convertToAMPM(classSubject.end_time)}</div>
+                                        <div>{classSubject.subject_secondary_schedule?.start_time && convertToAMPM(classSubject.subject_secondary_schedule.start_time)} {classSubject.subject_secondary_schedule && '-'} {classSubject.subject_secondary_schedule?.end_time && convertToAMPM(classSubject.subject_secondary_schedule.end_time)}</div>
                                     </div>
                                     <div className="text-center">
                                         {classSubject.credit_units}
@@ -447,7 +458,7 @@ function EnrollStudent() {
                                     </svg>
                                 </div>
                             ))}
-                            <div className={`grid grid-cols-[100px_100px_1fr_120px_180px_90px_auto] gap-4 items-center`}>
+                            <div className={`grid grid-cols-[100px_100px_1fr_120px_180px_90px_auto] gap-4 items-center p-2`}>
                                 <button
                                     disabled={classes.length < 1}
                                     className={`w-full col-span-2 bg-blue-500 text-white py-2 px-4 rounded-lg transition duration-200 ease-in-out ${classes.length < 1 ? 'bg-gray-300 cursor-not-allowed' : 'hover:bg-blue-400'}`}
@@ -462,8 +473,14 @@ function EnrollStudent() {
                                         "Enroll Student"
                                     )}
                                 </button>
-                                <h1 className="text-lg">Total units: {classes.reduce((total, subject) => total + subject.credit_units, 0)}</h1>
+                                <h1 className="col-start-5 text-md font-semibold text-end">Total units:</h1>
+                                <h1 className="text-center text-md font-semibold">{classes.reduce((total, subject) => total + subject.credit_units, 0)}</h1>
+                                <FaCircleMinus size={20} className="text-transparent" />
                             </div>
+                            {/* <div className={`grid grid-cols-[100px_100px_1fr_120px_180px_90px_auto] gap-4 items-center mt-2 px-2`}>
+                                
+                                <FaCircleMinus size={20} className="text-transparent" />
+                            </div> */}
                         </div>
                     </div>
                 </div>
@@ -521,11 +538,13 @@ function EnrollStudent() {
                                 <div className="">
                                     {classSubject.descriptive_title}
                                 </div>
-                                <div className="">
-                                    {classSubject.day}
+                                <div>
+                                    <div>{classSubject.day}</div>
+                                    <div>{classSubject.subject_secondary_schedule?.day || ''}</div>
                                 </div>
-                                <div className="">
-                                    {convertToAMPM(classSubject.start_time)} - {convertToAMPM(classSubject.end_time)}
+                                <div>
+                                    <div>{convertToAMPM(classSubject.start_time)} - {convertToAMPM(classSubject.end_time)}</div>
+                                    <div>{classSubject.subject_secondary_schedule?.start_time && convertToAMPM(classSubject.subject_secondary_schedule.start_time)} {classSubject.subject_secondary_schedule && '-'} {classSubject.subject_secondary_schedule?.end_time && convertToAMPM(classSubject.subject_secondary_schedule.end_time)}</div>
                                 </div>
                                 <div className="text-center">
                                     {classSubject.credit_units}

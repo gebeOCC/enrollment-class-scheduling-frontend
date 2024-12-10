@@ -56,7 +56,7 @@ function SideBar() {
                         className={`w-full p-2 flex items-center h-14 ${sidebarOpen ? 'space-x-2' : 'justify-center'} `}>
                         <HiBars3
                             onClick={toggleSidebar}
-                            className="md:hidden cursor-pointer  transition-transform duration-300 ease-in-out transform w-10 h-10 hover:scale-110 active:scale-90"
+                            className="md:hidden cursor-pointer  transition-transform duration-300 ease-in-out transform w-10 h-10 active:scale-90"
                             size={30} />
                         <img
                             src={OCC_LOGO}

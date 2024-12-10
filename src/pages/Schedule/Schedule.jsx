@@ -22,27 +22,28 @@ function dayToColumnIndex(day) {
 }
 
 const colors = [
-    "#ffc000",
-    "#ffff00",
-    "#92d050",
-    "#00b050",
-    "#00b0f0",
-    "#0070c0",
-    "#b113bd",
-    "#2e9288",
-    "#ff5050",
-    "#ff7043",
-    "#ff8c00",
-    "#ff1493",
-    "#8a2be2",
-    "#5f9ea0",
-    "#7fff00",
-    "#4682b4",
-    "#d2691e",
-    "#40e0d0",
-    "#c71585",
-    "#6b8e23",
+    "bg-amber-500",
+    "bg-yellow-500",
+    "bg-lightgreen-500",
+    "bg-green-500",
+    "bg-skyblue-500",
+    "bg-blue-500",
+    "bg-purple-500",
+    "bg-teal-500",
+    "bg-lightred-500",
+    "bg-coral-500",
+    "bg-darkorange-500",
+    "bg-deeppink-500",
+    "bg-blueviolet-500",
+    "bg-cadetblue-500",
+    "bg-chartreuse-500",
+    "bg-steelblue-500",
+    "bg-chocolate-500",
+    "bg-turquoise-500",
+    "bg-mediumvioletred-500",
+    "bg-olivedrab-500",
 ];
+
 
 function Schedule({ data }) {
     const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -70,13 +71,7 @@ function Schedule({ data }) {
 
     return (
         <div
-            className="grid w-full"
-            style={{
-                display: "grid",
-                gridTemplateColumns: "120px repeat(6, 1fr)", // Time + Mon-Sat
-                gridTemplateRows: `30px repeat(${timeSlots.length}, 25px)`, // Header + time slots
-                border: "2px solid black",
-            }}
+            className={`grid w-full border-2 border-black grid-cols-[120px_repeat(6,_1fr)] grid-rows-[30px_repeat(${timeSlots.length},_25px)]`}
         >
             {/* Header Row */}
             <div className="bg-gray-200 font-bold flex items-center justify-center border border-t-0 border-l-0 border-r-black border-b-black">
@@ -144,11 +139,10 @@ function Schedule({ data }) {
                 return (
                     <div
                         key={class_code}
-                        className="text-center text-sm flex flex-col items-center justify-center font-medium mt-[2px] ml-[2px] mr-[1px] mb-[1px] rounded-md p-1"
+                        className={`${isConflict ? "bg-red-600 bg-opacity-50 text-white" : `${color}`} text-center text-sm flex flex-col items-center justify-center font-medium mt-[2px] ml-[2px] mr-[1px] mb-[1px] rounded-md p-1`}
                         style={{
                             gridRow: `${rowStart} / ${rowEnd}`,
                             gridColumn: `${colStart} / ${colStart + 1}`,
-                            backgroundColor: isConflict ? "rgba(255, 0, 0, 0.5)" : `${convertToRgba(color, 0.95)}`,
                         }}
                     >
                         <span>{class_code || ''}</span>

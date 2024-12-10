@@ -38,8 +38,10 @@ function Header({ toggleSidebar }) {
     return (
         <>
             {/* Header */}
-            <HiBars3 onClick={toggleSidebar} className="cursor-pointer transition-transform duration-300 ease-in-out transform
-                w-10 h-10 hover:scale-110 active:scale-90" size={30} />
+            <div className="rounded-full hover:bg-gray-200">
+                <HiBars3 onClick={toggleSidebar} className="cursor-pointer transition-transform duration-300 ease-in-out transform
+                w-10 h-10 active:scale-90" size={30} />
+            </div>
 
             {/* Profile Picture and Dropdown */}
             <div className="relative" ref={dropdownRef}>

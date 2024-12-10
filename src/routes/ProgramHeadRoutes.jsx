@@ -18,7 +18,7 @@ const EnrollmentDashboardProgramHead = lazy(() => import("../pages/ProgramHead/E
 const RoomSchedules = lazy(() => import("../pages/enrollment/RoomSchedules"));
 const FacultySchedules = lazy(() => import("../pages/enrollment/FacultySchedules"));
 const FacultyClasses = lazy(() => import("../pages/Faculty/FacultyClasses"));
-const CLassStudents = lazy(() => import("../pages/Faculty/ClassStudents"));
+const ClassRouter = lazy(() => import("../pages/Faculty/Class/ClassRouter"));
 
 const ProgramHeadRoutes = ({ enrollmentOngoing, preparation }) => (
     <>
@@ -46,7 +46,7 @@ const ProgramHeadRoutes = ({ enrollmentOngoing, preparation }) => (
             </>
         }
         <Route path="/classes" element={<FacultyClasses />} />
-        <Route path="/classes/:classId" element={<CLassStudents />} />
+        <Route path="/classes/:classId" element={<ClassRouter />} />
         <Route path="*" element={<Navigate to="/classes" />} />
     </>
 )
