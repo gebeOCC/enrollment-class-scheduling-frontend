@@ -48,11 +48,17 @@ function FacultySchedules() {
                         className="w-full p-2 border border-gray-300 rounded-md cursor-pointer focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out"
                     >
                         <option value="all">All Faculties</option>
-                        {faculties.map(faculty => (
-                            <option key={faculty.id} value={faculty.id}>
-                                {formatFullNameFML(faculty)} ({faculty.schedules.length} classes)
-                            </option>
-                        ))}
+                        {faculties.map(faculty => {
+                            const secondaryCount = faculty.schedules.reduce((count, schedule) => {
+                                return count + (schedule.subject_secondary_schedule ? 1 : 0);
+                            }, 0);
+
+                            return (
+                                <option key={faculty.id} value={faculty.id}>
+                                    {formatFullNameFML(faculty)} ({faculty.schedules.length + secondaryCount} classes)
+                                </option>
+                            );
+                        })}
                     </select>
                 </div>
             </div>
@@ -66,7 +72,7 @@ function FacultySchedules() {
                         className="text-4xl tracking-wide border-b-2 border-gray-300 pb-2"
                     >
                         <span className="text-blue-700 font-bold"> {formatFullNameFML(faculty)}</span> <span className="text-gray-800 "> ({faculty.schedules.length} classes)</span>
-                       
+
                     </h1>
                     <Schedule data={faculty.schedules} />
                 </div>

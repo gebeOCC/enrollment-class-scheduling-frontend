@@ -1,5 +1,5 @@
 import React from "react";
-import { convertToAMPM, convertToRgba, formatFullName } from "../../utilities/utils";
+import { convertToAMPM, formatFullName } from "../../utilities/utils";
 
 // Helper function to convert time to row index
 function timeToRowIndex(time) {
@@ -62,12 +62,25 @@ function Schedule({ data }) {
     }).filter(Boolean); // Filter out the null value
 
     function hasTimeConflict(existingSchedules, newSchedule) {
-        return existingSchedules.some(
-            (schedule) =>
-                schedule.day === newSchedule.day && // Same day
-                (newSchedule.start_time < schedule.end_time && newSchedule.end_time > schedule.start_time) // Time overlap
-        );
+        return existingSchedules.some((schedule) => {
+            // Primary schedule conflict
+            const primaryConflict =
+                schedule.day === newSchedule.day &&
+                newSchedule.start_time < schedule.end_time &&
+                newSchedule.end_time > schedule.start_time;
+
+            // Secondary schedule conflict
+            const secondarySchedule = schedule.subject_secondary_schedule;
+            const secondaryConflict =
+                secondarySchedule &&
+                secondarySchedule.day === newSchedule.day &&
+                newSchedule.start_time < secondarySchedule.end_time &&
+                newSchedule.end_time > secondarySchedule.start_time;
+
+            return primaryConflict || secondaryConflict;
+        });
     }
+
 
     return (
         <div
@@ -136,20 +149,53 @@ function Schedule({ data }) {
                     { day, start_time, end_time }
                 );
 
+                // Secondary schedule data
+                const secondarySchedule = classData.subject_secondary_schedule;
+                const secondaryDay = secondarySchedule?.day;
+                const secondaryStartTime = secondarySchedule?.start_time;
+                const secondaryEndTime = secondarySchedule?.end_time;
+                const secondaryRoomName = secondarySchedule?.room?.room_name;
+
+                const secondaryRowStart = secondaryStartTime ? timeToRowIndex(secondaryStartTime) : null;
+                const secondaryRowEnd = secondaryEndTime ? timeToRowIndex(secondaryEndTime) : null;
+                const secondaryColStart = secondaryDay ? dayToColumnIndex(secondaryDay) : null;
+
+                const secondaryIsConflict = hasTimeConflict(
+                    data.filter((item) => item.id !== id),
+                    { day: secondaryDay, start_time: secondaryStartTime, end_time: secondaryEndTime }
+                );
+
                 return (
-                    <div
-                        key={class_code}
-                        className={`${isConflict ? "bg-red-600 bg-opacity-50 text-white" : `${color}`} text-center text-sm flex flex-col items-center justify-center font-medium mt-[2px] ml-[2px] mr-[1px] mb-[1px] rounded-md p-1`}
-                        style={{
-                            gridRow: `${rowStart} / ${rowEnd}`,
-                            gridColumn: `${colStart} / ${colStart + 1}`,
-                        }}
-                    >
-                        <span>{class_code || ''}</span>
-                        <span>{descriptive_title}</span>
-                        <span>{room_name || ""}</span>
-                        <span>{first_name ? formatFullName(classData) : ""}</span>
-                    </div>
+                    <React.Fragment key={id}>
+                        <div
+                            className={`${isConflict ? "bg-red-600 bg-opacity-50 text-white" : `${color}`} text-center text-sm flex flex-col items-center justify-center font-medium mt-[2px] ml-[2px] mr-[1px] mb-[1px] rounded-md p-1`}
+                            style={{
+                                gridRow: `${rowStart} / ${rowEnd}`,
+                                gridColumn: `${colStart} / ${colStart + 1}`,
+                            }}
+                        >
+                            <span>{class_code || ''}</span>
+                            <span>{descriptive_title}</span>
+                            <span>{room_name || ""}</span>
+                            <span>{first_name ? formatFullName(classData) : ""}</span>
+                        </div>
+
+                        {secondarySchedule && (
+                            <div
+                                key={`${class_code}-secondary`}
+                                className={`${secondaryIsConflict ? "bg-red-600 bg-opacity-50 text-white" : `${color}`} text-center text-sm flex flex-col items-center justify-center font-medium mt-[2px] ml-[2px] mr-[1px] mb-[1px] rounded-md p-1`}
+                                style={{
+                                    gridRow: secondaryRowStart && secondaryRowEnd ? `${secondaryRowStart} / ${secondaryRowEnd}` : undefined,
+                                    gridColumn: secondaryColStart ? `${secondaryColStart} / ${secondaryColStart + 1}` : undefined,
+                                }}
+                            >
+                                <span>{class_code || ''}</span>
+                                <span>{descriptive_title}</span>
+                                <span>{secondaryRoomName || ""}</span>
+                                <span>{first_name ? formatFullName(classData) : ""}</span>
+                            </div>
+                        )}
+                    </React.Fragment>
                 );
             })}
         </div>
