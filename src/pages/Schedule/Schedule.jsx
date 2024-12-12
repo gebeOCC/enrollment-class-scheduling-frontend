@@ -44,7 +44,6 @@ const colors = [
     "bg-olivedrab-500",
 ];
 
-
 function Schedule({ data }) {
     const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
