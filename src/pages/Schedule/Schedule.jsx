@@ -164,6 +164,8 @@ function Schedule({ data }) {
                     { day: secondaryDay, start_time: secondaryStartTime, end_time: secondaryEndTime }
                 );
 
+                if (day == "TBA" || start_time == "TBA") return;
+
                 return (
                     <React.Fragment key={id}>
                         <div

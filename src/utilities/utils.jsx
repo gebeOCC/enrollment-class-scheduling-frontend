@@ -194,11 +194,11 @@ export function copyText(text) {
 
 export function detectOwnClassesConflict(classDetails, classes) {
     const conflictExists = classes.find(classSchedule => hasTimeConflict(
-        convert24HourTimeToMinutes(classSchedule.start_time),
-        convert24HourTimeToMinutes(classSchedule.end_time),
+        convert24HourTimeToMinutes(classSchedule.year_section_subjects.start_time),
+        convert24HourTimeToMinutes(classSchedule.year_section_subjects.end_time),
         convert24HourTimeToMinutes(classDetails.start_time),
         convert24HourTimeToMinutes(classDetails.end_time)
-    ) && classSchedule.day == classDetails.day && classDetails.id != classSchedule.id);
+    ) && classSchedule.year_section_subjects.day == classDetails.day && classDetails.id != classSchedule.year_section_subjects.id);
     return !!conflictExists;
 }
 

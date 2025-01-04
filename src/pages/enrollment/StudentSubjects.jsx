@@ -96,11 +96,11 @@ function StudentSubjects() {
     const detectConflict = (classDetails) => {
         console.log(classDetails);
         const conflictExists = classes.find(classSchedule => hasTimeConflict(
-            convert24HourTimeToMinutes(classSchedule.start_time),
-            convert24HourTimeToMinutes(classSchedule.end_time),
+            convert24HourTimeToMinutes(classSchedule.year_section_subjects.start_time),
+            convert24HourTimeToMinutes(classSchedule.year_section_subjects.end_time),
             convert24HourTimeToMinutes(classDetails.start_time),
             convert24HourTimeToMinutes(classDetails.end_time)
-        ) && classSchedule.day == classDetails.day);
+        ) && classSchedule.year_section_subjects.day == classDetails.day);
         return !!conflictExists;
     };
 
@@ -177,12 +177,12 @@ function StudentSubjects() {
                                 onChange={() => { setEditing(!editing) }}
                                 aria-label="Toggle edit mode"
                                 className="appearance-none w-12 h-6 bg-gray-400 rounded-full cursor-pointer transition duration-300 ease-in-out flex justify-start items-center
-                                            checked:bg-blue-600 
-                                            after:content-[''] 
-                                            after:block after:w-5 after:h-5 after:bg-white 
-                                            after:rounded-full after:shadow-md 
-                                            after:transition-all after:duration-300 
-                                            after:translate-x-1 checked:after:translate-x-6   
+                                            checked:bg-blue-600
+                                            after:content-['']
+                                            after:block after:w-5 after:h-5 after:bg-white
+                                            after:rounded-full after:shadow-md
+                                            after:transition-all after:duration-300
+                                            after:translate-x-1 checked:after:translate-x-6
                                             hover:shadow-lg focus:outline-none"
                             />
                         </div>
@@ -216,30 +216,51 @@ function StudentSubjects() {
                         {classes.map((classSubject, index) => (
                             <div
                                 key={index}
-                                className={`border border-transparent border-b-gray-800 grid grid-cols-[100px_100px_1fr_120px_180px_90px_auto] gap-4 items-center p-2 transition duration-200 ease-in-out ${detectOwnClassesConflict(classSubject, classes) ? 'bg-red-600 text-white' : 'text-black bg-white hover:bg-gray-200'}`}
+                                className={`border border-transparent border-b-gray-800 grid grid-cols-[100px_100px_1fr_120px_180px_90px_auto] gap-4 items-center p-2 transition duration-200 ease-in-out ${detectOwnClassesConflict(classSubject.year_section_subjects, classes) ? 'bg-red-600 text-white' : 'text-black bg-white hover:bg-gray-200'}`}
                             >
                                 <div>
-                                    {classSubject.class_code}
+                                    {classSubject.year_section_subjects.class_code}
                                 </div>
                                 <div>
-                                    {classSubject.subject_code}
+                                    {classSubject.year_section_subjects.subject.subject_code}
                                 </div>
                                 <div>
-                                    {classSubject.descriptive_title}
+                                    {classSubject.year_section_subjects.subject.descriptive_title}
+                                </div>
+                                <div className="flex flex-col">
+                                    <div>
+                                        {classSubject.year_section_subjects.day}
+                                    </div>
+                                    <div>
+                                        {classSubject.year_section_subjects.subject_secondary_schedule?.day}
+                                    </div>
                                 </div>
                                 <div>
-                                    {classSubject.day}
-                                </div>
-                                <div>
-                                    {convertToAMPM(classSubject.start_time)} - {convertToAMPM(classSubject.end_time)}
+                                    <div>
+                                        {classSubject.year_section_subjects.start_time != "TBA" ? (
+                                            convertToAMPM(classSubject.year_section_subjects.start_time) + " - " + convertToAMPM(classSubject.year_section_subjects.end_time)
+                                        ) : (
+                                            <>TBA</>
+                                        )}
+                                    </div>
+                                    <div>
+                                        {classSubject.year_section_subjects.subject_secondary_schedule?.start_time !== "TBA" ? (
+                                            <>
+                                                {classSubject.year_section_subjects.subject_secondary_schedule?.start_time && convertToAMPM(classSubject.year_section_subjects.subject_secondary_schedule.start_time)}
+                                                {classSubject.year_section_subjects.subject_secondary_schedule?.start_time && classSubject.year_section_subjects.subject_secondary_schedule?.end_time && ' - '}
+                                                {classSubject.year_section_subjects.subject_secondary_schedule?.end_time && convertToAMPM(classSubject.year_section_subjects.subject_secondary_schedule.end_time)}
+                                            </>
+                                        ) : (
+                                            <>TBA</>
+                                        )}
+                                    </div>
                                 </div>
                                 <div className="text-center">
-                                    {classSubject.credit_units}
+                                    {classSubject.year_section_subjects.subject.credit_units}
                                 </div>
-
                                 {editing ? (
                                     <>
-                                        {(submitting && studentSubjectIdToAddDelete == classSubject.id) ? (
+                                        {(submitting && studentSubjectIdToAddDelete == classSubject.year_section_subjects.id) ? (
                                             <ImSpinner5 size={20} className={`text-red-500 size-6 inline-block animate-spin ml-1`} />
                                         ) : (
                                             <>
@@ -257,7 +278,7 @@ function StudentSubjects() {
                         ))}
                         <div className={`grid grid-cols-[100px_100px_1fr_120px_180px_90px_auto] gap-4 items-center mt-2 px-2`}>
                             <h1 className="col-start-5 text-md font-semibold text-end">Total units:</h1>
-                            <h1 className="text-center text-md font-semibold">{classes.reduce((total, subject) => total + subject.credit_units, 0)}</h1>
+                            <h1 className="text-center text-md font-semibold">{classes.reduce((total, subject) => total + subject.year_section_subjects.subject.credit_units, 0)}</h1>
                             <FaCircleMinus size={20} className="text-transparent" />
                         </div>
                     </div>
@@ -317,11 +338,31 @@ function StudentSubjects() {
                                 <div className="">
                                     {searchClass.descriptive_title}
                                 </div>
-                                <div className="">
-                                    {searchClass.day}
+                                <div className="flex flex-col">
+                                    <div>
+                                        {searchClass.day}
+                                    </div>
+                                    <div>
+                                        {searchClass.subject_secondary_schedule?.day}
+                                    </div>
                                 </div>
-                                <div className="">
-                                    {convertToAMPM(searchClass.start_time)} - {convertToAMPM(searchClass.end_time)}
+                                <div className="flex flex-col">
+                                    <div>
+                                        {searchClass.start_time != "TBA" ? (
+                                            convertToAMPM(searchClass.start_time) + " - " + convertToAMPM(searchClass.end_time)
+                                        ) : (
+                                            <>TBA</>
+                                        )}
+                                    </div>
+                                    {searchClass.subject_secondary_schedule && (
+                                        <div>
+                                            {searchClass.subject_secondary_schedule?.start_time != "TBA" ? (
+                                                convertToAMPM(searchClass.subject_secondary_schedule?.start_time) + " - " + convertToAMPM(searchClass.subject_secondary_schedule?.end_time)
+                                            ) : (
+                                                <>TBA</>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="text-center">
                                     {searchClass.credit_units}

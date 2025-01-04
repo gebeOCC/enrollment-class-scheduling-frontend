@@ -10,7 +10,7 @@ import OCC_LOGO from '../images/OCC_LOGO.png';
 import Header from "./Header";
 import { useAuth } from "../context/AuthContext";
 import { formatDateShort } from "../utilities/utils";
-import { PiChalkboardTeacher, PiChalkboardTeacherFill, PiStudent, PiStudentFill } from "react-icons/pi";
+import { PiChalkboardTeacher, PiChalkboardTeacherFill, PiNotebookDuotone, PiNotebookFill, PiStudent, PiStudentFill } from "react-icons/pi";
 import FirstLoginModal from "../pages/All/FirstLoginModal";
 import './SideBar.css'
 import PreLoader from "./preloader/PreLoader";
@@ -51,7 +51,7 @@ function SideBar() {
     return (
         <div className="flex h-svh overflow-hidden">
             <div className={`h-full fixed top-0 left-0 z-50  md:h-auto md:static bg-[#3e5c76] text-white flex-shrink-0 flex-col justify-between lg:block transition-all duration-200 ease-in-out ${sidebarOpen ? `'w-16 md:60 w-60` : `-translate-x-full md:translate-x-0 w-16`}`}>
-                <div className="flex flex-col h-full">
+                <aside className="flex flex-col h-full">
                     <div
                         className={`w-full p-2 flex items-center h-14 ${sidebarOpen ? 'space-x-2' : 'justify-center'} `}>
                         <HiBars3
@@ -509,12 +509,12 @@ function SideBar() {
                                                                         <>
                                                                             {sidebarOpen ? (
                                                                                 <>
-                                                                                    {isActive ? <GoPersonFill /> : <GoPerson />}
+                                                                                    {isActive ? <MdMeetingRoom /> : <MdOutlineMeetingRoom />}
                                                                                     <span>Room</span>
                                                                                 </>
                                                                             ) : (
                                                                                 <div className="w-full flex flex-col items-center">
-                                                                                    {isActive ? <GoPersonFill /> : <GoPerson />}
+                                                                                    {isActive ? <MdMeetingRoom /> : <MdOutlineMeetingRoom />}
                                                                                     <span className="text-[8px]">Room</span>
                                                                                 </div>
                                                                             )
@@ -541,13 +541,45 @@ function SideBar() {
                                                                         <>
                                                                             {sidebarOpen ? (
                                                                                 <>
-                                                                                    {isActive ? <MdMeetingRoom /> : <MdOutlineMeetingRoom />}
+                                                                                    {isActive ? <GoPersonFill /> : <GoPerson />}
                                                                                     <span>Faculty</span>
                                                                                 </>
                                                                             ) : (
                                                                                 <div className="w-full flex flex-col items-center">
-                                                                                    {isActive ? <MdMeetingRoom /> : <MdOutlineMeetingRoom />}
+                                                                                    {isActive ? <GoPersonFill /> : <GoPerson />}
                                                                                     <span className="text-[8px]">Faculty</span>
+                                                                                </div>
+                                                                            )
+                                                                            }
+                                                                        </>
+                                                                    )}
+                                                                </NavLink>
+                                                            </li>
+                                                            <li className="w-full">
+                                                                <NavLink
+                                                                    to="subjects-schedules"
+                                                                    className={({ isActive }) =>
+                                                                        isActive
+                                                                            ? "bg-[#539ad8] p-2 rounded-md flex items-center space-x-2 py-2"
+                                                                            : "p-2 flex items-center space-x-2 py-2 rounded-md duration-100 focus:bg-[#4e90ca] hover:bg-[#3d7cb1]"
+                                                                    }
+                                                                    onClick={() => {
+                                                                        if (location.pathname !== '/subjects-schedules' && onMobile) {
+                                                                            setSidebarOpen(false);
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    {({ isActive }) => (
+                                                                        <>
+                                                                            {sidebarOpen ? (
+                                                                                <>
+                                                                                    {isActive ? <PiNotebookFill /> : <PiNotebookDuotone />}
+                                                                                    <span>Subjects</span>
+                                                                                </>
+                                                                            ) : (
+                                                                                <div className="w-full flex flex-col items-center">
+                                                                                    {isActive ? <PiNotebookFill /> : <PiNotebookDuotone />}
+                                                                                    <span className="text-[8px]">Subjects</span>
                                                                                 </div>
                                                                             )
                                                                             }
@@ -643,12 +675,12 @@ function SideBar() {
                                                         {sidebarOpen ? (
                                                             <>
                                                                 {isActive ? <GoPersonFill /> : <GoPerson />}
-                                                                <span>Faculty</span>
+                                                                <span>Faculty List</span>
                                                             </>
                                                         ) : (
                                                             <div className="w-full flex flex-col items-center">
                                                                 {isActive ? <GoPersonFill /> : <GoPerson />}
-                                                                <span className="text-[8px]">Faculty</span>
+                                                                <span className="text-[8px]">Faculty List</span>
                                                             </div>
                                                         )
                                                         }
@@ -941,13 +973,11 @@ function SideBar() {
                             return null;
                         })()}
                     </ul >
-                </div >
+                </aside >
             </div >
 
             <div className="flex flex-col flex-grow">
-                <div className="h-14 max-h-14 min-h-14 bg-white text-black flex items-center justify-between px-2">
-                    <Header sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
-                </div>
+                <Header sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
 
                 <div className="flex-grow p-4 bg-[#F0F4F8] overflow-auto">
                     <Suspense fallback={<PreLoader />}>

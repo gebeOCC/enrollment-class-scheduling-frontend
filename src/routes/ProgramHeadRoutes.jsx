@@ -19,6 +19,7 @@ const RoomSchedules = lazy(() => import("../pages/enrollment/RoomSchedules"));
 const FacultySchedules = lazy(() => import("../pages/enrollment/FacultySchedules"));
 const FacultyClasses = lazy(() => import("../pages/Faculty/FacultyClasses"));
 const ClassRouter = lazy(() => import("../pages/Faculty/Class/ClassRouter"));
+const EnrollmentSubjectsSchedules = lazy(() => import("../pages/ClassScheduling/EnrollmentSubjectsSchedules"));
 
 const ProgramHeadRoutes = ({ enrollmentOngoing, preparation }) => (
     <>
@@ -42,6 +43,7 @@ const ProgramHeadRoutes = ({ enrollmentOngoing, preparation }) => (
                 <Route path="/dashboard" element={<EnrollmentDashboardProgramHead />} />
                 <Route path="/room-schedules" element={<RoomSchedules />} />
                 <Route path="/faculty-schedules" element={<FacultySchedules />} />
+                <Route path="/subjects-schedules" element={<EnrollmentSubjectsSchedules />} />
                 <Route path="*" element={<Navigate to="/dashboard" />} />
             </>
         }

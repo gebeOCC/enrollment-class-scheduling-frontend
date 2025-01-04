@@ -5,7 +5,7 @@ import PreLoader from "../../components/preloader/PreLoader";
 
 function RoomSchedules() {
     const [rooms, setRooms] = useState([]);
-    const [selectedRoom, setSelectedRoom] = useState("all"); // Default to "all"
+    const [selectedRoom, setSelectedRoom] = useState("all");
     const [fetching, setFetching] = useState(true);
 
     const getEnrollmentRoomSchedules = async () => {

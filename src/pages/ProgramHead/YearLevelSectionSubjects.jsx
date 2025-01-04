@@ -6,6 +6,7 @@ import { MdDelete, MdEdit } from 'react-icons/md';
 import { ImSpinner5 } from 'react-icons/im';
 import { FaPlus } from 'react-icons/fa6';
 import Schedule from '../Schedule/Schedule';
+import { RiMegaphoneFill, RiMegaphoneLine } from 'react-icons/ri';
 
 function YearLevelSectionSubjects() {
     const { courseid, yearlevel } = useParams();
@@ -146,12 +147,18 @@ function YearLevelSectionSubjects() {
         setStartTime(prev => ({ ...prev, [name]: value }));
     };
 
-
     useEffect(() => {
-        setClassForm(prev => ({
-            ...prev,
-            end_time: convertMinutesTo24HourTime(Number(convert24HourTimeToMinutes(classForm.start_time)) + Number(startTime.end))
-        }))
+        if (classForm.start_time != "TBA") {
+            setClassForm(prev => ({
+                ...prev,
+                end_time: convertMinutesTo24HourTime(Number(convert24HourTimeToMinutes(classForm.start_time)) + Number(startTime.end))
+            }))
+        } else {
+            setClassForm(prev => ({
+                ...prev,
+                end_time: "TBA"
+            }))
+        }
     }, [classForm.start_time, startTime.end])
 
     const subjectCodeExist = (subjectCode) => {
@@ -267,7 +274,9 @@ function YearLevelSectionSubjects() {
     };
 
     useEffect(() => {
-        if (classForm.faculty_id != 0) {
+        if (classForm.faculty_id == null) {
+            setFacultyName("TBA");
+        } else if (classForm.faculty_id != 0) {
             const instructor = instructors.find(instructor => instructor.id === classForm.faculty_id);
             setFacultyName(instructor.last_name + ', ' + instructor.first_name);
         } else {
@@ -291,8 +300,6 @@ function YearLevelSectionSubjects() {
         return `odd:bg-white even:bg-gray-100 hover:bg-cyan-200`
     };
 
-
-
     const addEditClass = async (url) => {
         await axiosInstance.post(url, classForm)
             .then(response => {
@@ -304,17 +311,17 @@ function YearLevelSectionSubjects() {
                     setAddingSecondarySchedule(false)
                     setEditingSecondarySchedule(false);
                     setEditClass(false);
-                    setClassForm({
-                        class_code: '',
-                        subject_id: '',
-                        day: '',
-                        start_time: '7:00',
-                        end_time: '',
-                        faculty_id: 0,
-                        room_id: 0,
+                    // setClassForm({
+                    //     class_code: '',
+                    //     subject_id: '',
+                    //     day: '',
+                    //     start_time: '7:00',
+                    //     end_time: '',
+                    //     faculty_id: 0,
+                    //     room_id: 0,
 
-                        descriptive_title: '',
-                    });
+                    //     descriptive_title: '',
+                    // });
                 }
             })
             .finally(() => {
@@ -324,6 +331,8 @@ function YearLevelSectionSubjects() {
 
     const [classInvalidFields, setClassInvalidFields] = useState([""]);
     const submit = async () => {
+        console.log(classForm)
+        // return
         setSubmitting(true)
         const invalidFields = [];
 
@@ -478,14 +487,24 @@ function YearLevelSectionSubjects() {
                                                     <td className={`py-2 px-1`}>
                                                         {classSubject.day}
                                                     </td>
-                                                    <td className={`py-2 px-1`}>
-                                                        {`${convertToAMPM(classSubject.start_time)} - ${convertToAMPM(classSubject.end_time)}`}
+                                                    <td className="py-2 px-1 text-center">
+                                                        {classSubject.start_time !== "TBA"
+                                                            ? convertToAMPM(classSubject.start_time) + ' - ' + convertToAMPM(classSubject.end_time)
+                                                            : "TBA"}
                                                     </td>
                                                     <td className={`py-2 px-1`}>
-                                                        {classSubject.room_name}
+                                                        {classSubject.room_name != null ? (
+                                                            classSubject.room_name
+                                                        ) : (
+                                                            <>TBA</>
+                                                        )}
                                                     </td>
                                                     <td className={`py-2 px-1 truncate max-w-xs overflow-hidden whitespace-nowrap`}>
-                                                        {formatFullName(classSubject)}
+                                                        {classSubject.first_name != null ? (
+                                                            <>{formatFullName(classSubject)}</>
+                                                        ) : (
+                                                            <>TBA</>
+                                                        )}
                                                     </td>
                                                     <td>
                                                         {(!editClass && !addingSubject && !addingSecondarySchedule) && (
@@ -532,62 +551,70 @@ function YearLevelSectionSubjects() {
                                                 </>
                                             </tr>
 
-                                            {
-                                                classSubject.subject_secondary_schedule && (
-                                                    <tr
-                                                        className={`border-b ${getRowClass(classSubject.subject_secondary_schedule, classForm, true)}`}
-                                                    >
-                                                        <>
-                                                            <td className={`py-2 px-1`}>
-                                                                {classSubject.class_code}
-                                                            </td>
-                                                            <td className={`py-2 px-1`}>
-                                                                {classSubject.subject_code}
-                                                            </td>
-                                                            <td className={`py-2 px-1 truncate max-w-xs overflow-hidden whitespace-nowrap`}>
-                                                                {classSubject.descriptive_title}
-                                                            </td>
-                                                            <td className={`py-2 px-1`}>
-                                                                {classSubject.subject_secondary_schedule.day}
-                                                            </td>
-                                                            <td className={`py-2 px-1`}>
-                                                                {`${convertToAMPM(classSubject.subject_secondary_schedule.start_time)} - ${convertToAMPM(classSubject.subject_secondary_schedule.end_time)}`}
-                                                            </td>
-                                                            <td className={`py-2 px-1`}>
-                                                                {classSubject.subject_secondary_schedule.room_name}
-                                                            </td>
-                                                            <td className={`py-2 px-1 truncate max-w-xs overflow-hidden whitespace-nowrap`}>
-                                                                {formatFullName(classSubject)}
-                                                            </td>
-                                                            <td>
-                                                                {(!editClass && !addingSubject && !addingSecondarySchedule) && (
-                                                                    <div className="h-full w-full flex justify-end items-center">
-                                                                        <MdEdit
-                                                                            className="text-green-500 cursor-pointer"
-                                                                            onClick={() => {
-                                                                                if (submitting) return
-                                                                                setEditingSecondarySchedule(true)
-                                                                                handleEditClass(classSubject, true)
-                                                                            }}
-                                                                        />
-                                                                        <MdDelete
-                                                                            onClick={() => {
-                                                                                if (submitting) return
-                                                                                setSubjectToDelete({
-                                                                                    deleting: true,
-                                                                                    classId: classSubject.subject_secondary_schedule.id,
-                                                                                    secondaSched: true,
-                                                                                });
-                                                                            }}
-                                                                            className={`text-red-500 cursor-pointer`}
-                                                                        />
-                                                                    </div>
-                                                                )}
-                                                            </td>
-                                                        </>
-                                                    </tr>
-                                                )
-                                            }
+                                            {classSubject.subject_secondary_schedule && (
+                                                <tr
+                                                    className={`border-b ${getRowClass(classSubject.subject_secondary_schedule, classForm, true)}`}
+                                                >
+                                                    <>
+                                                        <td className={`py-2 px-1`}>
+                                                            {classSubject.class_code}
+                                                        </td>
+                                                        <td className={`py-2 px-1`}>
+                                                            {classSubject.subject_code}
+                                                        </td>
+                                                        <td className={`py-2 px-1 truncate max-w-xs overflow-hidden whitespace-nowrap`}>
+                                                            {classSubject.descriptive_title}
+                                                        </td>
+                                                        <td className={`py-2 px-1`}>
+                                                            {classSubject.subject_secondary_schedule.day}
+                                                        </td>
+                                                        <td className={`py-2 px-1 text-center`}>
+                                                            {classSubject.subject_secondary_schedule.start_time !== "TBA"
+                                                                ? convertToAMPM(classSubject.subject_secondary_schedule.start_time) + " - " + convertToAMPM(classSubject.subject_secondary_schedule.end_time)
+                                                                : "TBA"}
+                                                        </td>
+                                                        <td className={`py-2 px-1`}>
+                                                            {classSubject.subject_secondary_schedule.room_name != null ? (
+                                                                classSubject.subject_secondary_schedule.room_name
+                                                            ) : (
+                                                                <>TBA</>
+                                                            )}
+                                                        </td>
+                                                        <td className={`py-2 px-1 truncate max-w-xs overflow-hidden whitespace-nowrap`}>
+                                                            {classSubject.first_name != null ? (
+                                                                <>{formatFullName(classSubject)}</>
+                                                            ) : (
+                                                                <>TBA</>
+                                                            )}
+                                                        </td>
+                                                        <td>
+                                                            {(!editClass && !addingSubject && !addingSecondarySchedule) && (
+                                                                <div className="h-full w-full flex justify-end items-center">
+                                                                    <MdEdit
+                                                                        className="text-green-500 cursor-pointer"
+                                                                        onClick={() => {
+                                                                            if (submitting) return
+                                                                            setEditingSecondarySchedule(true)
+                                                                            handleEditClass(classSubject, true)
+                                                                        }}
+                                                                    />
+                                                                    <MdDelete
+                                                                        onClick={() => {
+                                                                            if (submitting) return
+                                                                            setSubjectToDelete({
+                                                                                deleting: true,
+                                                                                classId: classSubject.subject_secondary_schedule.id,
+                                                                                secondaSched: true,
+                                                                            });
+                                                                        }}
+                                                                        className={`text-red-500 cursor-pointer`}
+                                                                    />
+                                                                </div>
+                                                            )}
+                                                        </td>
+                                                    </>
+                                                </tr>
+                                            )}
                                         </React.Fragment>
                                     );
                                 })
@@ -615,7 +642,7 @@ function YearLevelSectionSubjects() {
                                     <div className=''>
                                         <label htmlFor="descriptive_title" className="truncate">Class Code:</label>
                                         <input
-                                            disabled={addingSecondarySchedule}
+                                            disabled={addingSecondarySchedule || editingSecondarySchedule}
                                             value={classForm.class_code}
                                             onChange={handleClassFormChange}
                                             name='class_code'
@@ -626,7 +653,7 @@ function YearLevelSectionSubjects() {
                                     <div className="relative">
                                         <label htmlFor="descriptive_title" className="truncate">Subject Code:</label>
                                         <input
-                                            disabled={addingSecondarySchedule}
+                                            disabled={addingSecondarySchedule || editingSecondarySchedule}
                                             value={classForm.subject_code}
                                             onChange={handleSubectCodeChange}
                                             name='subject_code'
@@ -676,114 +703,189 @@ function YearLevelSectionSubjects() {
                                         Schedule
                                     </div>
                                     <div className='col-span-1'>
-                                        <label htmlFor="day" className="truncate">Day</label>
-                                        <select
-                                            value={classForm.day}
-                                            onChange={handleClassFormChange}
-                                            name='day'
-                                            className={`h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400 ${classInvalidFields.includes('day') && 'border-red-300'}`}
-                                        >
-                                            <option value="" disabled>...</option>
-                                            <option value="Monday">Monday</option>
-                                            <option value="Tuesday">Tuesday</option>
-                                            <option value="Wednesday">Wednesday</option>
-                                            <option value="Thursday">Thursday</option>
-                                            <option value="Friday">Friday</option>
-                                            <option value="Saturday">Saturday</option>
-                                        </select>
+                                        <div className='flex justify-between'>
+                                            <label htmlFor="day" className="truncate">Day</label>
+                                            {classForm.day != "TBA" ? (
+                                                <RiMegaphoneLine
+                                                    onClick={() => {
+                                                        setClassForm(prev => ({
+                                                            ...prev,
+                                                            day: "TBA",
+                                                        }))
+                                                    }}
+                                                    size={20}
+                                                    className='text-gray-800 cursor-pointer' />
+                                            ) : (
+                                                <RiMegaphoneFill
+                                                    onClick={() => {
+                                                        setClassForm(prev => ({
+                                                            ...prev,
+                                                            day: "Monday",
+                                                        }))
+                                                    }}
+                                                    size={20}
+                                                    className='text-green-500 cursor-pointer' />
+                                            )}
+                                        </div>
+
+                                        {classForm.day != "TBA" ? (
+                                            <select
+                                                value={classForm.day}
+                                                onChange={handleClassFormChange}
+                                                name='day'
+                                                className={`h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400 ${classInvalidFields.includes('day') && 'border-red-300'}`}
+                                            >
+                                                <option value="" disabled>...</option>
+                                                <option value="Monday">Monday</option>
+                                                <option value="Tuesday">Tuesday</option>
+                                                <option value="Wednesday">Wednesday</option>
+                                                <option value="Thursday">Thursday</option>
+                                                <option value="Friday">Friday</option>
+                                                <option value="Saturday">Saturday</option>
+                                            </select>
+                                        ) : (
+                                            <select
+                                                disabled={true}
+                                                value={"TBA"}
+                                                className={`h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400 ${classInvalidFields.includes('day') && 'border-red-300'}`}
+                                            >
+                                                <option value="TBA">TBA</option>
+                                            </select>
+                                        )}
                                     </div>
 
                                     <div className='col-span-2'>
-                                        <label htmlFor="day" className="truncate">Start Time:</label>
-                                        <div className='flex items-center gap-1'>
-                                            <select
-                                                style={{ WebkitAppearance: 'none' }}
-                                                value={startTime.hours}
-                                                onChange={startTimeChange}
-                                                name='hours'
-                                                className={`text-center h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400 0 ${classInvalidFields.includes('start_time') && 'border-red-300'}`}
-                                            >
-                                                <option value="" disabled>...</option>
-                                                {startTime.time_indicator === 'PM' &&
-                                                    <>
-                                                        <option value="12">12</option>
-                                                        <option value="1">1</option>
-                                                        <option value="2">2</option>
-                                                        <option value="3">3</option>
-                                                        <option value="4">4</option>
-                                                        <option value="5">5</option>
-                                                    </>
-                                                }
-                                                {startTime.time_indicator === 'AM' &&
-                                                    <>
-                                                        <option value="7">7</option>
-                                                        <option value="8">8</option>
-                                                        <option value="9">9</option>
-                                                        <option value="10">10</option>
-                                                        <option value="11">11</option>
-                                                    </>
-                                                }
-                                            </select>
-                                            :
-                                            <select
-                                                style={{ WebkitAppearance: 'none' }}
-                                                value={startTime.minutes}
-                                                onChange={startTimeChange}
-                                                name='minutes'
-                                                className={`text-center h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400 ${classInvalidFields.includes('start_time') && 'border-red-300'}`}
-                                            >
-                                                {startTime.hours !== '7' &&
-                                                    <option value="00">00</option>
-                                                }
-                                                <option value="30">30</option>
-                                            </select>
-                                            <select
-                                                // style={{ WebkitAppearance: 'none' }}
-                                                value={startTime.time_indicator}
-                                                onChange={startTimeChange}
-                                                name='time_indicator'
-                                                className={`text-center h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400 ${classInvalidFields.includes('start_time') && 'border-red-300'}`}
-                                            >
-                                                <option value="AM">AM</option>
-                                                <option value="PM">PM</option>
-                                            </select>
+                                        <div className='flex justify-between'>
+                                            <label htmlFor="day" className="truncate">Start Time:</label>
+                                            {classForm.start_time != "TBA" ? (
+                                                <RiMegaphoneLine
+                                                    onClick={() => {
+                                                        setClassForm(prev => ({
+                                                            ...prev,
+                                                            start_time: "TBA",
+                                                        }))
+                                                    }}
+                                                    size={20}
+                                                    className='text-gray-800 cursor-pointer' />
+                                            ) : (
+                                                <RiMegaphoneFill
+                                                    onClick={() => {
+                                                        setClassForm(prev => ({
+                                                            ...prev,
+                                                            start_time: "7:30",
+                                                            end_time: "10:30",
+                                                        }))
+
+                                                        setStartTime({
+                                                            hours: '7',
+                                                            minutes: '00',
+                                                            time_indicator: 'AM',
+                                                            end: 180,
+                                                        });
+
+                                                    }}
+                                                    size={20}
+                                                    className='text-green-500 cursor-pointer' />
+                                            )}
                                         </div>
+                                        {classForm.start_time != "TBA" ? (
+                                            <div className='flex items-center gap-1'>
+                                                <select
+                                                    style={{ WebkitAppearance: 'none' }}
+                                                    value={startTime.hours}
+                                                    onChange={startTimeChange}
+                                                    name='hours'
+                                                    className={`text-center h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400 0 ${classInvalidFields.includes('start_time') && 'border-red-300'}`}
+                                                >
+                                                    <option value="" disabled>...</option>
+                                                    {startTime.time_indicator === 'PM' &&
+                                                        <>
+                                                            <option value="12">12</option>
+                                                            <option value="1">1</option>
+                                                            <option value="2">2</option>
+                                                            <option value="3">3</option>
+                                                            <option value="4">4</option>
+                                                            <option value="5">5</option>
+                                                        </>
+                                                    }
+                                                    {startTime.time_indicator === 'AM' &&
+                                                        <>
+                                                            <option value="7">7</option>
+                                                            <option value="8">8</option>
+                                                            <option value="9">9</option>
+                                                            <option value="10">10</option>
+                                                            <option value="11">11</option>
+                                                        </>
+                                                    }
+                                                </select>
+                                                :
+                                                <select
+                                                    style={{ WebkitAppearance: 'none' }}
+                                                    value={startTime.minutes}
+                                                    onChange={startTimeChange}
+                                                    name='minutes'
+                                                    className={`text-center h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400 ${classInvalidFields.includes('start_time') && 'border-red-300'}`}
+                                                >
+                                                    {startTime.hours !== '7' &&
+                                                        <option value="00">00</option>
+                                                    }
+                                                    <option value="30">30</option>
+                                                </select>
+                                                <select
+                                                    // style={{ WebkitAppearance: 'none' }}
+                                                    value={startTime.time_indicator}
+                                                    onChange={startTimeChange}
+                                                    name='time_indicator'
+                                                    className={`text-center h-8 px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400 ${classInvalidFields.includes('start_time') && 'border-red-300'}`}
+                                                >
+                                                    <option value="AM">AM</option>
+                                                    <option value="PM">PM</option>
+                                                </select>
+                                            </div>
+                                        ) : (
+                                            <p className='px-4 py-1 border'>TBA</p>
+                                        )}
+
                                     </div>
                                     <div className='col-span-1'>
                                         <label htmlFor="descriptive_title" className="truncate">End Time:</label>
-                                        <div className="relative col-span-1">
-                                            <input
-                                                readOnly={true}
-                                                value={convertToAMPM(classForm.end_time)}
-                                                onFocus={handleFocus}
-                                                onBlur={() => setTimeout(handleBlur, 100)}
-                                                name='end_time'
-                                                type="text"
-                                                className={`h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400 ${classInvalidFields.includes('end_time') && 'border-red-300'}`}
-                                            />
-                                            {isActive && (
-                                                <div className="absolute left-0 right-0 bg-white rounded-md shadow-2xl border-2 border-gray-400 max-h-32 overflow-y-auto z-10">
-                                                    <div
-                                                        onMouseDown={() => setStartTime(prev => ({ ...prev, end: 120 }))}
-                                                        className="px-2 py-1 hover:bg-blue-400 cursor-pointer"
-                                                    >
-                                                        +2hrs
+                                        {classForm.start_time != "TBA" ? (
+                                            <div className="relative col-span-1">
+                                                <input
+                                                    readOnly={true}
+                                                    value={convertToAMPM(classForm.end_time)}
+                                                    onFocus={handleFocus}
+                                                    onBlur={() => setTimeout(handleBlur, 100)}
+                                                    name='end_time'
+                                                    type="text"
+                                                    className={`h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400 ${classInvalidFields.includes('end_time') && 'border-red-300'}`}
+                                                />
+                                                {isActive && (
+                                                    <div className="absolute left-0 right-0 bg-white rounded-md shadow-2xl border-2 border-gray-400 max-h-32 overflow-y-auto z-10">
+                                                        <div
+                                                            onMouseDown={() => setStartTime(prev => ({ ...prev, end: 120 }))}
+                                                            className="px-2 py-1 hover:bg-blue-400 cursor-pointer"
+                                                        >
+                                                            +2hrs
+                                                        </div>
+                                                        <div
+                                                            onMouseDown={() => setStartTime(prev => ({ ...prev, end: 180 }))}
+                                                            className="px-2 py-1 hover:bg-blue-400 cursor-pointer"
+                                                        >
+                                                            +3hrs
+                                                        </div>
+                                                        <div
+                                                            onMouseDown={() => setStartTime(prev => ({ ...prev, end: 300 }))}
+                                                            className="px-2 py-1 hover:bg-blue-400 cursor-pointer"
+                                                        >
+                                                            +5hrs
+                                                        </div>
                                                     </div>
-                                                    <div
-                                                        onMouseDown={() => setStartTime(prev => ({ ...prev, end: 180 }))}
-                                                        className="px-2 py-1 hover:bg-blue-400 cursor-pointer"
-                                                    >
-                                                        +3hrs
-                                                    </div>
-                                                    <div
-                                                        onMouseDown={() => setStartTime(prev => ({ ...prev, end: 300 }))}
-                                                        className="px-2 py-1 hover:bg-blue-400 cursor-pointer"
-                                                    >
-                                                        +5hrs
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </div>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <p className='px-4 py-1 border'>TBA</p>
+                                        )}
                                     </div>
                                 </div>
 
@@ -792,24 +894,92 @@ function YearLevelSectionSubjects() {
                                         Assign
                                     </div>
                                     <div className=''>
-                                        <label htmlFor="descriptive_title" className="truncate">Room:</label>
-                                        <select
-                                            value={classForm.room_id}
-                                            onChange={handleClassFormChange}
-                                            name='room_id'
-                                            type="text"
-                                            className={`h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400 ${classInvalidFields.includes('room_id') && 'border-red-300'}`}
-                                        >
-                                            <option disabled value="0">...</option>
-                                            {rooms.map((room, index) => (
-                                                <option key={room.id + room.room_name} value={room.id}>{room.room_name}</option>
-                                            ))}
-                                        </select>
+                                        <div className='flex justify-between'>
+                                            <label htmlFor="room_id" className="truncate">Room:</label>
+                                            {classForm.room_id != null ? (
+                                                <RiMegaphoneLine
+                                                    onClick={() => {
+                                                        setClassForm(prev => ({
+                                                            ...prev,
+                                                            room_id: null,
+                                                        }))
+                                                    }}
+                                                    size={20}
+                                                    className='text-gray-800 cursor-pointer' />
+                                            ) : (
+                                                <RiMegaphoneFill
+                                                    onClick={() => {
+                                                        setClassForm(prev => ({
+                                                            ...prev,
+                                                            room_id: 0,
+                                                        }))
+                                                    }}
+                                                    size={20}
+                                                    className='text-green-500 cursor-pointer' />
+                                            )}
+                                        </div>
+                                        {classForm.room_id != null ? (
+                                            <select
+                                                value={classForm.room_id}
+                                                onChange={handleClassFormChange}
+                                                name='room_id'
+                                                type="text"
+                                                className={`h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400 ${classInvalidFields.includes('room_id') && 'border-red-300'}`}
+                                            >
+                                                <option disabled value="0">...</option>
+                                                {rooms.map((room, index) => (
+                                                    <option key={room.id + room.room_name} value={room.id}>{room.room_name}</option>
+                                                ))}
+                                            </select>
+                                        ) : (
+                                            <select
+                                                disabled={true}
+                                                value={'TBA'}
+                                                type="text"
+                                                className={`h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400 ${classInvalidFields.includes('room_id') && 'border-red-300'}`}
+                                            >
+                                                <option disabled value="TBA">TBA</option>
+                                            </select>
+                                        )}
                                     </div>
                                     <div className='relative'>
-                                        <label htmlFor="faculty_id" className="truncate">Instructor:</label>
+                                        <div className='flex justify-between'>
+                                            <label htmlFor="faculty_id" className="truncate">Instructor:</label>
+                                            {(classForm.faculty_id != null) ? (
+                                                <>
+                                                    {!editingSecondarySchedule ? (
+                                                        <RiMegaphoneLine
+                                                            onClick={() => {
+                                                                setClassForm(prev => ({
+                                                                    ...prev,
+                                                                    faculty_id: null,
+                                                                }))
+                                                            }}
+                                                            size={20}
+                                                            className='text-gray-800 cursor-pointer' />
+
+                                                    ) : (
+
+                                                        <RiMegaphoneFill
+                                                            size={20}
+                                                            className='text-gray-800' />
+                                                    )}
+                                                </>
+                                            ) : (
+                                                <RiMegaphoneFill
+                                                    onClick={() => {
+                                                        setClassForm(prev => ({
+                                                            ...prev,
+                                                            faculty_id: 0,
+                                                        }))
+                                                    }}
+                                                    size={20}
+                                                    className='text-green-500 cursor-pointer' />
+                                            )}
+                                        </div>
                                         <input
-                                            disabled={addingSecondarySchedule}
+                                            disabled={addingSecondarySchedule || editingSecondarySchedule}
+                                            readOnly={classForm.faculty_id == null}
                                             value={facultyName}
                                             onChange={(e) => {
                                                 setFacultyName(e.target.value);

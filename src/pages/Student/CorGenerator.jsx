@@ -12,7 +12,7 @@ function CorGenerator({ data }) {
                         <h2 className="text-xl font-bold">CERTIFICATE OF REGISTRATION</h2>
                     </div>
                 </div>
-                
+
                 <div className="grid grid-cols-[40px,50px,35px,1px,75px,130px,100px,1fr,85px,80px] gap-x-2 text-xs">
                     <div className="col-span-2 font-bold">Registration No.:</div>
                     <div className="col-span-3 col-start-3 border-b border-gray-900 pl-2">{data.registration_number}</div>
@@ -75,23 +75,76 @@ function CorGenerator({ data }) {
                         </tr>
                     </thead>
                     <tbody>
-                        {data.student_subject.map((subjects, index) => (
-                            <tr key={index} className="odd:bg-white even:bg-gray-100">
-                                <td className="border text-center">{index + 1}</td>
-                                <td className="border">{subjects.year_section_subjects.class_code}</td>
-                                <td className="border">{subjects.year_section_subjects.subject.subject_code}</td>
-                                <td className="border">{subjects.year_section_subjects.subject.descriptive_title}</td>
-                                <td className="border text-center">{subjects.year_section_subjects.subject.lecture_hours}</td>
-                                <td className="border text-center">{subjects.year_section_subjects.subject.laboratory_hours}</td>
-                                <td className="border text-center">{subjects.year_section_subjects.subject.credit_units}</td>
-                                <td className="border text-center">{subjects.year_section_subjects.day}</td>
-                                <td className="border text-center">
-                                    {convertToAMPM(subjects.year_section_subjects.start_time)} - {convertToAMPM(subjects.year_section_subjects.end_time)}
-                                </td>
-                                <td className="border text-center">{subjects.year_section_subjects.room.room_name}</td>
-                                    <td className="border">{formatFullName(subjects.year_section_subjects.instructor.instructor_information)}</td>
+                        {data.student_subject.map((subjects, index) => {
+                            const hasSecondSched = subjects.year_section_subjects.subject_secondary_schedule;
+
+                            return (
+                                <tr key={index} className="odd:bg-white even:bg-gray-100">
+                                    <td className="border text-center">{index + 1}</td>
+                                    <td className="border">{subjects.year_section_subjects.class_code}</td>
+                                    <td className="border">{subjects.year_section_subjects.subject.subject_code}</td>
+                                    <td className="border">{subjects.year_section_subjects.subject.descriptive_title}</td>
+                                    <td className="border text-center">{subjects.year_section_subjects.subject.lecture_hours}</td>
+                                    <td className="border text-center">{subjects.year_section_subjects.subject.laboratory_hours}</td>
+                                    <td className="border text-center">{subjects.year_section_subjects.subject.credit_units}</td>
+                                    <td className="border text-center">
+                                        <div className='flex flex-col'>
+                                            <div className={`${hasSecondSched && 'border-0 border-b'}`}>
+                                                {subjects.year_section_subjects.day}
+                                            </div>
+                                            <div>
+                                                {subjects.year_section_subjects.subject_secondary_schedule?.day || ''}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="border text-center">
+                                        <div className='flex flex-col'>
+                                            <div className={`${hasSecondSched && 'border-0 border-b'}`}>
+                                                {subjects.year_section_subjects.start_time != "TBA" ? (
+                                                    convertToAMPM(subjects.year_section_subjects.start_time) + "-" + convertToAMPM(subjects.year_section_subjects.end_time)
+                                                ) : (
+                                                    <>TBA</>
+                                                )}
+                                            </div>
+                                            {hasSecondSched &&
+                                                <div>
+                                                    {subjects.year_section_subjects.subject_secondary_schedule.start_time != "TBA" ? (
+                                                        convertToAMPM(subjects.year_section_subjects.subject_secondary_schedule.start_time) + "-" + convertToAMPM(subjects.year_section_subjects.subject_secondary_schedule.end_time)
+                                                    ) : (
+                                                        <>TBA</>
+                                                    )}
+                                                </div>
+                                            }
+                                        </div>
+                                    </td>
+                                    <td className="border text-center ">
+                                        <div className='flex flex-col'>
+                                            <div className={`${hasSecondSched && 'border-0 border-b'}`}>
+                                                {subjects.year_section_subjects.room?.room_name != null ? (
+                                                    subjects.year_section_subjects.room.room_name
+                                                ) : (
+                                                    <>TBA</>
+                                                )}
+                                            </div>
+                                            <div>
+                                                {subjects.year_section_subjects.subject_secondary_schedule?.room?.room_name != null ? (
+                                                    subjects.year_section_subjects.subject_secondary_schedule?.room.room_name
+                                                ) : (
+                                                    <>TBA</>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="border">
+                                        {(subjects.year_section_subjects.instructor?.instructor_information.first_name != null) ? (
+                                            formatFullName(subjects.year_section_subjects.instructor.instructor_information)
+                                        ) : (
+                                            <>TBA</>
+                                        )}
+                                    </td>
                                 </tr>
-                        ))}
+                            )
+                        })}
                         {/* Row for total units */}
                         <tr className="bg-gray-200">
                             <td className="border text-right" colSpan="4">Total No. of Units:</td>

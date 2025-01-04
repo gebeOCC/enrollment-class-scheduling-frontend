@@ -187,13 +187,17 @@ function EnrollStudent() {
                     convert24HourTimeToMinutes(classDetails.end_time)
                 )
                 ||
-                hasTimeConflict(
-                    convert24HourTimeToMinutes(classSchedule.start_time),
-                    convert24HourTimeToMinutes(classSchedule.end_time),
-                    convert24HourTimeToMinutes(classDetails.subject_secondary_schedule?.start_time),
-                    convert24HourTimeToMinutes(classDetails.subject_secondary_schedule?.end_time)
+                (classDetails.subject_secondary_schedule &&
+                    hasTimeConflict(
+                        convert24HourTimeToMinutes(classSchedule.start_time),
+                        convert24HourTimeToMinutes(classSchedule.end_time),
+                        convert24HourTimeToMinutes(classDetails.subject_secondary_schedule.start_time),
+                        convert24HourTimeToMinutes(classDetails.subject_secondary_schedule.end_time)
+                    )
                 )
-            ) && (classSchedule.day == classDetails.day || classSchedule.day == classDetails.subject_secondary_schedule?.day));
+            ) &&
+            (classSchedule.day === classDetails.day || classSchedule.day === classDetails.subject_secondary_schedule?.day)
+        );
 
         return !!conflictExists;
     };
@@ -437,8 +441,24 @@ function EnrollStudent() {
                                         <div>{classSubject.subject_secondary_schedule?.day || ''}</div>
                                     </div>
                                     <div>
-                                        <div>{convertToAMPM(classSubject.start_time)} - {convertToAMPM(classSubject.end_time)}</div>
-                                        <div>{classSubject.subject_secondary_schedule?.start_time && convertToAMPM(classSubject.subject_secondary_schedule.start_time)} {classSubject.subject_secondary_schedule && '-'} {classSubject.subject_secondary_schedule?.end_time && convertToAMPM(classSubject.subject_secondary_schedule.end_time)}</div>
+                                        <div>
+                                            {classSubject.start_time != "TBA" ? (
+                                                convertToAMPM(classSubject.start_time) + " - " + convertToAMPM(classSubject.end_time)
+                                            ) : (
+                                                <>TBA</>
+                                            )}
+                                        </div>
+                                        <div>
+                                            {classSubject.subject_secondary_schedule?.start_time !== "TBA" ? (
+                                                <>
+                                                    {classSubject.subject_secondary_schedule?.start_time && convertToAMPM(classSubject.subject_secondary_schedule.start_time)}
+                                                    {classSubject.subject_secondary_schedule?.start_time && classSubject.subject_secondary_schedule?.end_time && ' - '}
+                                                    {classSubject.subject_secondary_schedule?.end_time && convertToAMPM(classSubject.subject_secondary_schedule.end_time)}
+                                                </>
+                                            ) : (
+                                                <>TBA</>
+                                            )}
+                                        </div>
                                     </div>
                                     <div className="text-center">
                                         {classSubject.credit_units}
@@ -522,7 +542,6 @@ function EnrollStudent() {
                             {searchingClasses && <p className="text-blue-400 text-2xl">Searching Classes 🔍</p>}
 
                             {!classesFound && <p className="text-red-500 text-2xl">No classes found!</p>}
-
                         </div>
                         {subjectSearch.map((classSubject, index) => (
                             <div
@@ -543,8 +562,26 @@ function EnrollStudent() {
                                     <div>{classSubject.subject_secondary_schedule?.day || ''}</div>
                                 </div>
                                 <div>
-                                    <div>{convertToAMPM(classSubject.start_time)} - {convertToAMPM(classSubject.end_time)}</div>
-                                    <div>{classSubject.subject_secondary_schedule?.start_time && convertToAMPM(classSubject.subject_secondary_schedule.start_time)} {classSubject.subject_secondary_schedule && '-'} {classSubject.subject_secondary_schedule?.end_time && convertToAMPM(classSubject.subject_secondary_schedule.end_time)}</div>
+                                    <div>
+                                        {classSubject.start_time != "TBA" ? (
+                                            convertToAMPM(classSubject.start_time) + " - " + convertToAMPM(classSubject.end_time)
+                                        ) : (
+                                            <>TBA</>
+                                        )}
+                                    </div>
+                                    <div>
+                                        <div>
+                                            {classSubject.subject_secondary_schedule?.start_time !== "TBA" ? (
+                                                <>
+                                                    {classSubject.subject_secondary_schedule?.start_time && convertToAMPM(classSubject.subject_secondary_schedule.start_time)}
+                                                    {classSubject.subject_secondary_schedule?.start_time && classSubject.subject_secondary_schedule?.end_time && ' - '}
+                                                    {classSubject.subject_secondary_schedule?.end_time && convertToAMPM(classSubject.subject_secondary_schedule.end_time)}
+                                                </>
+                                            ) : (
+                                                <>TBA</>
+                                            )}
+                                        </div>
+                                    </div>
                                 </div>
                                 <div className="text-center">
                                     {classSubject.credit_units}
