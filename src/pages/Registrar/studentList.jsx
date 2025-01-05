@@ -111,8 +111,10 @@ function Studentlist() {
                             };
 
                             setUploadExcelStudentList(prevList => [...prevList, newStudent]);
+                            console.log(response.data.message);
+                        } else {
+                            console.log(response.data);
                         }
-                        console.log(response.data);
                     })
                     .catch(error => {
                         console.error("Error uploading student:", error);
@@ -123,8 +125,8 @@ function Studentlist() {
                         if (totalStudentUpload == totalStudents) {
                             getStudentList();
                         }
-                        console.log(totalStudentUpload);
-                        console.log(totalStudents);
+                        // console.log(totalStudentUpload);
+                        // console.log(totalStudents);
                     })
             });
 
