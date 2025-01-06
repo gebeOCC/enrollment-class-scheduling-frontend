@@ -10,6 +10,7 @@ const StudentCor = lazy(() => import("../pages/enrollment/StudentCor"))
 const EnrollmentDashboardProgramHead = lazy(() => import("../pages/ProgramHead/EnrollmentDashboardProgramHead"))
 const FacultyClasses = lazy(() => import("../pages/Faculty/FacultyClasses"))
 const CLassStudents = lazy(() => import("../pages/Faculty/ClassStudents"))
+const YearLevelSectionSubjects = lazy(() => import("../pages/ProgramHead/YearLevelSectionSubjects"))
 
 const EvaluatorRoutes = ({ enrollmentOngoing, preparation }) => (
     <>
@@ -19,7 +20,7 @@ const EvaluatorRoutes = ({ enrollmentOngoing, preparation }) => (
         {(enrollmentOngoing || preparation) &&
             <>
                 <Route path="/enrollment/:courseid" element={<EnrollmentCourse />} />
-                <Route path="/enrollment/:courseid/class/:yearlevel" element={<YearLevelSectionSubejcts />} />
+                <Route path="/enrollment/:courseid/class/:yearlevel" element={<YearLevelSectionSubjects />} />
                 <Route path="/enrollment/:courseid/enroll-student/:yearlevel" element={<EnrollStudent />} />
                 <Route path="/enrollment/:courseid/students/:yearlevel" element={<SectionsEnrolledStudents />} />
                 <Route path="/enrollment/:courseid/students/:yearlevel/:section/:studentid" element={<StudentCor />} />
