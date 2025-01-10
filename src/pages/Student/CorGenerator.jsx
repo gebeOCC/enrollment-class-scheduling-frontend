@@ -130,7 +130,12 @@ function CorGenerator({ data }) {
                                                 {subjects.year_section_subjects.subject_secondary_schedule?.room?.room_name != null ? (
                                                     subjects.year_section_subjects.subject_secondary_schedule?.room.room_name
                                                 ) : (
-                                                    <>TBA</>
+                                                    <>
+                                                        {
+                                                            subjects.year_section_subjects.subject_secondary_schedule &&
+                                                            subjects.year_section_subjects.subject_secondary_schedule?.room.room_name
+                                                        }
+                                                    </>
                                                 )}
                                             </div>
                                         </div>
@@ -145,6 +150,21 @@ function CorGenerator({ data }) {
                                 </tr>
                             )
                         })}
+                        {Array.from({ length: 14 - data.student_subject.length }).map((_, index) => (
+                            <tr key={index}>
+                                <td className='text-center'>{data.student_subject.length + index + 1}</td>
+                                <td className='text-center'>-</td>
+                                <td className='text-center'>-</td>
+                                <td className='text-center'>-</td>
+                                <td className='text-center'>-</td>
+                                <td className='text-center'>-</td>
+                                <td className='text-center'>-</td>
+                                <td className='text-center'>-</td>
+                                <td className='text-center'>-</td>
+                                <td className='text-center'>-</td>
+                                <td className='text-center'>-</td>
+                            </tr>
+                        ))}
                         {/* Row for total units */}
                         <tr className="bg-gray-200">
                             <td className="border text-right" colSpan="4">Total No. of Units:</td>

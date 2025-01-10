@@ -80,8 +80,7 @@ function SectionsEnrolledStudents() {
                                 student.user.user_id_no.toLowerCase().includes(searchBar.toLowerCase()) ||
                                 (`${student.user.user_information.last_name}${student.user.user_information.first_name}${getFirstLetter(student.user.user_information.middle_name)}`)
                                     .toLowerCase().includes(searchBar.toLowerCase())
-                            ))
-                            .slice(0, showCount)
+                            ))  
                             .map((student, index) => (
                                 <tr
                                     key={index}

@@ -14,7 +14,7 @@ function StudentClasses() {
     const [enrolled, setEnrolled] = useState(false);
     const [fetching, setFetching] = useState(true);
 
-    const [selected, setSelected] = useState('COR');
+    const [selected, setSelected] = useState('Schedule');
 
     const getStudentClasses = async () => {
         try {
@@ -104,14 +104,6 @@ function StudentClasses() {
                     (
                         <>
                             <div className="flex items-center space-x-1 p-1 bg-gray-300 w-full sm:w-96 rounded-lg text-black">
-                                {/* Button for COR */}
-                                <button
-                                    onClick={() => setSelected('COR')}
-                                    className={`w-1/2 px-4 py-2 rounded-lg ${selected === 'COR' ? 'bg-white text-blue-500' : ''
-                                        } transition-colors duration-300 `}
-                                >
-                                    COR
-                                </button>
 
                                 {/* Button for Schedule */}
                                 <button
@@ -120,6 +112,15 @@ function StudentClasses() {
                                         } transition-colors duration-300 `}
                                 >
                                     Schedule
+                                </button>
+
+                                {/* Button for COR */}
+                                <button
+                                    onClick={() => setSelected('COR')}
+                                    className={`w-1/2 px-4 py-2 rounded-lg ${selected === 'COR' ? 'bg-white text-blue-500' : ''
+                                        } transition-colors duration-300 `}
+                                >
+                                    COR
                                 </button>
                             </div>
                             <div className="relative">

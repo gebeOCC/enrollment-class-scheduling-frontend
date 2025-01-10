@@ -211,6 +211,30 @@ function YearLevelSectionSubjects() {
             })
     }
 
+    const getSubjects = async () => {
+        if (subjects.length > 0) return
+        await axiosInstance.get(`get-subjects`)
+            .then(response => {
+                setSubjects(response.data)
+            })
+    }
+
+    const getDeptRooms = async () => {
+        if (rooms.length > 0) return
+        await axiosInstance.get(`get-department-rooms`)
+            .then(response => {
+                setRooms(response.data)
+            })
+    }
+
+    const getInstructors = async () => {
+        if (instructors.length > 0) return
+        await axiosInstance.get(`get-instructors`)
+            .then(response => {
+                setInstructors(response.data);
+            })
+    }
+
     useEffect(() => {
         const getCourseName = async () => {
             await axiosInstance.get(`get-course-name/${courseid}`)
@@ -219,32 +243,8 @@ function YearLevelSectionSubjects() {
                 });
         };
 
-        const getSubjects = async () => {
-            await axiosInstance.get(`get-subjects`)
-                .then(response => {
-                    setSubjects(response.data)
-                })
-        }
-
-        const getDeptRooms = async () => {
-            await axiosInstance.get(`get-department-rooms`)
-                .then(response => {
-                    setRooms(response.data)
-                })
-        }
-
-        const getInstructors = async () => {
-            await axiosInstance.get(`get-instructors`)
-                .then(response => {
-                    setInstructors(response.data);
-                })
-        }
-
         getClasses()
         getCourseName()
-        getSubjects()
-        getDeptRooms()
-        getInstructors()
     }, [courseid]);
 
     const [isActive, setIsActive] = useState(false);
@@ -311,17 +311,17 @@ function YearLevelSectionSubjects() {
                     setAddingSecondarySchedule(false)
                     setEditingSecondarySchedule(false);
                     setEditClass(false);
-                    // setClassForm({
-                    //     class_code: '',
-                    //     subject_id: '',
-                    //     day: '',
-                    //     start_time: '7:00',
-                    //     end_time: '',
-                    //     faculty_id: 0,
-                    //     room_id: 0,
+                    setClassForm({
+                        class_code: '',
+                        subject_id: '',
+                        day: '',
+                        start_time: '7:00',
+                        end_time: '',
+                        faculty_id: 0,
+                        room_id: 0,
 
-                    //     descriptive_title: '',
-                    // });
+                        descriptive_title: '',
+                    });
                 }
             })
             .finally(() => {
@@ -396,10 +396,10 @@ function YearLevelSectionSubjects() {
                         <h1 className="text-4xl font-bold text-blue-600"
                             onClick={() => console.log(classForm)}>
                             {course.course_name_abbreviation} -
-                            {yearlevel === 'First-Year' ? '1' :
-                                yearlevel === 'Second-Year' ? '2' :
-                                    yearlevel === 'Third-Year' ? '3' :
-                                        yearlevel === 'Fourth-Year' ? '4' : ''}{section}
+                            {yearlevel === 'First-Year' ? ' 1' :
+                                yearlevel === 'Second-Year' ? ' 2' :
+                                    yearlevel === 'Third-Year' ? ' 3' :
+                                        yearlevel === 'Fourth-Year' ? ' 4' : ''}{section}
 
                         </h1>
                     </>
@@ -1067,6 +1067,9 @@ function YearLevelSectionSubjects() {
                                 < button
                                     onClick={() => {
                                         setAddingSubject(true)
+                                        getSubjects()
+                                        getDeptRooms()
+                                        getInstructors()
                                     }}
                                     className={`bg-blue-500 mr-2 text-white px-4 py-2 rounded hover:bg-opacity-90 transition`}>
                                     Add class
