@@ -65,6 +65,7 @@ function SectionsEnrolledStudents() {
             <table className="min-w-full bg-white">
                 <thead>
                     <tr className="w-full bg-[#00b6cf] text-white text-left">
+                        <th></th>
                         <th className="hidden sm:table-cell py-2 px-4">Student ID no.</th>
                         <th className="py-2 px-4">Name</th>
                         <th className="hidden sm:table-cell py-2 px-4">Email</th>
@@ -80,12 +81,13 @@ function SectionsEnrolledStudents() {
                                 student.user.user_id_no.toLowerCase().includes(searchBar.toLowerCase()) ||
                                 (`${student.user.user_information.last_name}${student.user.user_information.first_name}${getFirstLetter(student.user.user_information.middle_name)}`)
                                     .toLowerCase().includes(searchBar.toLowerCase())
-                            ))  
+                            ))
                             .map((student, index) => (
                                 <tr
                                     key={index}
                                     className="border-b hover:bg-[#deeced]"
                                 >
+                                    <td className="text-right">{index + 1}.</td>
                                     <td className="hidden sm:table-cell py-2 px-4 transition duration-200">{student.user.user_id_no}</td>
                                     <td className="py-2 px-4 transition duration-200">
                                         {capitalizeFirstLetter(student.user.user_information.last_name)}, {capitalizeFirstLetter(student.user.user_information.first_name)}{" "}

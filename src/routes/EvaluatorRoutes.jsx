@@ -11,6 +11,7 @@ const EnrollmentDashboardProgramHead = lazy(() => import("../pages/ProgramHead/E
 const FacultyClasses = lazy(() => import("../pages/Faculty/FacultyClasses"))
 const CLassStudents = lazy(() => import("../pages/Faculty/ClassStudents"))
 const YearLevelSectionSubjects = lazy(() => import("../pages/ProgramHead/YearLevelSectionSubjects"))
+const StudentSubjects = lazy(() => import("../pages/enrollment/StudentSubjects"));
 
 const EvaluatorRoutes = ({ enrollmentOngoing, preparation }) => (
     <>
@@ -24,6 +25,7 @@ const EvaluatorRoutes = ({ enrollmentOngoing, preparation }) => (
                 <Route path="/enrollment/:courseid/enroll-student/:yearlevel" element={<EnrollStudent />} />
                 <Route path="/enrollment/:courseid/students/:yearlevel" element={<SectionsEnrolledStudents />} />
                 <Route path="/enrollment/:courseid/students/:yearlevel/:section/:studentid" element={<StudentCor />} />
+                <Route path="/enrollment/:courseid/students/:yearlevel/:section/subjects/:studentid" element={<StudentSubjects />} />
                 <Route path="/dashboard" element={<EnrollmentDashboardProgramHead />} />
                 <Route path="*" element={<Navigate to="/dashboard" />} />
             </>
