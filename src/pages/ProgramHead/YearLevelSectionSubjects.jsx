@@ -219,19 +219,30 @@ function YearLevelSectionSubjects() {
             })
     }
 
+    const [fetchingRooms, setFetchingRooms] = useState(false);
+    const [fetchingInstructors, setFetchingInstructors] = useState(false);
+
     const getDeptRooms = async () => {
         if (rooms.length > 0) return
+        setFetchingRooms(true);
         await axiosInstance.get(`get-department-rooms`)
             .then(response => {
                 setRooms(response.data)
+            })
+            .finally(() => {
+                setFetchingRooms(false);
             })
     }
 
     const getInstructors = async () => {
         if (instructors.length > 0) return
+        setFetchingInstructors(true);
         await axiosInstance.get(`get-instructors`)
             .then(response => {
                 setInstructors(response.data);
+            })
+            .finally(() => {
+                setFetchingInstructors(false);
             })
     }
 
@@ -277,13 +288,13 @@ function YearLevelSectionSubjects() {
         if (classForm.faculty_id == null) {
             setFacultyName("TBA");
         } else if (classForm.faculty_id != 0) {
-            const instructor = instructors.find(instructor => instructor.id === classForm.faculty_id);
-            setFacultyName(instructor.last_name + ', ' + instructor.first_name);
+            const instructor = instructors?.find(instructor => instructor.id === classForm.faculty_id);
+            setFacultyName(instructor?.last_name + ', ' + instructor?.first_name);
         } else {
             setFacultyName("")
         }
 
-    }, [classForm.faculty_id, instructorInFocus])
+    }, [classForm.faculty_id, instructorInFocus, fetchingInstructors])
 
     const getRowClass = (classSubject, classForm, secondarySchedule) => {
         const isTimeConflict = hasTimeConflict(
@@ -500,7 +511,7 @@ function YearLevelSectionSubjects() {
                                                         )}
                                                     </td>
                                                     <td className={`py-2 px-1 truncate max-w-xs overflow-hidden whitespace-nowrap`}>
-                                                        {classSubject.first_name != null ? (
+                                                        {classSubject?.first_name != null ? (
                                                             <>{formatFullName(classSubject)}</>
                                                         ) : (
                                                             <>TBA</>
@@ -530,6 +541,9 @@ function YearLevelSectionSubjects() {
                                                                 <MdEdit
                                                                     className="text-green-500 cursor-pointer"
                                                                     onClick={() => {
+                                                                        getInstructors()
+                                                                        getSubjects()
+                                                                        getDeptRooms()
                                                                         if (submitting) return
                                                                         handleEditClass(classSubject, false)
                                                                     }}
@@ -581,7 +595,7 @@ function YearLevelSectionSubjects() {
                                                             )}
                                                         </td>
                                                         <td className={`py-2 px-1 truncate max-w-xs overflow-hidden whitespace-nowrap`}>
-                                                            {classSubject.first_name != null ? (
+                                                            {classSubject?.first_name != null ? (
                                                                 <>{formatFullName(classSubject)}</>
                                                             ) : (
                                                                 <>TBA</>
@@ -593,6 +607,9 @@ function YearLevelSectionSubjects() {
                                                                     <MdEdit
                                                                         className="text-green-500 cursor-pointer"
                                                                         onClick={() => {
+                                                                            getInstructors()
+                                                                            getSubjects()
+                                                                            getDeptRooms()
                                                                             if (submitting) return
                                                                             setEditingSecondarySchedule(true)
                                                                             handleEditClass(classSubject, true)
@@ -920,14 +937,15 @@ function YearLevelSectionSubjects() {
                                         </div>
                                         {classForm.room_id != null ? (
                                             <select
-                                                value={classForm.room_id}
+                                                value={!fetchingRooms ? classForm.room_id : '0'}
                                                 onChange={handleClassFormChange}
                                                 name='room_id'
                                                 type="text"
                                                 className={`h-8 w-full px-2 py-1 border focus:outline-none focus:ring-2 focus:ring-blue-400 ${classInvalidFields.includes('room_id') && 'border-red-300'}`}
                                             >
                                                 <option disabled value="0">...</option>
-                                                {rooms.map((room, index) => (
+
+                                                {!fetchingRooms && rooms.map((room, index) => (
                                                     <option key={room.id + room.room_name} value={room.id}>{room.room_name}</option>
                                                 ))}
                                             </select>
@@ -980,7 +998,7 @@ function YearLevelSectionSubjects() {
                                         <input
                                             disabled={addingSecondarySchedule || editingSecondarySchedule}
                                             readOnly={classForm.faculty_id == null}
-                                            value={facultyName}
+                                            value={!fetchingInstructors ? facultyName : 'loading'}
                                             onChange={(e) => {
                                                 setFacultyName(e.target.value);
                                                 if (e.target.value == "") {
@@ -999,33 +1017,53 @@ function YearLevelSectionSubjects() {
 
                                         {/* {!facultyName && ( */}
                                         <div className="w-full max-h-16 bg-white overflow-y-auto z-10 border">
-                                            {instructors
-                                                .filter(instructor =>
-                                                    (instructor.last_name.toUpperCase() + ',' + ' ' + instructor.first_name.toUpperCase()).includes(facultyName.toUpperCase())
-                                                )
-                                                .map((instructor, index) => {
+                                            {fetchingInstructors && (
+                                                <div className="text-center py-2">Loading...</div>
+                                            )}
+                                            {!fetchingInstructors && instructors?.length > 0 &&
+                                                instructors
+                                                    .filter(instructor => {
+                                                        // If facultyName is empty, show all instructors
+                                                        if (!facultyName.trim()) return true;
 
-                                                    if (classForm.faculty_id && facultyName.toLocaleUpperCase == formatFullName(instructor).toLocaleUpperCase) return null
-                                                    return (
-                                                        <div
-                                                            key={instructor.id + instructor.first_name}
-                                                            className="px-2 py-1 hover:bg-blue-400 cursor-pointer"
-                                                            onClick={() => {
-                                                                setClassForm(prev => ({
-                                                                    ...prev,
-                                                                    faculty_id: instructor.id
-                                                                }))
-                                                                setFacultyName(instructor.last_name + ',' + ' ' + instructor.first_name)
-                                                                if (classForm.day !== '') {
-                                                                    getInstructorClassesTime(instructor.id)
-                                                                }
-                                                            }}
-                                                        >
-                                                            {formatFullName(instructor)}
-                                                        </div>
-                                                    )
-                                                })}
+                                                        // Match instructors based on the formatted full name
+                                                        const fullName = `${instructor.last_name.toUpperCase()}, ${instructor.first_name.toUpperCase()}`;
+                                                        return fullName.includes(facultyName.toUpperCase());
+                                                    })
+                                                    .map(instructor => {
+                                                        // Avoid rendering duplicate selection
+                                                        const fullName = `${instructor.last_name}, ${instructor.first_name}`;
+                                                        if (
+                                                            classForm.faculty_id &&
+                                                            facultyName.toUpperCase() === fullName.toUpperCase()
+                                                        ) {
+                                                            return null;
+                                                        }
+
+                                                        return (
+                                                            <div
+                                                                key={instructor.id}
+                                                                className="px-2 py-1 hover:bg-blue-400 cursor-pointer"
+                                                                onClick={() => {
+                                                                    setClassForm(prev => ({
+                                                                        ...prev,
+                                                                        faculty_id: instructor.id,
+                                                                    }));
+                                                                    setFacultyName(fullName);
+                                                                    if (classForm.day) {
+                                                                        getInstructorClassesTime(instructor.id);
+                                                                    }
+                                                                }}
+                                                            >
+                                                                {formatFullName(instructor)}
+                                                            </div>
+                                                        );
+                                                    })}
+                                            {!fetchingInstructors && (!instructors || instructors.length === 0) && (
+                                                <div className="text-center py-2">No instructors available.</div>
+                                            )}
                                         </div>
+
                                         {/* )} */}
                                     </div>
                                 </div>
