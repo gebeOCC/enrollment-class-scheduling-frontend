@@ -47,7 +47,7 @@ const colors = [
 function Schedule({ data }) {
     const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-    const timeSlots = Array.from({ length: 26 }, (_, i) => {
+    const timeSlots = Array.from({ length: 27 }, (_, i) => {
         const startHour = 7;
         const hour = Math.floor((startHour * 60 + i * 30) / 60);
         const minute = (startHour * 60 + i * 30) % 60;
