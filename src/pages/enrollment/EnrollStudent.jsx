@@ -9,6 +9,7 @@ import { FaCircleMinus, FaCirclePlus } from "react-icons/fa6";
 import AddNewStudentModal from "../GlobalFunction/AddNewStudentModal";
 import { ImSpinner5 } from "react-icons/im";
 import PreLoader from "../../components/preloader/PreLoader";
+import StudentCor from "./StudentCor";
 function EnrollStudent() {
     // page start
     const { courseid, yearlevel } = useParams();
@@ -42,6 +43,11 @@ function EnrollStudent() {
         }
     }, [classes]);
 
+    const yearLevelNumber =
+        yearlevel === 'First-Year' ? '1' :
+            yearlevel === 'Second-Year' ? '2' :
+                yearlevel === 'Third-Year' ? '3' :
+                    yearlevel === 'Fourth-Year' ? '4' : '';
 
     useEffect(() => {
         const getCourseName = async () => {
@@ -52,12 +58,6 @@ function EnrollStudent() {
         };
 
         const getYearLevelSectionSectionSubjects = async () => {
-
-            const yearLevelNumber =
-                yearlevel === 'First-Year' ? '1' :
-                    yearlevel === 'Second-Year' ? '2' :
-                        yearlevel === 'Third-Year' ? '3' :
-                            yearlevel === 'Fourth-Year' ? '4' : '';
 
             await axiosInstance.get(`get-year-level-section-section-subjects/${courseid}/${yearLevelNumber}/${section}`)
                 .then(response => {
@@ -124,6 +124,7 @@ function EnrollStudent() {
                             setStudentFound(true);
                             setStudentInfo(response.data.student);
                             setStudentAlreadyEnrrolled(false);
+                            setStudentIdSearch(response.data.student.user_id_no)
                         }
                         console.log(response.data);
                     })
@@ -237,14 +238,16 @@ function EnrollStudent() {
                         setStudentAlreadyEnrrolled(false);
 
                         // Construct the link
-                        const enrollmentLink = '/enrollment/' + courseid + '/students/' + yearlevel + '/' + section + '/cor?student-id=' + studentIdSearch;
-                        console.log(enrollmentLink);
+                        // const enrollmentLink = '/enrollment/' + courseid + '/students/' + yearlevel + '/' + section + '/cor?student-id=' + studentIdSearch;
+                        // console.log(enrollmentLink);
 
                         // Navigate to the constructed link using React Router
-                        navigate(enrollmentLink);
+                        // navigate(enrollmentLink);
 
                         // Reset state
-                        setStudentIdSearch("");
+                        // setStudentIdSearch("");
+
+                        getStudentEnrollmentInfo();
                     } else if (response.data.message === 'student already enrolled') {
                         setStudentAlreadyEnrrolled(true);
                     }
@@ -258,7 +261,30 @@ function EnrollStudent() {
         }
     }
 
+    const [showCOR, setShowCOR] = useState(false);
+
+    const resetEnrolling = () => {
+        setClasses(defaultClasses);
+        setStudentIdSearch('')
+        setShowCOR(false);
+    }
+
+    const getStudentEnrollmentInfo = async () => {
+        await axiosInstance.get(`get-student-enrollment-info/${courseid}/${yearLevelNumber}/${section}/${studentIdSearch}`)
+            .then(response => {
+                if (response.data.message === 'success') {
+                    setStudentInfo(response.data.studentinfo);
+                    setShowCOR(true)
+                }
+            })
+            .finally(() => {
+                setFetching(false);
+            });
+    };
+
     if (fetching) return <PreLoader />
+
+    if (showCOR) return <StudentCor courseHashedId={courseid} yearLevel={yearLevelNumber} sectionLetter={section} studentIdNo={studentIdSearch} resetEnrolling={resetEnrolling} />
 
     return (
         <>

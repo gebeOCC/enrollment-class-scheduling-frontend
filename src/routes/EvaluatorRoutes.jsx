@@ -12,6 +12,7 @@ const FacultyClasses = lazy(() => import("../pages/Faculty/FacultyClasses"))
 const CLassStudents = lazy(() => import("../pages/Faculty/ClassStudents"))
 const YearLevelSectionSubjects = lazy(() => import("../pages/ProgramHead/YearLevelSectionSubjects"))
 const StudentSubjects = lazy(() => import("../pages/enrollment/StudentSubjects"));
+const ClassRouter = lazy(() => import("../pages/Faculty/Class/ClassRouter"));
 
 const EvaluatorRoutes = ({ enrollmentOngoing, preparation }) => (
     <>
@@ -32,7 +33,7 @@ const EvaluatorRoutes = ({ enrollmentOngoing, preparation }) => (
         }
         <Route path="/" element={<Navigate to="/classes" />} />
         <Route path="/classes" element={<FacultyClasses />} />
-        <Route path="/classes/:classId" element={<CLassStudents />} />
+        <Route path="/classes/:classId" element={<ClassRouter />} />
         <Route path="*" element={<Navigate to="/classes" />} />
     </>
 )
