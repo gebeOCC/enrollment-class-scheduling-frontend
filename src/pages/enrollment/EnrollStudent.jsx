@@ -179,6 +179,10 @@ function EnrollStudent() {
     }
 
     const detectConflict = (classDetails) => {
+        if (classDetails.start_time == 'TBA' || classDetails.day == 'TBA'){
+            return false
+        }
+
         const conflictExists = classes.find(classSchedule =>
             (
                 hasTimeConflict(
@@ -614,7 +618,7 @@ function EnrollStudent() {
                                 </div>
                                 <FaCirclePlus
                                     onClick={() => {
-                                        if ((detectConflict(classSubject)) || classes.find(classItem => classItem.subject_id === classSubject.subject_id)) {
+                                        if ((detectConflict(classSubject) ) || classes.find(classItem => classItem.subject_id === classSubject.subject_id)) {
                                             return;
                                         }
                                         setClasses(prevClasses => [...prevClasses, classSubject]);
