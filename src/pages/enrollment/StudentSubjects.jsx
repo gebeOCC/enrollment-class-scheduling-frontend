@@ -94,7 +94,11 @@ function StudentSubjects() {
     }
 
     const detectConflict = (classDetails) => {
-        console.log(classDetails);
+        if (classDetails.start_time == 'TBA' || classDetails.day == 'TBA') {
+            return false
+        }
+        // console.log(classDetails);
+        
         const conflictExists = classes.find(classSchedule => hasTimeConflict(
             convert24HourTimeToMinutes(classSchedule.year_section_subjects.start_time),
             convert24HourTimeToMinutes(classSchedule.year_section_subjects.end_time),
@@ -374,7 +378,7 @@ function StudentSubjects() {
                                         <FaCirclePlus
                                             onClick={() => {
 
-                                                if ((detectConflict(searchClass)) || classes.find(classItem => classItem.subject_id === searchClass.subject_id)) {
+                                                if ((detectConflict(classSubject)) || classes.find(classItem => classItem.subject_id === classSubject.subject_id)) {
                                                     return;
                                                 }
                                                 if (!submitting) { addClass(searchClass.id) }
