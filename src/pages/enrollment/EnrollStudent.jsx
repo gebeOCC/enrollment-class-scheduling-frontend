@@ -132,7 +132,7 @@ function EnrollStudent() {
                         setSearchingStudent(false);
                     })
             }
-            if (e.target.value === '') return;
+            if (e.target.value.length < 5) return;
             getStudentInfo();
         }, 1000);
 
@@ -179,7 +179,7 @@ function EnrollStudent() {
     }
 
     const detectConflict = (classDetails) => {
-        if (classDetails.start_time == 'TBA' || classDetails.day == 'TBA'){
+        if (classDetails.start_time == 'TBA' || classDetails.day == 'TBA') {
             return false
         }
 
@@ -618,7 +618,7 @@ function EnrollStudent() {
                                 </div>
                                 <FaCirclePlus
                                     onClick={() => {
-                                        if ((detectConflict(classSubject) ) || classes.find(classItem => classItem.subject_id === classSubject.subject_id)) {
+                                        if ((detectConflict(classSubject)) || classes.find(classItem => classItem.subject_id === classSubject.subject_id)) {
                                             return;
                                         }
                                         setClasses(prevClasses => [...prevClasses, classSubject]);

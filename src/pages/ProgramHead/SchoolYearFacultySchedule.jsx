@@ -71,7 +71,7 @@ function SchoolYearFacultySchedule() {
                         <span className="text-blue-700 font-bold"> {formatFullNameFML(faculty)}</span> <span className="text-gray-800 "> ({faculty.schedules.length} classes)</span>
 
                     </h1>
-                    <Schedule data={faculty.schedules} />
+                    <Schedule data={faculty.schedules} colorful={true} />
                 </div>
             ))}
         </div>

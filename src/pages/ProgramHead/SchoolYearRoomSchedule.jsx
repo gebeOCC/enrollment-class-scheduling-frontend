@@ -69,7 +69,7 @@ function SchoolYearRoomSchedule() {
                     >
                         <span className="text-blue-700 font-bold">{room.room_name}</span> <span className="text-gray-800 ">({room.schedules.length} classes)</span>
                     </h1>
-                    <Schedule data={room.schedules} />
+                    <Schedule data={room.schedules} colorful={true}/>
                 </div>
             ))}
         </div>

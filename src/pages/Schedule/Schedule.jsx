@@ -44,7 +44,7 @@ const colors = [
     "bg-olivedrab-500",
 ];
 
-function Schedule({ data }) {
+function Schedule({ data, colorful }) {
     const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
     const timeSlots = Array.from({ length: 27 }, (_, i) => {
@@ -169,7 +169,7 @@ function Schedule({ data }) {
                 return (
                     <React.Fragment key={id}>
                         <div
-                            className={`${isConflict ? "bg-red-600 bg-opacity-50 text-white" : `${color}`} text-center text-sm flex flex-col items-center justify-center font-medium mt-[2px] ml-[2px] mr-[1px] mb-[1px] rounded-md p-1`}
+                            className={`${isConflict ? "bg-red-600 bg-opacity-50 text-white" : `${!colorful ? 'bg-white opacity-90 border border-gray-300' : color}`} text-center text-sm flex flex-col items-center justify-center font-medium mt-[2px] ml-[2px] mr-[1px] mb-[1px] rounded-md p-1`}
                             style={{
                                 gridRow: `${rowStart} / ${rowEnd}`,
                                 gridColumn: `${colStart} / ${colStart + 1}`,
@@ -184,7 +184,7 @@ function Schedule({ data }) {
                         {secondarySchedule && (
                             <div
                                 key={`${class_code}-secondary`}
-                                className={`${secondaryIsConflict ? "bg-red-600 bg-opacity-50 text-white" : `${color}`} text-center text-sm flex flex-col items-center justify-center font-medium mt-[2px] ml-[2px] mr-[1px] mb-[1px] rounded-md p-1`}
+                                className={`${secondaryIsConflict ? "bg-red-600 bg-opacity-50 text-white" : `${!colorful ? 'bg-white opacity-90 border border-gray-300' : color}`} text-center text-sm flex flex-col items-center justify-center font-medium mt-[2px] ml-[2px] mr-[1px] mb-[1px] rounded-md p-1`}
                                 style={{
                                     gridRow: secondaryRowStart && secondaryRowEnd ? `${secondaryRowStart} / ${secondaryRowEnd}` : undefined,
                                     gridColumn: secondaryColStart ? `${secondaryColStart} / ${secondaryColStart + 1}` : undefined,

@@ -76,7 +76,7 @@ function EnrollmentSubjectsSchedules() {
                         >
                             <span className="text-blue-700 font-bold">{subject.room_name}</span> <span className="text-gray-800 ">({subject.schedules.length + secondaryCount} classes)</span>
                         </h1>
-                        <Schedule data={subject.schedules} />
+                        <Schedule data={subject.schedules} colorful={true} />
                     </div>
                 )
             })}
