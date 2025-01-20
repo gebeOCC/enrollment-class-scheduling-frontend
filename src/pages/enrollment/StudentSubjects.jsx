@@ -378,13 +378,13 @@ function StudentSubjects() {
                                         <FaCirclePlus
                                             onClick={() => {
 
-                                                if ((detectConflict(classSubject)) || classes.find(classItem => classItem.subject_id === classSubject.subject_id)) {
+                                                    if ((detectConflict(searchClass)) || classes.find(classItem => classItem.year_section_subjects.subject_id === searchClass.subject_id)) {
                                                     return;
                                                 }
                                                 if (!submitting) { addClass(searchClass.id) }
                                             }}
                                             size={18}
-                                            className={`transition duration-200 ease-in-out ${(detectConflict(searchClass)) || (classes.find(classItem => classItem.subject_id === searchClass.subject_id)) ? 'text-gray-700 cursor-not-allowed' : ` ${submitting ? 'text-gray-500' : 'text-green-500 hover:text-green-400 cursor-pointer'} `}`}
+                                                className={`transition duration-200 ease-in-out ${(detectConflict(searchClass)) || (classes.find(classItem => classItem.year_section_subjects.subject_id === searchClass.subject_id)) ? 'text-gray-700 cursor-not-allowed' : ` ${submitting ? 'text-gray-500' : 'text-green-500 hover:text-green-400 cursor-pointer'} `}`}
                                         />
                                     </>
                                 )}
