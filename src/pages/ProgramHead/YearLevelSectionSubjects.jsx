@@ -7,6 +7,7 @@ import { ImSpinner5 } from 'react-icons/im';
 import { FaPlus } from 'react-icons/fa6';
 import Schedule from '../Schedule/Schedule';
 import { RiMegaphoneFill, RiMegaphoneLine } from 'react-icons/ri';
+import html2canvas from "html2canvas";
 
 function YearLevelSectionSubjects() {
     const { courseid, yearlevel } = useParams();
@@ -19,6 +20,14 @@ function YearLevelSectionSubjects() {
     const [addingSecondarySchedule, setAddingSecondarySchedule] = useState(false);
     const [editingSecondarySchedule, setEditingSecondarySchedule] = useState(false);
     const [plotting, setPlotting] = useState(false);
+    const [colorful, setColorful] = useState(true);
+
+    const yearMapping = {
+        "First-Year": "1",
+        "Second-Year": "2",
+        "Third-Year": "3",
+        "Fourth-Year": "4",
+    };
 
     const [subjectToDelete, setSubjectToDelete] = useState({
         deleting: false,
@@ -399,6 +408,30 @@ function YearLevelSectionSubjects() {
         }
     };
 
+    const downloadSectionSchedules = () => {
+        const filename = `${course.course_name_abbreviation} - ${yearMapping[yearlevel] || ''}${section} classes.png`;
+
+        const element = document.getElementById(`section-schedule`);
+
+        if (element) {
+            // Add inline styling for images
+            const style = document.createElement("style");
+            document.head.appendChild(style);
+            style.sheet?.insertRule('body > div:last-child img { display: inline-block; }');
+
+            html2canvas(element, { scale: 5 }).then((canvas) => {
+                const imageUrl = canvas.toDataURL("image/png");
+
+                const link = document.createElement("a");
+                link.href = imageUrl;
+                link.download = filename;
+                link.click();
+
+                style.remove(); // Remove style after image export
+            });
+        }
+    };
+
     return (
         <>
             <div className="bg-white p-4 rounded-lg shadow overflow-hidden mb-6 text-center">
@@ -406,30 +439,63 @@ function YearLevelSectionSubjects() {
                     <>
                         <h1 className="text-4xl font-bold text-blue-600"
                             onClick={() => console.log(classForm)}>
-                            {course.course_name_abbreviation} -
-                            {yearlevel === 'First-Year' ? ' 1' :
-                                yearlevel === 'Second-Year' ? ' 2' :
-                                    yearlevel === 'Third-Year' ? ' 3' :
-                                        yearlevel === 'Fourth-Year' ? ' 4' : ''}{section}
-
+                            {course.course_name_abbreviation} - {yearMapping[yearlevel]}{section}
                         </h1>
                     </>
                 }
             </div>
-            <div className='bg-white px-4 py-2 w-max rounded-md mb-2 flex items-center gap-3 shadow-md border border-gray-300 hover:shadow-lg transition-all duration-200'>
-                <label htmlFor="time-table" className='cursor-pointer text-gray-700 font-medium'>
-                    Time Table
-                </label>
-                <input
-                    id="time-table"
-                    type="checkbox"
-                    checked={plotting}
-                    onChange={(e) => setPlotting(e.target.checked)}
-                    className='cursor-pointer h-5 w-5 accent-blue-500'
-                />
+            <div className='flex gap-4 h-16'>
+                <div className='bg-white px-4 py-2 w-max rounded-md mb-2 flex items-center gap-3 shadow-md border border-gray-300 hover:shadow-lg transition-all duration-200'>
+                    <label htmlFor="time-table" className='cursor-pointer text-gray-700 font-medium'>
+                        Time Table
+                    </label>
+                    <input
+                        id="time-table"
+                        type="checkbox"
+                        checked={plotting}
+                        onChange={(e) => setPlotting(e.target.checked)}
+                        className='cursor-pointer h-5 w-5 accent-blue-500'
+                    />
+                </div>
+
+                {plotting &&
+                    <div className='flex items-center gap-4 bg-white p-2 rounded-lg shadow-md w-max mb-2'>
+                        <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-md border border-gray-300 hover:shadow-lg transition-all duration-200  w-max">
+                            <label
+                                htmlFor="colorful"
+                                className="cursor-pointer text-gray-700 font-medium"
+                            >
+                                Colorful
+                            </label>
+                            <input
+                                id="colorful"
+                                type="checkbox"
+                                checked={colorful}
+                                onChange={(e) => setColorful(e.target.checked)}
+                                className="cursor-pointer h-5 w-5 accent-blue-500"
+                            />
+                        </div>
+                        <button
+                            onClick={downloadSectionSchedules}
+                            className="bg-blue-600 text-white font-medium py-2 px-4 rounded-md shadow-lg hover:bg-blue-700 transition-all duration-200"
+                        >
+                            Download
+                        </button>
+                    </div>
+                }
             </div>
 
-            {plotting && <Schedule data={classes} />}
+            {plotting &&
+                <div id={`section-schedule`} className='w-full p-4 bg-white rounded-lg shadow-light space-y-4 border border-gray-200'>
+                    <h1 className="text-4xl font-bold text-blue-600"
+                        onClick={() => console.log(classForm)}>
+                        {course.course_name_abbreviation} - {yearMapping[yearlevel]}{section}
+                    </h1>
+                    <Schedule
+                        colorful={colorful}
+                        data={classes} />
+                </div>
+            }
 
             {!plotting &&
                 <>

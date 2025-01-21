@@ -37,7 +37,7 @@ function FacultySchedules() {
 
 
     const downloadAllSchedules = () => {
-        filteredFaculties.forEach((faculty, index) => {
+        filteredFaculties.forEach((room, index) => {
             const element = document.getElementById(`schedule-${index}`);
             if (element) {
                 // Add inline styling for images
