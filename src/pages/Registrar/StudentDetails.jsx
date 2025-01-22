@@ -127,10 +127,10 @@ function StudentDetails() {
 
 
     const handleSubmit = () => {
+        setSubmitting(true);
 
         const invalidFields = [];
         if (!studentInfoForm.first_name) invalidFields.push('first_name');
-        if (!studentInfoForm.middle_name) invalidFields.push('middle_name');
         if (!studentInfoForm.last_name) invalidFields.push('last_name');
         if (!studentInfoForm.gender) invalidFields.push('gender');
         if (!studentInfoForm.birthday && studentDetails.user_information.birthday) invalidFields.push('birthday');
@@ -316,6 +316,7 @@ function StudentDetails() {
                                 Cancel
                             </button>
                             <button
+                                disabled={submitting}
                                 className="px-4 py-2 bg-green-600 text-white rounded-sm hover:bg-green-700"
                                 onClick={handleSubmit}
                             >

@@ -73,7 +73,7 @@ function RoomSchedules() {
                     <label className="text-xl font-semibold text-gray-700">Filter:</label>
                     <select
                         onChange={handleRoomChange}
-                        className="flex-1 p-2 border border-gray-300 rounded-md cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out"
+                        className="flex-1 p-2 hover:border-blue-500 border border-gray-300 rounded-md cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out"
                     >
                         <option value="all">All Rooms</option>
                         {rooms.map((room) => (

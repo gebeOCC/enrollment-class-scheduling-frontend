@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axiosInstance from "../../../axios/axiosInstance";
 import Schedule from "../Schedule/Schedule";
 import PreLoader from "../../components/preloader/PreLoader";
-import { formatFullNameFML } from "../../utilities/utils";
+import { formatFullName } from "../../utilities/utils";
 import html2canvas from "html2canvas";
 
 function FacultySchedules() {
@@ -47,7 +47,7 @@ function FacultySchedules() {
 
                 html2canvas(element, { scale: 5 }).then((canvas) => {
                     const imageUrl = canvas.toDataURL("image/png");
-                    const filename = `${formatFullNameFML(faculty)} (${faculty.schedules.length} classes).png`;
+                    const filename = `${formatFullName(faculty)} (${faculty.schedules.length} classes).png`;
 
                     const link = document.createElement("a");
                     link.href = imageUrl;
@@ -68,26 +68,24 @@ function FacultySchedules() {
                 Faculties
             </h1>
             <div className="flex items-center gap-6 bg-white p-4 rounded-lg shadow-md w-max">
-                <div className="text-2xl flex gap-2 items-center text-center">
-                    Filter:
-                    <select
-                        onChange={handleRoomChange}
-                        className="w-full p-2 border border-gray-300 rounded-md cursor-pointer focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out"
-                    >
-                        <option value="all">All Faculties</option>
-                        {faculties.map(faculty => {
-                            const secondaryCount = faculty.schedules.reduce((count, schedule) => {
-                                return count + (schedule.subject_secondary_schedule ? 1 : 0);
-                            }, 0);
+                <label className="text-xl font-semibold text-gray-700">Filter:</label>
+                <select
+                    onChange={handleRoomChange}
+                    className="flex-1 p-2 border hover:border-blue-500 border-gray-300 rounded-md cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out"
+                >
+                    <option value="all">All Faculties</option>
+                    {faculties.map(faculty => {
+                        const secondaryCount = faculty.schedules.reduce((count, schedule) => {
+                            return count + (schedule.subject_secondary_schedule ? 1 : 0);
+                        }, 0);
 
-                            return (
-                                <option key={faculty.id} value={faculty.id}>
-                                    {formatFullNameFML(faculty)} ({faculty.schedules.length + secondaryCount} classes)
-                                </option>
-                            );
-                        })}
-                    </select>
-                </div>
+                        return (
+                            <option key={faculty.id} value={faculty.id}>
+                                {formatFullName(faculty)} ({faculty.schedules.length + secondaryCount} classes)
+                            </option>
+                        );
+                    })}
+                </select>
 
                 <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-md border border-gray-300 hover:shadow-lg transition-all duration-200">
                     <label
@@ -125,7 +123,7 @@ function FacultySchedules() {
                         <h1
                             className="text-4xl tracking-wide border-b-2 border-gray-300 pb-2"
                         >
-                            <span className="text-blue-700 font-bold"> {formatFullNameFML(faculty)}</span> <span className="text-gray-800 "> ({faculty.schedules.length + secondaryCount} classes)</span>
+                            <span className="text-blue-700 font-bold"> {formatFullName(faculty)}</span> <span className="text-gray-800 "> ({faculty.schedules.length + secondaryCount} classes)</span>
 
                         </h1>
                         <Schedule data={faculty.schedules} colorful={colorful} />
