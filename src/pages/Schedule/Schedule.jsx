@@ -153,7 +153,7 @@ function Schedule({ data, colorful }) {
                 const secondaryDay = secondarySchedule?.day;
                 const secondaryStartTime = secondarySchedule?.start_time;
                 const secondaryEndTime = secondarySchedule?.end_time;
-                const secondaryRoomName = secondarySchedule?.room?.room_name;
+                const secondaryRoomName = secondarySchedule?.room_name;
 
                 const secondaryRowStart = secondaryStartTime ? timeToRowIndex(secondaryStartTime) : null;
                 const secondaryRowEnd = secondaryEndTime ? timeToRowIndex(secondaryEndTime) : null;
