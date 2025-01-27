@@ -8,6 +8,7 @@ import { FaPlus } from 'react-icons/fa6';
 import Schedule from '../Schedule/Schedule';
 import { RiMegaphoneFill, RiMegaphoneLine } from 'react-icons/ri';
 import html2canvas from "html2canvas";
+import { utils, writeFile } from 'xlsx';
 
 function YearLevelSectionSubjects() {
     const { courseid, yearlevel } = useParams();
@@ -408,7 +409,7 @@ function YearLevelSectionSubjects() {
         }
     };
 
-    const downloadSectionSchedules = () => {
+    const downloadImage = () => {
         const filename = `${course.course_name_abbreviation} - ${yearMapping[yearlevel] || ''}${section} classes.png`;
 
         const element = document.getElementById(`section-schedule`);
@@ -430,6 +431,76 @@ function YearLevelSectionSubjects() {
                 style.remove(); // Remove style after image export
             });
         }
+    }
+
+    const exportToExcel = () => {
+
+        // Map the classes to exportable data
+        const dataToExport = classes.flatMap((classSubject) => {
+            const primarySchedule = {
+                "Class Code": classSubject.class_code,
+                "Subject Code": classSubject.subject_code,
+                "Descriptive Title": classSubject.descriptive_title,
+                "Day": classSubject.day,
+                "Time": classSubject.start_time !== "TBA"
+                    ? convertToAMPM(classSubject.start_time) + ' - ' + convertToAMPM(classSubject.end_time)
+                    : "TBA",
+                "Room": classSubject.room_name != null ? classSubject.room_name : 'TBA',
+                "Instructor": classSubject?.first_name != null ? formatFullName(classSubject) : 'TBA',
+            };
+
+            const secondarySchedule = classSubject.subject_secondary_schedule
+                ? {
+                    "Class Code": classSubject.class_code,
+                    "Subject Code": classSubject.subject_code,
+                    "Descriptive Title": classSubject.descriptive_title + " (2nd Schedule)",
+                    "Day": classSubject.subject_secondary_schedule.day,
+                    "Time": classSubject.subject_secondary_schedule.start_time !== "TBA"
+                        ? convertToAMPM(classSubject.subject_secondary_schedule.start_time) + ' - ' + convertToAMPM(classSubject.subject_secondary_schedule.end_time)
+                        : "TBA",
+                    "Room": classSubject.subject_secondary_schedule.room_name != null ? classSubject.subject_secondary_schedule.room_name : 'TBA',
+                    "Instructor": classSubject?.first_name != null ? formatFullName(classSubject) : 'TBA',
+                }
+                : null;
+
+            return secondarySchedule ? [primarySchedule, secondarySchedule] : [primarySchedule];
+        });
+
+        // Combine the main header and the data
+        const fullDataToExport = [...dataToExport]; // Wrap mainHeader in an array to make it a separate row
+
+        // Convert to worksheet
+        const ws = utils.json_to_sheet(fullDataToExport);
+
+        // Set the column widths
+        const columnWidths = [
+            { wch: 14 }, // Class Code
+            { wch: 14 }, // Subject Code
+            { wch: 30 }, // Descriptive Title
+            { wch: 12 }, // Day
+            { wch: 20 }, // Time
+            { wch: 12 }, // Room
+            { wch: 30 }, // Instructor
+        ];
+
+        ws['!cols'] = columnWidths; // Apply the column widths
+
+        // Create a new workbook and append the worksheet
+        const wb = utils.book_new();
+        utils.book_append_sheet(wb, ws, "Classes");
+
+        // File name for download
+        const fileName = `${course.course_name_abbreviation} - ${yearMapping[yearlevel] || ''}${section} classes.xlsx`;
+
+        writeFile(wb, fileName); // Write the file
+    };
+
+    const downloadSectionSchedules = () => {
+        if (plotting) {
+            downloadImage()
+        } else {
+            exportToExcel()
+        }
     };
 
     return (
@@ -444,49 +515,50 @@ function YearLevelSectionSubjects() {
                     </>
                 }
             </div>
-            <div className='flex gap-4 h-16'>
-                <div className='bg-white px-4 py-2 w-max rounded-md mb-2 flex items-center gap-3 shadow-md border border-gray-300 hover:shadow-lg transition-all duration-200'>
-                    <label htmlFor="time-table" className='cursor-pointer text-gray-700 font-medium'>
-                        Time Table
-                    </label>
-                    <input
-                        id="time-table"
-                        type="checkbox"
-                        checked={plotting}
-                        onChange={(e) => setPlotting(e.target.checked)}
-                        className='cursor-pointer h-5 w-5 accent-blue-500'
-                    />
-                </div>
-
-                {plotting &&
-                    <div className='flex items-center gap-4 bg-white p-2 rounded-lg shadow-md w-max mb-2'>
-                        <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-md border border-gray-300 hover:shadow-lg transition-all duration-200  w-max">
-                            <label
-                                htmlFor="colorful"
-                                className="cursor-pointer text-gray-700 font-medium"
-                            >
-                                Colorful
-                            </label>
-                            <input
-                                id="colorful"
-                                type="checkbox"
-                                checked={colorful}
-                                onChange={(e) => setColorful(e.target.checked)}
-                                className="cursor-pointer h-5 w-5 accent-blue-500"
-                            />
-                        </div>
-                        <button
-                            onClick={downloadSectionSchedules}
-                            className="bg-blue-600 text-white font-medium py-2 px-4 rounded-md shadow-lg hover:bg-blue-700 transition-all duration-200"
-                        >
-                            Download
-                        </button>
+            <div className='flex h-16'>
+                <div className='flex items-center gap-2 bg-white p-2 rounded-t-lg border border-t-gray-400 border-x-gray-400 border-b-white w-max'>
+                    <div className='flex items-center gap-2 p-2 rounded-md border border-gray-300 hover:shadow-lg transition-all duration-200 w-max'>
+                        <label htmlFor="time-table" className='cursor-pointer text-gray-700 font-medium'>
+                            Time Table
+                        </label>
+                        <input
+                            id="time-table"
+                            type="checkbox"
+                            checked={plotting}
+                            onChange={(e) => setPlotting(e.target.checked)}
+                            className='cursor-pointer h-5 w-5 accent-blue-500'
+                        />
                     </div>
-                }
+                    <div className={`${plotting ? 'bg-white hover:shadow-lg' : 'bg-gray-300'} flex items-center gap-2 px-4 py-2 rounded-md border border-gray-300 transition-all duration-200 w-max`}>
+                        <label
+                            htmlFor="colorful"
+                            className={`${plotting ? 'cursor-pointer text-gray-700' : 'text-white'} font-medium`}
+                        >
+                            Colorful
+                        </label>
+                        <input
+                            disabled={!plotting}
+                            id="colorful"
+                            type="checkbox"
+                            checked={colorful}
+                            onChange={(e) => {
+                                if (!plotting) return
+                                setColorful(e.target.checked)
+                            }}
+                            className={`${plotting && 'cursor-pointer'} h-5 w-5 bg-white accent-blue-500`}
+                        />
+                    </div>
+                    <button
+                        onClick={downloadSectionSchedules}
+                        className="bg-blue-600 text-white font-medium py-2 px-4 rounded-md shadow-lg hover:bg-blue-700 transition-all duration-200"
+                    >
+                        Download
+                    </button>
+                </div>
             </div>
 
             {plotting &&
-                <div id={`section-schedule`} className='w-full p-4 bg-white rounded-lg shadow-light space-y-4 border border-gray-200'>
+                <div id={`section-schedule`} className='w-full p-4 bg-white rounded-lg space-y-4'>
                     <h1 className="text-4xl font-bold text-blue-600"
                         onClick={() => console.log(classForm)}>
                         {course.course_name_abbreviation} - {yearMapping[yearlevel]}{section}
@@ -643,7 +715,7 @@ function YearLevelSectionSubjects() {
                                                             {classSubject.subject_code}
                                                         </td>
                                                         <td className={`py-2 px-1 truncate max-w-xs overflow-hidden whitespace-nowrap`}>
-                                                            {classSubject.descriptive_title}
+                                                            {classSubject.descriptive_title + " (2nd Schedule)"}
                                                         </td>
                                                         <td className={`py-2 px-1`}>
                                                             {classSubject.subject_secondary_schedule.day}

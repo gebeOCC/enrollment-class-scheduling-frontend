@@ -169,7 +169,7 @@ function Schedule({ data, colorful }) {
                 return (
                     <React.Fragment key={id}>
                         <div
-                            className={`${isConflict ? "bg-red-600 bg-opacity-50 text-white" : `${!colorful ? 'bg-white opacity-90 ring-1 ring-gray-400' : color}`} text-center text-sm flex flex-col items-center justify-center font-medium mt-[2px] ml-[2px] mr-[1px] mb-[1px] rounded-md p-1`}
+                            className={`${isConflict ? "bg-red-600 bg-opacity-50 text-white" : `${!colorful ? 'bg-white opacity-90 border border-gray-400' : color}`} text-center text-sm flex flex-col items-center justify-center font-medium mt-[2px] ml-[2px] mr-[1px] mb-[1px] rounded-md p-1`}
                             style={{
                                 gridRow: `${rowStart} / ${rowEnd}`,
                                 gridColumn: `${colStart} / ${colStart + 1}`,
