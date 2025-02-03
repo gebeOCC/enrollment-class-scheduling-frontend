@@ -109,7 +109,9 @@ function StudentDetails() {
     };
 
     const studentInforChange = (e) => {
-        const { name, value } = e.target
+        const { name } = e.target
+
+        let value = e.target.value
 
         if ((name === 'contact_number' || name === 'zip_code') && isNaN(value)) {
             return;
@@ -119,12 +121,15 @@ function StudentDetails() {
             return;
         }
 
+        if (name == 'first_name' || name == 'middle_name' || name == 'last_name') {
+            value = value.toUpperCase();
+        }
+
         setStudentInfoForm(prev => ({
             ...prev,
             [name]: value
         }));
     };
-
 
     const handleSubmit = () => {
         setSubmitting(true);

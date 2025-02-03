@@ -87,88 +87,98 @@ function SectionsEnrolledStudents() {
     return (
         <>
             <div className="space-y-4">
-                {courseName.course_name_abbreviation && (
-                    <div className="bg-white p-4 rounded-lg shadow-light overflow-hidden text-center flex justify-center items-center">
-                        <h1 className="text-4xl font-bold text-blue-600">
-                            {courseName.course_name_abbreviation} -{' '}
-                            {
-                                { 'First-Year': '1', 'Second-Year': '2', 'Third-Year': '3', 'Fourth-Year': '4' }[yearlevel] || ''
-                            }
-                            {section}
-                        </h1>
+                <div className="bg-white p-4 rounded-lg shadow-light overflow-hidden space-y-2">
+                    <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
+                        {courseName.course_name_abbreviation && (
+                            <h2 className="text-4xl font-bold text-blue-600">
+                                {courseName.course_name_abbreviation} -{' '}
+                                {
+                                    { 'First-Year': '1', 'Second-Year': '2', 'Third-Year': '3', 'Fourth-Year': '4' }[yearlevel] || ''
+                                }
+                                {section}
+                            </h2>)
+                        }
+                        <div className="flex flex-col sm:flex-row space-x-0 sm:space-x-2 w-full sm:w-auto">
+                            <input
+                                value={searchBar}
+                                onChange={(e) => { setSearchBar(e.target.value) }}
+                                type="text"
+                                placeholder="Search..."
+                                className="px-4 py-2 rounded-md mb-2 md:mb-0 w-full sm:w-72 border border-gray-20 focus:outline-none hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out"
+                            />
+                        </div>
                     </div>
-                )}
-
-                <table className="min-w-full bg-white">
-                    <thead>
-                        <tr className="w-full bg-[#00b6cf] text-white text-left">
-                            <th className="text-center">#</th>
-                            <th className="hidden sm:table-cell py-2 px-4">Student ID no.</th>
-                            <th className="py-2 px-4">Name</th>
-                            <th className="hidden sm:table-cell py-2 px-4">Email</th>
-                            {/* <th className="py-2 px-4"> Contact no.</th> */}
-                            <th className="hidden sm:table-cell py-2 px-4"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {students.length > 0 ? (
-                            students
-                                .filter((student) => (
-                                    searchBar === "" ||
-                                    student.user.user_id_no.toLowerCase().includes(searchBar.toLowerCase()) ||
-                                    (`${student.user.user_information.last_name}${student.user.user_information.first_name}${getFirstLetter(student.user.user_information.middle_name)}`)
-                                        .toLowerCase().includes(searchBar.toLowerCase())
-                                ))
-                                .map((student, index) => (
-                                    <tr
-                                        key={index}
-                                        className="border-b hover:bg-[#deeced]"
-                                    >
-                                        <td className="text-center">{index + 1}.</td>
-                                        <td className="hidden sm:table-cell transition duration-200">{student.user.user_id_no}</td>
-                                        <td className="py-2 px-4 transition duration-200">
-                                            {capitalizeFirstLetter(student.user.user_information.last_name)}, {capitalizeFirstLetter(student.user.user_information.first_name)}{" "}
-                                            {student.user.user_information.middle_name && getFirstLetter(student.user.user_information.middle_name) + '.'}
-                                        </td>
-                                        <td className="hidden sm:table-cell transition duration-200">{student.user.user_information.email_address}</td>
-                                        {/* <td className="py-2 px-4 transition duration-200">{student.user.user_information.contact_number}</td> */}
-                                        <td className="hidden sm:table-cell transition duration-200 space-x-2 items-center">
-                                            <div className="flex justify-center items-center gap-2">
-                                                <Link to={`${section}/subjects/student?student-id=${student.user.user_id_no}`}>
-                                                    <button className="bg-green-500 text-white py-1 px-3 rounded-lg shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 transition duration-200">
-                                                        Subject
-                                                    </button>
-                                                </Link>
-
-                                                <Link to={`${section}/cor?student-id=${student.user.user_id_no}`}>
-                                                    <button className="bg-blue-500 text-white py-1 px-3 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-200">
-                                                        COR
-                                                    </button>
-                                                </Link>
-
-                                                {userRole == 'program_head' &&
-                                                    <button
-                                                        onClick={() => {
-                                                            setEnrolledStudentId(student.id)
-                                                            getSections()
-                                                        }}
-                                                        className="self-center">
-                                                        <MdOutlineDriveFileMove size={40} className="text-blue-500 cursor-pointer" />
-                                                    </button>
-                                                }
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))
-                        ) : (
-                            <tr>
-                                <td className="py-2 px-4" colSpan="4">
-                                    No Data
-                                </td>
+                    <table className="min-w-full bg-white">
+                        <thead>
+                            <tr className="w-full bg-[#00b6cf] text-white text-left">
+                                <th className="text-center">#</th>
+                                <th className="hidden sm:table-cell py-2 px-4">Student ID no.</th>
+                                <th className="py-2 px-4">Name</th>
+                                <th className="hidden sm:table-cell py-2 px-4">Email</th>
+                                {/* <th className="py-2 px-4"> Contact no.</th> */}
+                                <th className="hidden sm:table-cell py-2 px-4"></th>
                             </tr>
-                        )}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {students.length > 0 ? (
+                                students
+                                    .filter((student) => (
+                                        searchBar === "" ||
+                                        student.user.user_id_no.toLowerCase().includes(searchBar.toLowerCase()) ||
+                                        (`${student.user.user_information.last_name}${student.user.user_information.first_name}${getFirstLetter(student.user.user_information.middle_name)}`)
+                                            .toLowerCase().includes(searchBar.toLowerCase())
+                                    ))
+                                    .map((student, index) => (
+                                        <tr
+                                            key={index}
+                                            className="border-b hover:bg-[#deeced]"
+                                        >
+                                            <td className="text-center">{index + 1}.</td>
+                                            <td className="hidden sm:table-cell transition duration-200">{student.user.user_id_no}</td>
+                                            <td className="py-2 px-4 transition duration-200">
+                                                {capitalizeFirstLetter(student.user.user_information.last_name)}, {capitalizeFirstLetter(student.user.user_information.first_name)}{" "}
+                                                {student.user.user_information.middle_name && getFirstLetter(student.user.user_information.middle_name) + '.'}
+                                            </td>
+                                            <td className="hidden sm:table-cell transition duration-200">{student.user.user_information.email_address}</td>
+                                            {/* <td className="py-2 px-4 transition duration-200">{student.user.user_information.contact_number}</td> */}
+                                            <td className="hidden sm:table-cell transition duration-200 space-x-2 items-center">
+                                                <div className="flex justify-center items-center gap-2">
+                                                    <Link to={`${section}/subjects/student?student-id=${student.user.user_id_no}`}>
+                                                        <button className="bg-green-500 text-white py-1 px-3 rounded-lg shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 transition duration-200">
+                                                            Subject
+                                                        </button>
+                                                    </Link>
+
+                                                    <Link to={`${section}/cor?student-id=${student.user.user_id_no}`}>
+                                                        <button className="bg-blue-500 text-white py-1 px-3 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-200">
+                                                            COR
+                                                        </button>
+                                                    </Link>
+
+                                                    {userRole == 'program_head' &&
+                                                        <button
+                                                            onClick={() => {
+                                                                setEnrolledStudentId(student.id)
+                                                                getSections()
+                                                            }}
+                                                            className="self-center">
+                                                            <MdOutlineDriveFileMove size={40} className="text-blue-500 cursor-pointer" />
+                                                        </button>
+                                                    }
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                            ) : (
+                                <tr>
+                                    <td className="py-2 px-4" colSpan="4">
+                                        No Data
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
             </div>
             {!!enrolledStudentId && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">

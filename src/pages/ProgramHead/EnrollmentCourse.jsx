@@ -134,7 +134,18 @@ function EnrollmentCourse() {
                                 {yearLevel.year_section && yearLevel.year_section.map((section, index) => (
                                     <tr key={index} className={`border-b ${index % 2 === 0 ? "bg-gray-100" : "bg-gray-50"}`}>
                                         <td className="p-2 text-gray-700">{section.section}</td>
-                                        <td className="p-2 text-gray-700">{section.student_count}/{section.max_students}</td>
+                                        <td
+                                            className={`p-2 text-gray-700 ${section.student_count > section.max_students
+                                                    ? "text-red-600 font-bold" // Overload
+                                                    : section.student_count === section.max_students
+                                                        ? "text-green-600 font-bold" // Complete
+                                                        : section.student_count + 5 >= section.max_students
+                                                            ? "text-orange-400 font-bold" // Almost complete (87.5% or higher)
+                                                            : "text-gray-700" // Default
+                                                }`}
+                                        >
+                                            {section.student_count}/{section.max_students}
+                                        </td>
                                         <td className="p-2 space-x-1 flex items-center">
                                             {userRole === 'program_head' &&
                                                 <Link to={`class/${yearLevel.year_level_name.replace(/\s+/g, '-')}?section=${section.section}`}>
@@ -170,7 +181,6 @@ function EnrollmentCourse() {
                     </div>
                 ))}
             </div>
-
 
             {yearSectionForm.year_level_id != 0 &&
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">

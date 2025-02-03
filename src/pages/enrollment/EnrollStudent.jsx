@@ -10,6 +10,7 @@ import AddNewStudentModal from "../GlobalFunction/AddNewStudentModal";
 import { ImSpinner5 } from "react-icons/im";
 import PreLoader from "../../components/preloader/PreLoader";
 import StudentCor from "./StudentCor";
+import { PiStudent } from "react-icons/pi";
 function EnrollStudent() {
     // page start
     const { courseid, yearlevel } = useParams();
@@ -433,8 +434,8 @@ function EnrollStudent() {
                                 <div>
                                     Time
                                 </div>
-                                <div>
-                                    Credit units
+                                <div className="text-center">
+                                    Units
                                 </div>
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -576,16 +577,19 @@ function EnrollStudent() {
                         {subjectSearch.map((classSubject, index) => (
                             <div
                                 key={index}
-                                className={`border border-black grid grid-cols-[100px_100px_1fr_120px_180px_90px_auto] gap-4 items-center ${detectConflict(classSubject) ? 'bg-red-600 text-white' : 'bg-white text-black hover:bg-gray-200'}  p-2 rounded-lg transition duration-200 ease-in-out`}
+                                className={`border border-black grid grid-cols-[100px_100px_1fr_120px_120px_180px_90px_auto] gap-4 items-center ${detectConflict(classSubject) ? 'bg-red-600 text-white' : 'bg-white text-black hover:bg-gray-200'}  p-2 rounded-lg transition duration-200 ease-in-out`}
                             >
-                                <div className="">
+                                <div>
                                     {classSubject.class_code}
                                 </div>
-                                <div className="">
+                                <div>
                                     {classSubject.subject_code}
                                 </div>
-                                <div className="">
+                                <div>
                                     {classSubject.descriptive_title}
+                                </div>
+                                <div className="flex items-center">
+                                    <PiStudent />{classSubject.student_count}/{classSubject.max_students}
                                 </div>
                                 <div>
                                     <div>{classSubject.day}</div>

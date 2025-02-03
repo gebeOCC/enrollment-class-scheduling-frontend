@@ -4,11 +4,14 @@ import axiosInstance from '../../../axios/axiosInstance';
 import { convert24HourTimeToMinutes, convertAMPMTo24Hour, convertMinutesTo24HourTime, convertToAMPM, formatFullName, hasTimeConflict } from '../../utilities/utils';
 import { MdDelete, MdEdit } from 'react-icons/md';
 import { ImSpinner5 } from 'react-icons/im';
-import { FaPlus } from 'react-icons/fa6';
+import { FaDownload, FaPlus } from 'react-icons/fa6';
 import Schedule from '../Schedule/Schedule';
 import { RiMegaphoneFill, RiMegaphoneLine } from 'react-icons/ri';
 import html2canvas from "html2canvas";
 import { utils, writeFile } from 'xlsx';
+import { IoColorPaletteOutline } from 'react-icons/io5';
+import { IoIosColorPalette } from 'react-icons/io';
+import PreLoader from '../../components/preloader/PreLoader';
 
 function YearLevelSectionSubjects() {
     const { courseid, yearlevel } = useParams();
@@ -22,6 +25,8 @@ function YearLevelSectionSubjects() {
     const [editingSecondarySchedule, setEditingSecondarySchedule] = useState(false);
     const [plotting, setPlotting] = useState(false);
     const [colorful, setColorful] = useState(true);
+    const [fetching, setFetching] = useState(true);
+    const [secondaryScheduleId, setSecondaryScheduleId] = useState(0);
 
     const yearMapping = {
         "First-Year": "1",
@@ -261,7 +266,10 @@ function YearLevelSectionSubjects() {
             await axiosInstance.get(`get-course-name/${courseid}`)
                 .then(response => {
                     setCourse(response.data);
-                });
+                })
+                .finally(() => {
+                    setFetching(false)
+                })
         };
 
         getClasses()
@@ -303,7 +311,6 @@ function YearLevelSectionSubjects() {
         } else {
             setFacultyName("")
         }
-
     }, [classForm.faculty_id, instructorInFocus, fetchingInstructors])
 
     const getRowClass = (classSubject, classForm, secondarySchedule) => {
@@ -314,11 +321,11 @@ function YearLevelSectionSubjects() {
             convert24HourTimeToMinutes(classForm.end_time)
         ) && classForm.day.toUpperCase() === classSubject.day.toUpperCase();
 
-        if (secondarySchedule && editingSecondarySchedule) return 'bg-green-400 text-white font-semibold';
-        if (classSubject.id == classId && editClass && !editingSecondarySchedule) return 'bg-green-400 text-white font-semibold';
+        if (secondarySchedule && editingSecondarySchedule && classSubject.id == secondaryScheduleId) return 'bg-green-400 text-white font-semibold';
+        if (classSubject.id == classId && editClass && !editingSecondarySchedule && !secondarySchedule) return 'bg-green-400 text-white font-semibold';
         if (isTimeConflict) return 'bg-red-500 text-white font-semibold';
 
-        return `odd:bg-white even:bg-gray-100 hover:bg-cyan-200`
+        return `odd:bg-white even:bg-gray-100 ${colorful ? 'hover:bg-cyan-200' : 'hover:bg-gray-300'} `
     };
 
     const addEditClass = async (url) => {
@@ -332,6 +339,7 @@ function YearLevelSectionSubjects() {
                     setAddingSecondarySchedule(false)
                     setEditingSecondarySchedule(false);
                     setEditClass(false);
+                    setScondaryScheduleId(0);
                     setClassForm({
                         class_code: '',
                         subject_id: '',
@@ -419,6 +427,7 @@ function YearLevelSectionSubjects() {
             const style = document.createElement("style");
             document.head.appendChild(style);
             style.sheet?.insertRule('body > div:last-child img { display: inline-block; }');
+            style.sheet?.insertRule('td div > svg { display: none !important; }');
 
             html2canvas(element, { scale: 5 }).then((canvas) => {
                 const imageUrl = canvas.toDataURL("image/png");
@@ -496,16 +505,14 @@ function YearLevelSectionSubjects() {
     };
 
     const downloadSectionSchedules = () => {
-        if (plotting) {
-            downloadImage()
-        } else {
-            exportToExcel()
-        }
+        downloadImage()
     };
 
+    if (fetching) return <PreLoader />
+
     return (
-        <>
-            <div className="bg-white p-4 rounded-lg shadow overflow-hidden mb-6 text-center">
+        <div className=''>
+            {/* <div className="bg-white p-4 rounded-lg shadow overflow-hidden mb-6 text-center">
                 {course.course_name &&
                     <>
                         <h1 className="text-4xl font-bold text-blue-600"
@@ -514,66 +521,97 @@ function YearLevelSectionSubjects() {
                         </h1>
                     </>
                 }
-            </div>
-            <div className='flex h-16'>
-                <div className='flex items-center gap-2 bg-white p-2 rounded-t-lg border border-t-gray-400 border-x-gray-400 border-b-white w-max'>
-                    <div className='flex items-center gap-2 p-2 rounded-md border border-gray-300 hover:shadow-lg transition-all duration-200 w-max'>
-                        <label htmlFor="time-table" className='cursor-pointer text-gray-700 font-medium'>
-                            Time Table
-                        </label>
-                        <input
-                            id="time-table"
-                            type="checkbox"
-                            checked={plotting}
-                            onChange={(e) => setPlotting(e.target.checked)}
-                            className='cursor-pointer h-5 w-5 accent-blue-500'
-                        />
-                    </div>
-                    <div className={`${plotting ? 'bg-white hover:shadow-lg' : 'bg-gray-300'} flex items-center gap-2 px-4 py-2 rounded-md border border-gray-300 transition-all duration-200 w-max`}>
-                        <label
-                            htmlFor="colorful"
-                            className={`${plotting ? 'cursor-pointer text-gray-700' : 'text-white'} font-medium`}
-                        >
-                            Colorful
-                        </label>
-                        <input
-                            disabled={!plotting}
-                            id="colorful"
-                            type="checkbox"
-                            checked={colorful}
-                            onChange={(e) => {
-                                if (!plotting) return
-                                setColorful(e.target.checked)
-                            }}
-                            className={`${plotting && 'cursor-pointer'} h-5 w-5 bg-white accent-blue-500`}
-                        />
-                    </div>
+            </div> */}
+            <div className='flex space-x-2 w-full'>
+                <div className='flex'>
+                    {/* View Mode Selection */}
                     <button
-                        onClick={downloadSectionSchedules}
-                        className="bg-blue-600 text-white font-medium py-2 px-4 rounded-md shadow-lg hover:bg-blue-700 transition-all duration-200"
+                        onClick={() => setPlotting(false)}
+                        className={`self-end border-gray-300 w-28 p-2 rounded-tl-md text-lg h-min ${!plotting
+                            ? 'bg-white text-blue-700 underline'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            }`}
                     >
-                        Download
+                        Tabular
+                    </button>
+                    <button
+                        onClick={() => setPlotting(true)}
+                        className={`self-end w-28 p-2 rounded-tr-md text-lg h-min ${plotting
+                            ? 'bg-white text-blue-700 underline'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            }`}
+                    >
+                        Timetable
                     </button>
                 </div>
+
+                {/* <div className='items-center gap-2 bg-white px-2 rounded-lg border border-gray-400 w-max h-min p-2 '> */}
+                {/* <label className="text-xs font-semibold text-gray-700">Download:</label> */}
+                <div className='flex gap-2'>
+                    <button
+                        onClick={exportToExcel}
+                        className="h-min flex gap-2 shadow-lg bg-green-600 text-white font-medium py-2 px-4 rounded-md hover:bg-green-700 transition-all duration-200"
+                    >
+                        <FaDownload className="text-xl" />
+                        Excel
+                    </button>
+                    <button
+                        onClick={downloadImage}
+                        className="h-min flex gap-2 shadow-lg bg-blue-600 text-white font-medium py-2 px-4 rounded-md hover:bg-blue-700 transition-all duration-200"
+                    >
+                        <FaDownload className="text-xl" />
+                        Image
+                    </button>
+                </div>
+                {/* </div> */}
+
+                <button className={`self-center mb-1 bg-white border border-gray-300 flex items-center gap-1 rounded-md transition-all duration-200 w-max h-min `}>
+                    <input
+                        id="colorful"
+                        type="checkbox"
+                        checked={colorful}
+                        onChange={(e) => {
+                            setColorful(e.target.checked);
+                        }}
+                        className={`
+                                    ml-2
+                                    cursor-pointer 
+                                    h-4 w-4 
+                                    appearance-none
+                                    border border-gray-500 rounded-md 
+                                    checked:bg-white checked:border-blue-500
+                                    checked:after:content-['✔']
+                                    checked:after:text-blue-500 
+                                    checked:after:font-bold
+                                    flex items-center justify-center
+                                    `}
+                    />
+
+                    <label
+                        htmlFor="colorful"
+                        className={`cursor-pointer text-black font-medium py-1 pr-2`}
+                    >
+                        Color
+                    </label>
+                </button>
             </div>
 
-            {plotting &&
-                <div id={`section-schedule`} className='w-full p-4 bg-white rounded-lg space-y-4'>
-                    <h1 className="text-4xl font-bold text-blue-600"
-                        onClick={() => console.log(classForm)}>
-                        {course.course_name_abbreviation} - {yearMapping[yearlevel]}{section}
-                    </h1>
+            <div id={`section-schedule`} className='w-full p-4 bg-white mb-4 border-x border-b border-gray-300'>
+                <h1 className={`text-4xl font-bold  mb-2 ${colorful ? 'text-blue-600' : 'text-black'}`}
+                    onClick={() => console.log(classForm)}>
+                    {course.course_name_abbreviation} - {yearMapping[yearlevel]}{section}
+                </h1>
+
+                {plotting &&
                     <Schedule
                         colorful={colorful}
                         data={classes} />
-                </div>
-            }
+                }
 
-            {!plotting &&
-                <>
-                    <table className="min-w-full bg-white mb-4 shadow-md">
+                {!plotting &&
+                    <table className="min-w-full bg-white shadow-md">
                         <thead>
-                            <tr className="w-full bg-cyan-500 text-white text-left">
+                            <tr className={`w-full ${colorful ? 'bg-cyan-500' : 'bg-gray-500'} text-white text-left`}>
                                 <th className="py-2 px-1">Class Code</th>
                                 <th className="py-2 px-1">Subject Code</th>
                                 <th className="py-2 px-1">Descriptive Title</th>
@@ -636,7 +674,7 @@ function YearLevelSectionSubjects() {
                                                     <td className={`py-2 px-1`}>
                                                         {classSubject.day}
                                                     </td>
-                                                    <td className="py-2 px-1 text-center">
+                                                    <td className="py-2 px-1">
                                                         {classSubject.start_time !== "TBA"
                                                             ? convertToAMPM(classSubject.start_time) + ' - ' + convertToAMPM(classSubject.end_time)
                                                             : "TBA"}
@@ -720,7 +758,7 @@ function YearLevelSectionSubjects() {
                                                         <td className={`py-2 px-1`}>
                                                             {classSubject.subject_secondary_schedule.day}
                                                         </td>
-                                                        <td className={`py-2 px-1 text-center`}>
+                                                        <td className={`py-2 px-1`}>
                                                             {classSubject.subject_secondary_schedule.start_time !== "TBA"
                                                                 ? convertToAMPM(classSubject.subject_secondary_schedule.start_time) + " - " + convertToAMPM(classSubject.subject_secondary_schedule.end_time)
                                                                 : "TBA"}
@@ -750,6 +788,7 @@ function YearLevelSectionSubjects() {
                                                                             getDeptRooms()
                                                                             if (submitting) return
                                                                             setEditingSecondarySchedule(true)
+                                                                            setSecondaryScheduleId(classSubject.subject_secondary_schedule.id)
                                                                             handleEditClass(classSubject, true)
                                                                         }}
                                                                     />
@@ -782,6 +821,10 @@ function YearLevelSectionSubjects() {
                             )}
                         </tbody>
                     </table >
+                }
+            </div>
+            {!plotting &&
+                <>
                     {(addingSubject || addingSecondarySchedule || editClass) &&
                         <div className="mb-4 p-2 bg-white rounded-lg shadow-light space-y-2">
                             <div className='text-2xl font-semibold bg-white max-w-max text-blue-500 rounded-md px-2'>
@@ -1228,6 +1271,7 @@ function YearLevelSectionSubjects() {
                                         setRoomClassesTime([]);
                                         setInstructorClassesTimes([]);
                                         setClassId(0);
+                                        setSecondaryScheduleId(0)
                                         setAddingSecondarySchedule(false);
                                         setAddingSubject(false);
                                         setEditClass(false);
@@ -1342,7 +1386,7 @@ function YearLevelSectionSubjects() {
                     }
                 </>
             }
-        </>
+        </div>
     );
 }
 

@@ -1,5 +1,6 @@
 import React from "react";
 import { convertToAMPM, formatFullName } from "../../utilities/utils";
+import { PiStudent } from "react-icons/pi";
 
 // Helper function to convert time to row index
 function timeToRowIndex(time) {
@@ -136,7 +137,7 @@ function Schedule({ data, colorful }) {
 
             {/* Schedule Data */}
             {data.map((classData, index) => {
-                const { id, day, start_time, end_time, descriptive_title, room_name, first_name, class_code } = classData;
+                const { id, day, start_time, end_time, descriptive_title, room_name, first_name, class_code, student_count } = classData;
                 const rowStart = timeToRowIndex(start_time);
                 const rowEnd = timeToRowIndex(end_time);
                 const colStart = dayToColumnIndex(day);
@@ -169,7 +170,7 @@ function Schedule({ data, colorful }) {
                 return (
                     <React.Fragment key={id}>
                         <div
-                            className={`${isConflict ? "bg-red-600 bg-opacity-50 text-white" : `${!colorful ? 'bg-white opacity-90 border border-gray-400' : color}`} text-center text-sm flex flex-col items-center justify-center font-medium mt-[2px] ml-[2px] mr-[1px] mb-[1px] rounded-md p-1`}
+                            className={`${isConflict ? "bg-red-600 bg-opacity-50 text-white" : `${!colorful ? 'bg-white opacity-90 ring-1 ring-gray-400' : `${color}`}`} m-[2px] text-center text-sm flex flex-col items-center justify-center font-medium rounded-md p-1`}
                             style={{
                                 gridRow: `${rowStart} / ${rowEnd}`,
                                 gridColumn: `${colStart} / ${colStart + 1}`,
@@ -179,12 +180,15 @@ function Schedule({ data, colorful }) {
                             <span>{descriptive_title}</span>
                             <span>{room_name || ""}</span>
                             <span>{first_name ? formatFullName(classData) : ""}</span>
+                            {student_count &&
+                                <span className="flex items-center justify-center"><PiStudent /> {student_count}</span>
+                            }
                         </div>
 
                         {secondarySchedule && (
                             <div
                                 key={`${class_code}-secondary`}
-                                className={`${secondaryIsConflict ? "bg-red-600 bg-opacity-50 text-white" : `${!colorful ? 'bg-white opacity-90 border border-gray-300' : color}`} text-center text-sm flex flex-col items-center justify-center font-medium mt-[2px] ml-[2px] mr-[1px] mb-[1px] rounded-md p-1`}
+                                className={`${secondaryIsConflict ? "bg-red-600 bg-opacity-50 text-white" : `${!colorful ? 'bg-white opacity-90 ring-1 ring-gray-300' : color}`} m-[2px] text-center text-sm flex flex-col items-center justify-center font-medium rounded-md p-1`}
                                 style={{
                                     gridRow: secondaryRowStart && secondaryRowEnd ? `${secondaryRowStart} / ${secondaryRowEnd}` : undefined,
                                     gridColumn: secondaryColStart ? `${secondaryColStart} / ${secondaryColStart + 1}` : undefined,
@@ -194,6 +198,9 @@ function Schedule({ data, colorful }) {
                                 <span>{descriptive_title}</span>
                                 <span>{secondaryRoomName || ""}</span>
                                 <span>{first_name ? formatFullName(classData) : ""}</span>
+                                {student_count && 
+                                    <span className="flex items-center justify-center"><PiStudent /> {student_count}</span>
+                                }
                             </div>
                         )}
                     </React.Fragment>
