@@ -168,7 +168,7 @@ function Schedule({ data, colorful }) {
                 if (day == "TBA" || start_time == "TBA") return;
 
                 return (
-                    <React.Fragment key={id}>
+                    <React.Fragment key={`${class_code}-first-${index}`}>
                         <div
                             className={`${isConflict ? "bg-red-600 bg-opacity-50 text-white" : `${!colorful ? 'bg-white opacity-90 ring-1 ring-gray-400' : `${color}`}`} m-[2px] text-center text-sm flex flex-col items-center justify-center font-medium rounded-md p-1`}
                             style={{
@@ -188,7 +188,7 @@ function Schedule({ data, colorful }) {
                         {secondarySchedule && (
                             <div
                                 key={`${class_code}-secondary`}
-                                className={`${secondaryIsConflict ? "bg-red-600 bg-opacity-50 text-white" : `${!colorful ? 'bg-white opacity-90 ring-1 ring-gray-300' : color}`} m-[2px] text-center text-sm flex flex-col items-center justify-center font-medium rounded-md p-1`}
+                                className={`${secondaryIsConflict ? "bg-red-600 bg-opacity-50 text-white" : `${!colorful ? 'bg-white opacity-90 ring-1 ring-gray-400' : color}`} m-[2px] text-center text-sm flex flex-col items-center justify-center font-medium rounded-md p-1`}
                                 style={{
                                     gridRow: secondaryRowStart && secondaryRowEnd ? `${secondaryRowStart} / ${secondaryRowEnd}` : undefined,
                                     gridColumn: secondaryColStart ? `${secondaryColStart} / ${secondaryColStart + 1}` : undefined,

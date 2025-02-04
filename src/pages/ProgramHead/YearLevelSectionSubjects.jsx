@@ -9,8 +9,6 @@ import Schedule from '../Schedule/Schedule';
 import { RiMegaphoneFill, RiMegaphoneLine } from 'react-icons/ri';
 import html2canvas from "html2canvas";
 import { utils, writeFile } from 'xlsx';
-import { IoColorPaletteOutline } from 'react-icons/io5';
-import { IoIosColorPalette } from 'react-icons/io';
 import PreLoader from '../../components/preloader/PreLoader';
 
 function YearLevelSectionSubjects() {

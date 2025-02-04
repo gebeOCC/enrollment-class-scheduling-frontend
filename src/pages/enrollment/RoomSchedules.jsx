@@ -1,20 +1,42 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axiosInstance from "../../../axios/axiosInstance";
 import Schedule from "../Schedule/Schedule";
 import PreLoader from "../../components/preloader/PreLoader";
 import html2canvas from "html2canvas";
+import { FaDownload } from "react-icons/fa6";
+import { convertToAMPM, formatFullName } from "../../utilities/utils"; 
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 function RoomSchedules() {
     const [rooms, setRooms] = useState([]);
     const [selectedRoom, setSelectedRoom] = useState("all");
     const [fetching, setFetching] = useState(true);
     const [colorful, setColorful] = useState(true);
+    const [plotting, setPlotting] = useState(true);
 
     const getEnrollmentRoomSchedules = async () => {
         await axiosInstance.get(`get-enrollment-room-schedules`)
             .then(response => {
-                console.log(response.data);
-                setRooms(response.data);
+                const sortedRooms = response.data.map(room => ({
+                    ...room,
+                    schedules: room.schedules.sort((a, b) => {
+                        const daysOrder = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday", "TBA"];
+
+                        // Sort by day
+                        const dayComparison = daysOrder.indexOf(a.day) - daysOrder.indexOf(b.day);
+                        if (dayComparison !== 0) return dayComparison;
+
+                        // Sort by descriptive title
+                        const titleComparison = a.descriptive_title.localeCompare(b.descriptive_title);
+                        if (titleComparison !== 0) return titleComparison;
+
+                        // Sort by start time
+                        return a.start_time.localeCompare(b.start_time);
+                    })
+                }));
+
+                setRooms(sortedRooms);
             })
             .finally(() => {
                 setFetching(false);
@@ -58,63 +80,126 @@ function RoomSchedules() {
         });
     };
 
+    const exportToExcel = () => {
+        if (!rooms || rooms.length === 0) {
+            alert("No data to export");
+            return;
+        }
+
+        const exportData = rooms.flatMap(room =>
+            room.schedules.map(schedule => ({
+                Room: room.room_name,
+                Day: schedule.day,
+                "Descriptive Title": schedule.descriptive_title,
+                "Start Time": convertToAMPM(schedule.start_time),
+                "End Time": convertToAMPM(schedule.end_time),
+                "Faculty": formatFullName(schedule),
+                "Class Code": schedule.class_code,
+            }))
+        );
+
+        const worksheet = XLSX.utils.json_to_sheet(exportData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Schedules");
+
+        const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+        const excelBlob = new Blob([excelBuffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+
+        saveAs(excelBlob, "Room_Schedules.xlsx");
+    };
 
     if (fetching) return <PreLoader />;
 
     return (
         <div className="space-y-4">
-            <h1 className="bg-white p-4 rounded-lg shadow-light overflow-hidden text-center flex flex-col sm:flex-row justify-center items-center text-2xl sm:text-4xl font-bold text-blue-600">
+            <h1 className="bg-white p-4 rounded-lg overflow-hidden text-center flex flex-col sm:flex-row justify-center items-center text-2xl sm:text-4xl font-bold text-blue-600">
                 Rooms
             </h1>
-            <div className="flex  gap-4">
-                {/* Filter Section */}
-                <div className="flex items-center gap-6 bg-white p-4 rounded-lg shadow-md w-max">
-                    {/* <div className="bg-white shadow-light px-6 py-4 rounded-lg flex items-center gap-4 w-full max-w-md"> */}
-                    <label className="text-xl font-semibold text-gray-700">Filter:</label>
-                    <select
-                        onChange={handleRoomChange}
-                        className="flex-1 p-2 hover:border-blue-500 border border-gray-300 rounded-md cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out"
-                    >
-                        <option value="all">All Rooms</option>
-                        {rooms.map((room) => (
-                            <option key={room.id} value={room.id}>
-                                {room.room_name} ({room.schedules.length} classes)
-                            </option>
-                        ))}
-                    </select>
-                    {/* </div> */}
+            <div className="flex gap-4">
 
-                    {/* Settings Section */}
-                    <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-md border border-gray-300 hover:shadow-lg transition-all duration-200">
-                        <label
-                            htmlFor="time-table"
-                            className="cursor-pointer text-gray-700 font-medium"
-                        >
-                            Colorful
-                        </label>
-                        <input
-                            id="time-table"
-                            type="checkbox"
-                            checked={colorful}
-                            onChange={(e) => setColorful(e.target.checked)}
-                            className="cursor-pointer h-5 w-5 accent-blue-500"
-                        />
-                    </div>
+                <div className='flex shadow-sm rounded-md'>
+                    {/* View Mode Selection */}
                     <button
-                        onClick={downloadAllSchedules}
-                        className="bg-blue-600 text-white font-medium py-2 px-4 rounded-md shadow-lg hover:bg-blue-700 transition-all duration-200"
+                        onClick={() => setPlotting(false)}
+                        className={`border-y border-l w-28 p-2 rounded-l-md ${!plotting
+                            ? 'bg-white text-blue-700 underline'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-300'
+                            }`}
                     >
-                        Download All
+                        Tabular
+                    </button>
+                    <button
+                        onClick={() => setPlotting(true)}
+                        className={`border-y border-r w-28 p-2 rounded-r-md ${plotting
+                            ? 'bg-white text-blue-700 underline'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-300'
+                            }`}
+                    >
+                        Timetable
                     </button>
                 </div>
-            </div>
+                <select
+                    onChange={handleRoomChange}
+                    className="min-h-max shadow-sm max-w-max flex-1 p-2 hover:border-blue-500 border border-gray-300 rounded-md cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ease-in-out"
+                >
+                    <option value="all">All Rooms</option>
+                    {rooms.map((room) => (
+                        <option key={room.id} value={room.id}>
+                            {room.room_name} ({room.schedules.length} classes)
+                        </option>
+                    ))}
+                </select>
+                <button
+                    onClick={exportToExcel}
+                    className="h-min flex gap-2 shadow-lg bg-green-600 text-white font-medium py-2 px-4 rounded-md hover:bg-green-700 transition-all duration-200"
+                >
+                    <FaDownload className="text-xl" />
+                    Excel
+                </button>
+                <button
+                    onClick={downloadAllSchedules}
+                    className="h-min flex gap-2 shadow-lg bg-blue-600 text-white font-medium py-2 px-4 rounded-md hover:bg-blue-700 transition-all duration-200"
+                >
+                    <FaDownload className="text-xl" />
+                    Image
+                </button>
 
+                <button className={`self-center mb-1 bg-white border border-gray-300 flex items-center gap-1 rounded-md transition-all duration-200 w-max h-min `}>
+                    <input
+                        id="colorful"
+                        type="checkbox"
+                        checked={colorful}
+                        onChange={(e) => {
+                            setColorful(e.target.checked);
+                        }}
+                        className={`
+                                    ml-2
+                                    cursor-pointer 
+                                    h-4 w-4 
+                                    appearance-none
+                                    border border-gray-500 rounded-md 
+                                    checked:bg-white checked:border-blue-500
+                                    checked:after:content-['✔']
+                                    checked:after:text-blue-500 
+                                    checked:after:font-bold
+                                    flex items-center justify-center
+                                    `}
+                    />
+
+                    <label
+                        htmlFor="colorful"
+                        className={`cursor-pointer text-black font-medium py-1 pr-2`}
+                    >
+                        Color
+                    </label>
+                </button>
+            </div>
 
             {filteredRooms.map((room, index) => (
                 <div
                     id={`schedule-${index}`} // Unique ID for each room
                     key={index}
-                    className="w-full p-4 bg-white rounded-lg shadow-light space-y-4 border border-gray-200"
+                    className="w-full p-4 bg-white rounded-lg space-y-4 border border-gray-300"
                 >
                     <h1 className="text-4xl tracking-wide border-b-2 border-gray-300 pb-2">
                         <span className="text-blue-700 font-bold">{room.room_name}</span>{" "}
@@ -122,7 +207,64 @@ function RoomSchedules() {
                             ({room.schedules.length} classes)
                         </span>
                     </h1>
-                    <Schedule data={room.schedules} colorful={colorful} />
+                    {plotting ? (
+                        <Schedule data={room.schedules} colorful={colorful} />
+                    ) : (
+                        <table className="min-w-full bg-white shadow-md">
+                            <thead>
+                                <tr className={`w-full ${colorful ? 'bg-cyan-500' : 'bg-gray-500'} text-white text-left`}>
+                                    <th className="py-2 px-1 w-32">Class Code</th>
+                                    <th className="py-2 px-1">Descriptive Title</th>
+                                    <th className="py-2 px-1 w-32">Day</th>
+                                    <th className="py-2 px-1 w-48">Time</th>
+                                    <th className="py-2 px-1 w-52">Instructor</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {room.schedules.length > 0 ? (
+                                    room.schedules.map((room, index) => {
+                                        return (
+                                            <React.Fragment key={index}>
+                                                <tr
+                                                    className={`border-b odd:bg-white even:bg-gray-100 ${colorful ? 'hover:bg-cyan-200' : 'hover:bg-gray-300'}`}
+                                                >
+                                                    <>
+                                                        <td className={`py-2 px-1`}>
+                                                            {room.class_code}
+                                                        </td>
+                                                        <td className={`py-2 px-1 truncate max-w-xs overflow-hidden whitespace-nowrap`}>
+                                                            {room.descriptive_title}
+                                                        </td>
+                                                        <td className={`py-2 px-1`}>
+                                                            {room.day}
+                                                        </td>
+                                                        <td className="py-2 px-1">
+                                                            {room.start_time !== "TBA"
+                                                                ? convertToAMPM(room.start_time) + ' - ' + convertToAMPM(room.end_time)
+                                                                : "TBA"}
+                                                        </td>
+                                                        <td className={`py-2 px-1 truncate max-w-xs overflow-hidden whitespace-nowrap`}>
+                                                            {room?.first_name != null ? (
+                                                                <>{formatFullName(room)}</>
+                                                            ) : (
+                                                                <>TBA</>
+                                                            )}
+                                                        </td>
+                                                    </>
+                                                </tr>
+                                            </React.Fragment>
+                                        );
+                                    })
+                                ) : (
+                                    <tr>
+                                        <td className="py-2 px-4" colSpan="6">
+                                            No Data
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table >
+                    )}
                 </div>
             ))}
         </div>
