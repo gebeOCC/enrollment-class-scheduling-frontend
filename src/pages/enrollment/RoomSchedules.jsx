@@ -4,9 +4,9 @@ import Schedule from "../Schedule/Schedule";
 import PreLoader from "../../components/preloader/PreLoader";
 import html2canvas from "html2canvas";
 import { FaDownload } from "react-icons/fa6";
-import { convertToAMPM, formatFullName } from "../../utilities/utils"; 
-import * as XLSX from "xlsx";
-import { saveAs } from "file-saver";
+import { utils, writeFile } from 'xlsx';
+import TabularSchedule from "../Schedule/TabularSchedule";
+import { convertToAMPM, formatFullName } from "../../utilities/utils";
 
 function RoomSchedules() {
     const [rooms, setRooms] = useState([]);
@@ -81,31 +81,33 @@ function RoomSchedules() {
     };
 
     const exportToExcel = () => {
-        if (!rooms || rooms.length === 0) {
-            alert("No data to export");
-            return;
-        }
+        // Combine the main header and the data
+        const fullDataToExport = [...rooms]; // Wrap mainHeader in an array to make it a separate row
 
-        const exportData = rooms.flatMap(room =>
-            room.schedules.map(schedule => ({
-                Room: room.room_name,
-                Day: schedule.day,
-                "Descriptive Title": schedule.descriptive_title,
-                "Start Time": convertToAMPM(schedule.start_time),
-                "End Time": convertToAMPM(schedule.end_time),
-                "Faculty": formatFullName(schedule),
-                "Class Code": schedule.class_code,
-            }))
-        );
+        // Convert to worksheet
+        const ws = utils.json_to_sheet(fullDataToExport);
 
-        const worksheet = XLSX.utils.json_to_sheet(exportData);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Schedules");
+        // Set the column widths
+        const columnWidths = [
+            { wch: 14 }, // Class Code
+            { wch: 14 }, // Subject Code
+            { wch: 30 }, // Descriptive Title
+            { wch: 12 }, // Day
+            { wch: 20 }, // Time
+            { wch: 12 }, // Room
+            { wch: 30 }, // Instructor
+        ];
 
-        const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-        const excelBlob = new Blob([excelBuffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+        ws['!cols'] = columnWidths; // Apply the column widths
 
-        saveAs(excelBlob, "Room_Schedules.xlsx");
+        // Create a new workbook and append the worksheet
+        const wb = utils.book_new();
+        utils.book_append_sheet(wb, ws, "Classes");
+
+        // File name for download
+        const fileName = `rooms.xlsx`;
+
+        writeFile(wb, fileName); // Write the file
     };
 
     if (fetching) return <PreLoader />;
@@ -116,7 +118,6 @@ function RoomSchedules() {
                 Rooms
             </h1>
             <div className="flex gap-4">
-
                 <div className='flex shadow-sm rounded-md'>
                     {/* View Mode Selection */}
                     <button
@@ -202,7 +203,7 @@ function RoomSchedules() {
                     className="w-full p-4 bg-white rounded-lg space-y-4 border border-gray-300"
                 >
                     <h1 className="text-4xl tracking-wide border-b-2 border-gray-300 pb-2">
-                        <span className="text-blue-700 font-bold">{room.room_name}</span>{" "}
+                        <span className={`${colorful && 'text-blue-700'} font-bold`}>{room.room_name}</span>{" "}
                         <span className="text-gray-800">
                             ({room.schedules.length} classes)
                         </span>
@@ -221,7 +222,7 @@ function RoomSchedules() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {room.schedules.length > 0 ? (
+                                    {room.schedules.length > 0 ? (
                                     room.schedules.map((room, index) => {
                                         return (
                                             <React.Fragment key={index}>

@@ -109,7 +109,7 @@ function Schedule({ data, colorful }) {
                         {/* Time Column */}
                         <div
                             key={`time-${rowIndex}`}
-                            className="font-medium flex items-center justify-center border border-l-0 border-b-0 border-t-black border-r-black bg-[#fff2cc]"
+                            className={`font-medium flex items-center justify-center border border-l-0 border-b-0 border-t-black border-r-black ${colorful && 'bg-[#fff2cc]'} `}
                             style={{
                                 gridColumn: "1 / 2", // Time column
                                 gridRow: rowIndex + 2, // Align with rows
@@ -165,27 +165,27 @@ function Schedule({ data, colorful }) {
                     { day: secondaryDay, start_time: secondaryStartTime, end_time: secondaryEndTime }
                 );
 
-                if (day == "TBA" || start_time == "TBA") return;
-
                 return (
                     <React.Fragment key={`${class_code}-first-${index}`}>
-                        <div
-                            className={`${isConflict ? "bg-red-600 bg-opacity-50 text-white" : `${!colorful ? 'bg-white opacity-90 ring-1 ring-gray-400' : `${color}`}`} m-[2px] text-center text-sm flex flex-col items-center justify-center font-medium rounded-md p-1`}
-                            style={{
-                                gridRow: `${rowStart} / ${rowEnd}`,
-                                gridColumn: `${colStart} / ${colStart + 1}`,
-                            }}
-                        >
-                            <span>{class_code || ''}</span>
-                            <span>{descriptive_title}</span>
-                            <span>{room_name || ""}</span>
-                            <span>{first_name ? formatFullName(classData) : ""}</span>
-                            {student_count &&
-                                <span className="flex items-center justify-center"><PiStudent /> {student_count}</span>
-                            }
-                        </div>
+                        {(day != "TBA" || start_time != "TBA") &&
+                            <div
+                                className={`${isConflict ? "bg-red-600 bg-opacity-50 text-white" : `${!colorful ? 'bg-white opacity-90 ring-1 ring-gray-400' : `${color}`}`} m-[2px] text-center text-sm flex flex-col items-center justify-center font-medium rounded-md p-1`}
+                                style={{
+                                    gridRow: `${rowStart} / ${rowEnd}`,
+                                    gridColumn: `${colStart} / ${colStart + 1}`,
+                                }}
+                            >
+                                <span>{class_code || ''}</span>
+                                <span>{descriptive_title}</span>
+                                <span>{room_name || ""}</span>
+                                <span>{first_name ? formatFullName(classData) : ""}</span>
+                                {student_count &&
+                                    <span className="flex items-center justify-center"><PiStudent /> {student_count}</span>
+                                }
+                            </div>
+                        }
 
-                        {secondarySchedule && (
+                        {(secondarySchedule && (secondaryDay != "TBA" || secondaryStartTime != "TBA")) && (
                             <div
                                 key={`${class_code}-secondary`}
                                 className={`${secondaryIsConflict ? "bg-red-600 bg-opacity-50 text-white" : `${!colorful ? 'bg-white opacity-90 ring-1 ring-gray-400' : color}`} m-[2px] text-center text-sm flex flex-col items-center justify-center font-medium rounded-md p-1`}
@@ -198,7 +198,7 @@ function Schedule({ data, colorful }) {
                                 <span>{descriptive_title}</span>
                                 <span>{secondaryRoomName || ""}</span>
                                 <span>{first_name ? formatFullName(classData) : ""}</span>
-                                {student_count && 
+                                {student_count &&
                                     <span className="flex items-center justify-center"><PiStudent /> {student_count}</span>
                                 }
                             </div>
