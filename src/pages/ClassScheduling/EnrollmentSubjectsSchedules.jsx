@@ -106,7 +106,7 @@ function EnrollmentSubjectsSchedules() {
 
                         return (
                             <option key={subject.id} value={subject.id}>
-                                {formatFullName(subject)} ({subject.schedules.length + secondaryCount} classes)
+                                {subject.descriptive_title} ({subject.schedules.length + secondaryCount})
                             </option>
                         );
                     })}

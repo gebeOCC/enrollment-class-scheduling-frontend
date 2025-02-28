@@ -146,7 +146,7 @@ function RoomSchedules() {
                     <option value="all">All Rooms</option>
                     {rooms.map((room) => (
                         <option key={room.id} value={room.id}>
-                            {room.room_name} ({room.schedules.length} classes)
+                            {room.room_name} ({room.schedules.length})
                         </option>
                     ))}
                 </select>

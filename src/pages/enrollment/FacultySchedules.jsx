@@ -154,7 +154,7 @@ function FacultySchedules() {
 
                         return (
                             <option key={faculty.id} value={faculty.id}>
-                                {formatFullName(faculty)} ({faculty.schedules.length + secondaryCount} classes)
+                                {formatFullName(faculty)} ({faculty.schedules.length + secondaryCount})
                             </option>
                         );
                     })}
